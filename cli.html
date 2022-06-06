@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command Line Interface Reference &mdash; corgi 0.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Credits" href="credits.html" />
+    <link rel="prev" title="API Reference" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> corgi
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Interface Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#corgi">corgi</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#corgi-bibliography">bibliography</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi-bibtex">bibtex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi-infer">infer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi-show-batch">show-batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi-train">train</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi-tune">tune</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi-validate">validate</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">corgi</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Command Line Interface Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cli.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="command-line-interface-reference">
+<h1>Command Line Interface Reference<a class="headerlink" href="#command-line-interface-reference" title="Permalink to this headline"></a></h1>
+<section id="corgi">
+<h2>corgi<a class="headerlink" href="#corgi" title="Permalink to this headline"></a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>corgi <span class="o">[</span>OPTIONS<span class="o">]</span> COMMAND <span class="o">[</span>ARGS<span class="o">]</span>...
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-v">
+<span id="cmdoption-corgi-version"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--version</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-v" title="Permalink to this definition"></a></dt>
+<dd><p>Prints the current version.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-install-completion">
+<span class="sig-name descname"><span class="pre">--install-completion</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;install_completion&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-install-completion" title="Permalink to this definition"></a></dt>
+<dd><p>Install completion for the specified shell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Options</dt>
+<dd class="field-odd"><p>bash | zsh | fish | powershell | pwsh</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-show-completion">
+<span class="sig-name descname"><span class="pre">--show-completion</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;show_completion&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-show-completion" title="Permalink to this definition"></a></dt>
+<dd><p>Show completion for the specified shell, to copy it or customize the installation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Options</dt>
+<dd class="field-odd"><p>bash | zsh | fish | powershell | pwsh</p>
+</dd>
+</dl>
+</dd></dl>
+
+<section id="corgi-bibliography">
+<h3>bibliography<a class="headerlink" href="#corgi-bibliography" title="Permalink to this headline"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>corgi bibliography <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+</section>
+<section id="corgi-bibtex">
+<h3>bibtex<a class="headerlink" href="#corgi-bibtex" title="Permalink to this headline"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>corgi bibtex <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+</section>
+<section id="corgi-infer">
+<h3>infer<a class="headerlink" href="#corgi-infer" title="Permalink to this headline"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>corgi infer <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-infer-pretrained">
+<span class="sig-name descname"><span class="pre">--pretrained</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;pretrained&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-infer-pretrained" title="Permalink to this definition"></a></dt>
+<dd><p>The location (URL or filepath) of a pretrained model.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-infer-reload">
+<span id="cmdoption-corgi-infer-no-reload"></span><span class="sig-name descname"><span class="pre">--reload</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-reload</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-infer-reload" title="Permalink to this definition"></a></dt>
+<dd><p>Should the pretrained model be downloaded again if it is online and already present locally.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="corgi-show-batch">
+<h3>show-batch<a class="headerlink" href="#corgi-show-batch" title="Permalink to this headline"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>corgi show-batch <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-show-batch-csv">
+<span class="sig-name descname"><span class="pre">--csv</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;csv&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-show-batch-csv" title="Permalink to this definition"></a></dt>
+<dd><p>The CSV which has the sequences to use.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-show-batch-base-dir">
+<span class="sig-name descname"><span class="pre">--base-dir</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;base_dir&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-show-batch-base-dir" title="Permalink to this definition"></a></dt>
+<dd><p>The base directory with the RefSeq HDF5 files.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-show-batch-batch-size">
+<span class="sig-name descname"><span class="pre">--batch-size</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;batch_size&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-show-batch-batch-size" title="Permalink to this definition"></a></dt>
+<dd><p>The batch size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>32</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="corgi-train">
+<h3>train<a class="headerlink" href="#corgi-train" title="Permalink to this headline"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>corgi train <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-distributed">
+<span id="cmdoption-corgi-train-no-distributed"></span><span class="sig-name descname"><span class="pre">--distributed</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-distributed</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-train-distributed" title="Permalink to this definition"></a></dt>
+<dd><p>If the learner is distributed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-fp16">
+<span id="cmdoption-corgi-train-no-fp16"></span><span class="sig-name descname"><span class="pre">--fp16</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-fp16</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-train-fp16" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not the floating-point precision of learner should be set to 16 bit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-output-dir">
+<span class="sig-name descname"><span class="pre">--output-dir</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;output_dir&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-output-dir" title="Permalink to this definition"></a></dt>
+<dd><p>The location of the output directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>./outputs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-csv">
+<span class="sig-name descname"><span class="pre">--csv</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;csv&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-csv" title="Permalink to this definition"></a></dt>
+<dd><p>The CSV which has the sequences to use.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-base-dir">
+<span class="sig-name descname"><span class="pre">--base-dir</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;base_dir&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-base-dir" title="Permalink to this definition"></a></dt>
+<dd><p>The base directory with the RefSeq HDF5 files.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-batch-size">
+<span class="sig-name descname"><span class="pre">--batch-size</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;batch_size&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-batch-size" title="Permalink to this definition"></a></dt>
+<dd><p>The batch size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>32</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-embedding-dim">
+<span class="sig-name descname"><span class="pre">--embedding-dim</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;embedding_dim&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-embedding-dim" title="Permalink to this definition"></a></dt>
+<dd><p>The size of the embeddings for the nucleotides (N, A, G, C, T).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>16</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-filters">
+<span class="sig-name descname"><span class="pre">--filters</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;filters&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-filters" title="Permalink to this definition"></a></dt>
+<dd><p>The number of filters in each of the 1D convolution layers. These are concatenated together</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>256</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-cnn-layers">
+<span class="sig-name descname"><span class="pre">--cnn-layers</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;cnn_layers&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-cnn-layers" title="Permalink to this definition"></a></dt>
+<dd><p>The number of 1D convolution layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>6</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-kernel-size-maxpool">
+<span class="sig-name descname"><span class="pre">--kernel-size-maxpool</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;kernel_size_maxpool&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-kernel-size-maxpool" title="Permalink to this definition"></a></dt>
+<dd><p>The size of the pooling before going to the LSTM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-lstm-dims">
+<span class="sig-name descname"><span class="pre">--lstm-dims</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;lstm_dims&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-lstm-dims" title="Permalink to this definition"></a></dt>
+<dd><p>The size of the hidden layers in the LSTM in both directions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>256</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-final-layer-dims">
+<span class="sig-name descname"><span class="pre">--final-layer-dims</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;final_layer_dims&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-final-layer-dims" title="Permalink to this definition"></a></dt>
+<dd><p>The size of a dense layer after the LSTM. If this is zero then this layer isn’t used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>0</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-dropout">
+<span class="sig-name descname"><span class="pre">--dropout</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;dropout&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-dropout" title="Permalink to this definition"></a></dt>
+<dd><p>The amount of dropout to use. (not currently enabled)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>0.5</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-epochs">
+<span class="sig-name descname"><span class="pre">--epochs</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;epochs&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-epochs" title="Permalink to this definition"></a></dt>
+<dd><p>The number of epochs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>20</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-freeze-epochs">
+<span class="sig-name descname"><span class="pre">--freeze-epochs</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;freeze_epochs&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-freeze-epochs" title="Permalink to this definition"></a></dt>
+<dd><p>The number of epochs to train when the learner is frozen and the last layer is trained by itself. Only if <cite>fine_tune</cite> is set on the app.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-learning-rate">
+<span class="sig-name descname"><span class="pre">--learning-rate</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;learning_rate&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-learning-rate" title="Permalink to this definition"></a></dt>
+<dd><p>The base learning rate (when fine tuning) or the max learning rate otherwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>0.0001</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-project-name">
+<span class="sig-name descname"><span class="pre">--project-name</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;project_name&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-project-name" title="Permalink to this definition"></a></dt>
+<dd><p>The name for this project for logging purposes.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-run-name">
+<span class="sig-name descname"><span class="pre">--run-name</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;run_name&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-run-name" title="Permalink to this definition"></a></dt>
+<dd><p>The name for this particular run for logging purposes.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-notes">
+<span class="sig-name descname"><span class="pre">--notes</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;notes&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-notes" title="Permalink to this definition"></a></dt>
+<dd><p>A longer description of the run for logging purposes.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-tag">
+<span class="sig-name descname"><span class="pre">--tag</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;tag&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-tag" title="Permalink to this definition"></a></dt>
+<dd><p>A tag for logging purposes. Multiple tags can be added each introduced with –tag.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-wandb">
+<span id="cmdoption-corgi-train-no-wandb"></span><span class="sig-name descname"><span class="pre">--wandb</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-wandb</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-train-wandb" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not to use ‘Weights and Biases’ for logging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-wandb-mode">
+<span class="sig-name descname"><span class="pre">--wandb-mode</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wandb_mode&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-wandb-mode" title="Permalink to this definition"></a></dt>
+<dd><p>The mode for ‘Weights and Biases’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>online</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-wandb-dir">
+<span class="sig-name descname"><span class="pre">--wandb-dir</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wandb_dir&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-wandb-dir" title="Permalink to this definition"></a></dt>
+<dd><p>The location for ‘Weights and Biases’ output.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-wandb-entity">
+<span class="sig-name descname"><span class="pre">--wandb-entity</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wandb_entity&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-wandb-entity" title="Permalink to this definition"></a></dt>
+<dd><p>An entity is a username or team name where you’re sending runs.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-wandb-group">
+<span class="sig-name descname"><span class="pre">--wandb-group</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wandb_group&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-wandb-group" title="Permalink to this definition"></a></dt>
+<dd><p>Specify a group to organize individual runs into a larger experiment.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-wandb-job-type">
+<span class="sig-name descname"><span class="pre">--wandb-job-type</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wandb_job_type&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-wandb-job-type" title="Permalink to this definition"></a></dt>
+<dd><p>Specify the type of run, which is useful when you’re grouping runs together into larger experiments using group.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-mlflow">
+<span id="cmdoption-corgi-train-no-mlflow"></span><span class="sig-name descname"><span class="pre">--mlflow</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-mlflow</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-train-mlflow" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not to use MLflow for logging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="corgi-tune">
+<h3>tune<a class="headerlink" href="#corgi-tune" title="Permalink to this headline"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>corgi tune <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-runs">
+<span class="sig-name descname"><span class="pre">--runs</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;runs&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-runs" title="Permalink to this definition"></a></dt>
+<dd><p>The number of runs to attempt to train the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-engine">
+<span class="sig-name descname"><span class="pre">--engine</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;engine&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-engine" title="Permalink to this definition"></a></dt>
+<dd><p>The optimizer to use to perform the hyperparameter tuning. Options: wandb, optuna, skopt.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>wandb</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-id">
+<span class="sig-name descname"><span class="pre">--id</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;id&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-id" title="Permalink to this definition"></a></dt>
+<dd><p>The ID of this hyperparameter tuning job. If using wandb, then this is the sweep id. If using optuna, then this is the storage. If using skopt, then this is the file to store the results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-name">
+<span class="sig-name descname"><span class="pre">--name</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;name&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-name" title="Permalink to this definition"></a></dt>
+<dd><p>An informative name for this hyperparameter tuning job. If empty, then it creates a name from the project name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-method">
+<span class="sig-name descname"><span class="pre">--method</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;method&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-method" title="Permalink to this definition"></a></dt>
+<dd><p>The sampling method to use to perform the hyperparameter tuning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>random</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-min-iter">
+<span class="sig-name descname"><span class="pre">--min-iter</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;min_iter&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-min-iter" title="Permalink to this definition"></a></dt>
+<dd><p>The minimum number of iterations if using early termination. If left empty, then early termination is not used.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-seed">
+<span class="sig-name descname"><span class="pre">--seed</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;seed&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-seed" title="Permalink to this definition"></a></dt>
+<dd><p>A seed for the random number generator.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-distributed">
+<span id="cmdoption-corgi-tune-no-distributed"></span><span class="sig-name descname"><span class="pre">--distributed</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-distributed</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-tune-distributed" title="Permalink to this definition"></a></dt>
+<dd><p>If the learner is distributed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-fp16">
+<span id="cmdoption-corgi-tune-no-fp16"></span><span class="sig-name descname"><span class="pre">--fp16</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-fp16</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-tune-fp16" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not the floating-point precision of learner should be set to 16 bit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-output-dir">
+<span class="sig-name descname"><span class="pre">--output-dir</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;output_dir&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-output-dir" title="Permalink to this definition"></a></dt>
+<dd><p>The location of the output directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>./outputs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-csv">
+<span class="sig-name descname"><span class="pre">--csv</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;csv&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-csv" title="Permalink to this definition"></a></dt>
+<dd><p>The CSV which has the sequences to use.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-base-dir">
+<span class="sig-name descname"><span class="pre">--base-dir</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;base_dir&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-base-dir" title="Permalink to this definition"></a></dt>
+<dd><p>The base directory with the RefSeq HDF5 files.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-batch-size">
+<span class="sig-name descname"><span class="pre">--batch-size</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;batch_size&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-batch-size" title="Permalink to this definition"></a></dt>
+<dd><p>The batch size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>32</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-embedding-dim">
+<span class="sig-name descname"><span class="pre">--embedding-dim</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;embedding_dim&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-embedding-dim" title="Permalink to this definition"></a></dt>
+<dd><p>The size of the embeddings for the nucleotides (N, A, G, C, T).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>16</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-filters">
+<span class="sig-name descname"><span class="pre">--filters</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;filters&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-filters" title="Permalink to this definition"></a></dt>
+<dd><p>The number of filters in each of the 1D convolution layers. These are concatenated together</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>256</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-cnn-layers">
+<span class="sig-name descname"><span class="pre">--cnn-layers</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;cnn_layers&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-cnn-layers" title="Permalink to this definition"></a></dt>
+<dd><p>The number of 1D convolution layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>6</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-kernel-size-maxpool">
+<span class="sig-name descname"><span class="pre">--kernel-size-maxpool</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;kernel_size_maxpool&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-kernel-size-maxpool" title="Permalink to this definition"></a></dt>
+<dd><p>The size of the pooling before going to the LSTM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-lstm-dims">
+<span class="sig-name descname"><span class="pre">--lstm-dims</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;lstm_dims&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-lstm-dims" title="Permalink to this definition"></a></dt>
+<dd><p>The size of the hidden layers in the LSTM in both directions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>256</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-final-layer-dims">
+<span class="sig-name descname"><span class="pre">--final-layer-dims</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;final_layer_dims&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-final-layer-dims" title="Permalink to this definition"></a></dt>
+<dd><p>The size of a dense layer after the LSTM. If this is zero then this layer isn’t used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>0</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-dropout">
+<span class="sig-name descname"><span class="pre">--dropout</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;dropout&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-dropout" title="Permalink to this definition"></a></dt>
+<dd><p>The amount of dropout to use. (not currently enabled)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>0.5</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-epochs">
+<span class="sig-name descname"><span class="pre">--epochs</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;epochs&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-epochs" title="Permalink to this definition"></a></dt>
+<dd><p>The number of epochs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>20</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-freeze-epochs">
+<span class="sig-name descname"><span class="pre">--freeze-epochs</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;freeze_epochs&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-freeze-epochs" title="Permalink to this definition"></a></dt>
+<dd><p>The number of epochs to train when the learner is frozen and the last layer is trained by itself. Only if <cite>fine_tune</cite> is set on the app.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-learning-rate">
+<span class="sig-name descname"><span class="pre">--learning-rate</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;learning_rate&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-learning-rate" title="Permalink to this definition"></a></dt>
+<dd><p>The base learning rate (when fine tuning) or the max learning rate otherwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>0.0001</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-project-name">
+<span class="sig-name descname"><span class="pre">--project-name</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;project_name&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-project-name" title="Permalink to this definition"></a></dt>
+<dd><p>The name for this project for logging purposes.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-run-name">
+<span class="sig-name descname"><span class="pre">--run-name</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;run_name&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-run-name" title="Permalink to this definition"></a></dt>
+<dd><p>The name for this particular run for logging purposes.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-notes">
+<span class="sig-name descname"><span class="pre">--notes</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;notes&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-notes" title="Permalink to this definition"></a></dt>
+<dd><p>A longer description of the run for logging purposes.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-tag">
+<span class="sig-name descname"><span class="pre">--tag</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;tag&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-tag" title="Permalink to this definition"></a></dt>
+<dd><p>A tag for logging purposes. Multiple tags can be added each introduced with –tag.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-wandb">
+<span id="cmdoption-corgi-tune-no-wandb"></span><span class="sig-name descname"><span class="pre">--wandb</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-wandb</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-tune-wandb" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not to use ‘Weights and Biases’ for logging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-wandb-mode">
+<span class="sig-name descname"><span class="pre">--wandb-mode</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wandb_mode&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-wandb-mode" title="Permalink to this definition"></a></dt>
+<dd><p>The mode for ‘Weights and Biases’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>online</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-wandb-dir">
+<span class="sig-name descname"><span class="pre">--wandb-dir</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wandb_dir&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-wandb-dir" title="Permalink to this definition"></a></dt>
+<dd><p>The location for ‘Weights and Biases’ output.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-wandb-entity">
+<span class="sig-name descname"><span class="pre">--wandb-entity</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wandb_entity&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-wandb-entity" title="Permalink to this definition"></a></dt>
+<dd><p>An entity is a username or team name where you’re sending runs.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-wandb-group">
+<span class="sig-name descname"><span class="pre">--wandb-group</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wandb_group&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-wandb-group" title="Permalink to this definition"></a></dt>
+<dd><p>Specify a group to organize individual runs into a larger experiment.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-wandb-job-type">
+<span class="sig-name descname"><span class="pre">--wandb-job-type</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wandb_job_type&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-wandb-job-type" title="Permalink to this definition"></a></dt>
+<dd><p>Specify the type of run, which is useful when you’re grouping runs together into larger experiments using group.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-mlflow">
+<span id="cmdoption-corgi-tune-no-mlflow"></span><span class="sig-name descname"><span class="pre">--mlflow</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-mlflow</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-tune-mlflow" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not to use MLflow for logging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="corgi-validate">
+<h3>validate<a class="headerlink" href="#corgi-validate" title="Permalink to this headline"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>corgi validate <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-validate-pretrained">
+<span class="sig-name descname"><span class="pre">--pretrained</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;pretrained&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-validate-pretrained" title="Permalink to this definition"></a></dt>
+<dd><p>The location (URL or filepath) of a pretrained model.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-validate-reload">
+<span id="cmdoption-corgi-validate-no-reload"></span><span class="sig-name descname"><span class="pre">--reload</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-reload</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-validate-reload" title="Permalink to this definition"></a></dt>
+<dd><p>Should the pretrained model be downloaded again if it is online and already present locally.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="credits.html" class="btn btn-neutral float-right" title="Credits" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Robert Turnbull.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
