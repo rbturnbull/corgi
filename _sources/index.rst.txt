@@ -6,16 +6,18 @@
 Welcome to corgi's documentation!
 ===========================================================
 
+.. image:: https://raw.githubusercontent.com/rbturnbull/corgi/main/docs/images/corgi-banner.svg
+
 .. include:: ../README.rst
    :start-after: start-badges
    :end-before: end-badges
 
-Classifier for ORganelle Genomes
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   quickstart
    api
    cli
    credits

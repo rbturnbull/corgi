@@ -138,6 +138,17 @@
 </div>
 <p class="rubric">Options</p>
 <dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-infer-gpu">
+<span id="cmdoption-corgi-infer-no-gpu"></span><span class="sig-name descname"><span class="pre">--gpu</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-gpu</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-infer-gpu" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not to use a GPU for processing if available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-corgi-infer-pretrained">
 <span class="sig-name descname"><span class="pre">--pretrained</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;pretrained&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-infer-pretrained" title="Permalink to this definition"></a></dt>
 <dd><p>The location (URL or filepath) of a pretrained model.</p>
@@ -165,6 +176,12 @@
 <span class="sig-name descname"><span class="pre">--max-seqs</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;max_seqs&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-infer-max-seqs" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-infer-output-csv">
+<span class="sig-name descname"><span class="pre">--output-csv</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;output_csv&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-infer-output-csv" title="Permalink to this definition"></a></dt>
+<dd><p>A path to output the results as a CSV.</p>
+</dd></dl>
+
 </section>
 <section id="corgi-show-batch">
 <h3>show-batch<a class="headerlink" href="#corgi-show-batch" title="Permalink to this headline"></a></h3>
@@ -172,6 +189,12 @@
 </pre></div>
 </div>
 <p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-show-batch-output-path">
+<span class="sig-name descname"><span class="pre">--output-path</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;output_path&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-show-batch-output-path" title="Permalink to this definition"></a></dt>
+<dd><p>A location to save the HTML which summarizes the batch.</p>
+</dd></dl>
+
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-corgi-show-batch-csv">
 <span class="sig-name descname"><span class="pre">--csv</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;csv&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-show-batch-csv" title="Permalink to this definition"></a></dt>
@@ -191,6 +214,19 @@
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p>32</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-show-batch-dataloader-type">
+<span class="sig-name descname"><span class="pre">--dataloader-type</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;dataloader_type&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-show-batch-dataloader-type" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>DataloaderType.PLAIN</p>
+</dd>
+<dt class="field-even">Options</dt>
+<dd class="field-even"><p>PLAIN | WEIGHTED | STRATIFIED</p>
 </dd>
 </dl>
 </dd></dl>
@@ -254,6 +290,19 @@
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p>32</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-dataloader-type">
+<span class="sig-name descname"><span class="pre">--dataloader-type</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;dataloader_type&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-dataloader-type" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>DataloaderType.PLAIN</p>
+</dd>
+<dt class="field-even">Options</dt>
+<dd class="field-even"><p>PLAIN | WEIGHTED | STRATIFIED</p>
 </dd>
 </dl>
 </dd></dl>
@@ -331,6 +380,48 @@
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p>0.5</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-final-bias">
+<span id="cmdoption-corgi-train-no-final-bias"></span><span class="sig-name descname"><span class="pre">--final-bias</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-final-bias</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-train-final-bias" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not to use bias in the final layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-cnn-only">
+<span id="cmdoption-corgi-train-no-cnn-only"></span><span class="sig-name descname"><span class="pre">--cnn-only</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-cnn-only</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-train-cnn-only" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-kernel-size">
+<span class="sig-name descname"><span class="pre">--kernel-size</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;kernel_size&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-kernel-size" title="Permalink to this definition"></a></dt>
+<dd><p>The size of the kernels for CNN only classifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-train-cnn-dims-start">
+<span class="sig-name descname"><span class="pre">--cnn-dims-start</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;cnn_dims_start&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-train-cnn-dims-start" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>64</p>
 </dd>
 </dl>
 </dd></dl>
@@ -578,6 +669,19 @@
 </dd></dl>
 
 <dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-dataloader-type">
+<span class="sig-name descname"><span class="pre">--dataloader-type</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;dataloader_type&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-dataloader-type" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>DataloaderType.PLAIN</p>
+</dd>
+<dt class="field-even">Options</dt>
+<dd class="field-even"><p>PLAIN | WEIGHTED | STRATIFIED</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-corgi-tune-embedding-dim">
 <span class="sig-name descname"><span class="pre">--embedding-dim</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;embedding_dim&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-embedding-dim" title="Permalink to this definition"></a></dt>
 <dd><p>The size of the embeddings for the nucleotides (N, A, G, C, T).</p>
@@ -650,6 +754,48 @@
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p>0.5</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-final-bias">
+<span id="cmdoption-corgi-tune-no-final-bias"></span><span class="sig-name descname"><span class="pre">--final-bias</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-final-bias</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-tune-final-bias" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not to use bias in the final layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-cnn-only">
+<span id="cmdoption-corgi-tune-no-cnn-only"></span><span class="sig-name descname"><span class="pre">--cnn-only</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-cnn-only</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-tune-cnn-only" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-kernel-size">
+<span class="sig-name descname"><span class="pre">--kernel-size</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;kernel_size&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-kernel-size" title="Permalink to this definition"></a></dt>
+<dd><p>The size of the kernels for CNN only classifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-tune-cnn-dims-start">
+<span class="sig-name descname"><span class="pre">--cnn-dims-start</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;cnn_dims_start&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-tune-cnn-dims-start" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>64</p>
 </dd>
 </dl>
 </dd></dl>
@@ -776,6 +922,17 @@
 </div>
 <p class="rubric">Options</p>
 <dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-validate-gpu">
+<span id="cmdoption-corgi-validate-no-gpu"></span><span class="sig-name descname"><span class="pre">--gpu</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-gpu</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-corgi-validate-gpu" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not to use a GPU for processing if available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-corgi-validate-pretrained">
 <span class="sig-name descname"><span class="pre">--pretrained</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;pretrained&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-validate-pretrained" title="Permalink to this definition"></a></dt>
 <dd><p>The location (URL or filepath) of a pretrained model.</p>
@@ -793,15 +950,40 @@
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-corgi-validate-fasta">
-<span class="sig-name descname"><span class="pre">--fasta</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;fasta&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-validate-fasta" title="Permalink to this definition"></a></dt>
-<dd><p>A fasta file with sequences to be classified.</p>
+<dt class="sig sig-object std" id="cmdoption-corgi-validate-csv">
+<span class="sig-name descname"><span class="pre">--csv</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;csv&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-validate-csv" title="Permalink to this definition"></a></dt>
+<dd><p>The CSV which has the sequences to use.</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-corgi-validate-max-seqs">
-<span class="sig-name descname"><span class="pre">--max-seqs</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;max_seqs&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-validate-max-seqs" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object std" id="cmdoption-corgi-validate-base-dir">
+<span class="sig-name descname"><span class="pre">--base-dir</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;base_dir&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-validate-base-dir" title="Permalink to this definition"></a></dt>
+<dd><p>The base directory with the RefSeq HDF5 files.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-validate-batch-size">
+<span class="sig-name descname"><span class="pre">--batch-size</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;batch_size&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-validate-batch-size" title="Permalink to this definition"></a></dt>
+<dd><p>The batch size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>32</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-corgi-validate-dataloader-type">
+<span class="sig-name descname"><span class="pre">--dataloader-type</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;dataloader_type&gt;</span></span><a class="headerlink" href="#cmdoption-corgi-validate-dataloader-type" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>DataloaderType.PLAIN</p>
+</dd>
+<dt class="field-even">Options</dt>
+<dd class="field-even"><p>PLAIN | WEIGHTED | STRATIFIED</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 </section>
