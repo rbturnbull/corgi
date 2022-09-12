@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for corgi/models.py: 60.63%</title>
+    <title>Coverage for corgi/models.py: 59.69%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
@@ -18,13 +18,13 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>corgi/models.py</b> :
-            <span class="pc_cov">60.63%</span>
+            <span class="pc_cov">59.69%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
-            127 statements &nbsp;
+            129 statements &nbsp;
             <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">77 run</button>
-            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">50 missing</button>
+            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">52 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">0 excluded</button>
         </h2>
     </div>
@@ -384,20 +384,21 @@
     <p id="t330" class="pln"><span class="n"><a href="#t330">330</a></span><span class="t">            <span class="com"># [0,:,:] and [1,:,:]</span>&nbsp;</span><span class="r"></span></p>
     <p id="t331" class="pln"><span class="n"><a href="#t331">331</a></span><span class="t">            <span class="com"># [0,:,:] -> considers the first index from the first dimension</span>&nbsp;</span><span class="r"></span></p>
     <p id="t332" class="mis show_mis"><span class="n"><a href="#t332">332</a></span><span class="t">            <span class="nam">x</span> <span class="op">=</span> <span class="nam">torch</span><span class="op">.</span><span class="nam">cat</span><span class="op">(</span><span class="op">(</span><span class="nam">h_n</span><span class="op">[</span><span class="num">0</span><span class="op">,</span> <span class="op">:</span><span class="op">,</span> <span class="op">:</span><span class="op">]</span><span class="op">,</span> <span class="nam">h_n</span><span class="op">[</span><span class="num">1</span><span class="op">,</span> <span class="op">:</span><span class="op">,</span> <span class="op">:</span><span class="op">]</span><span class="op">)</span><span class="op">,</span> <span class="nam">dim</span><span class="op">=</span><span class="op">-</span><span class="num">1</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t333" class="pln"><span class="n"><a href="#t333">333</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t333" class="mis show_mis"><span class="n"><a href="#t333">333</a></span><span class="t">        <span class="key">elif</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">x</span><span class="op">,</span> <span class="str">'average_pool'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t334" class="mis show_mis"><span class="n"><a href="#t334">334</a></span><span class="t">            <span class="nam">x</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">average_pool</span><span class="op">(</span><span class="nam">x</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t335" class="mis show_mis"><span class="n"><a href="#t335">335</a></span><span class="t">            <span class="nam">x</span> <span class="op">=</span> <span class="nam">torch</span><span class="op">.</span><span class="nam">flatten</span><span class="op">(</span><span class="nam">x</span><span class="op">,</span> <span class="num">1</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t336" class="pln"><span class="n"><a href="#t336">336</a></span><span class="t">            <span class="com"># x = torch.mean(x, axis=-1)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t337" class="pln"><span class="n"><a href="#t337">337</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t338" class="mis show_mis"><span class="n"><a href="#t338">338</a></span><span class="t">        <span class="nam">predictions</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">final</span><span class="op">(</span><span class="nam">x</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t339" class="pln"><span class="n"><a href="#t339">339</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t340" class="mis show_mis"><span class="n"><a href="#t340">340</a></span><span class="t">        <span class="key">return</span> <span class="nam">predictions</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t336" class="pln"><span class="n"><a href="#t336">336</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t337" class="mis show_mis"><span class="n"><a href="#t337">337</a></span><span class="t">            <span class="nam">x</span> <span class="op">=</span> <span class="nam">torch</span><span class="op">.</span><span class="nam">mean</span><span class="op">(</span><span class="nam">x</span><span class="op">,</span> <span class="nam">axis</span><span class="op">=</span><span class="op">-</span><span class="num">1</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t338" class="pln"><span class="n"><a href="#t338">338</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t339" class="mis show_mis"><span class="n"><a href="#t339">339</a></span><span class="t">        <span class="nam">predictions</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">final</span><span class="op">(</span><span class="nam">x</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t340" class="pln"><span class="n"><a href="#t340">340</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t341" class="mis show_mis"><span class="n"><a href="#t341">341</a></span><span class="t">        <span class="key">return</span> <span class="nam">predictions</span>&nbsp;</span><span class="r"></span></p>
 </div>
 <div id="footer">
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.5</a>,
-            created at 2022-09-12 14:31 +0000
+            created at 2022-09-12 14:32 +0000
         </p>
     </div>
 </div>
