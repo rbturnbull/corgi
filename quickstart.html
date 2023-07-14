@@ -30,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> corgi
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            corgi
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -65,8 +69,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Quickstart</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Quickstart</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/quickstart.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -81,7 +85,7 @@
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
 <p>The software can be installed using <code class="docutils literal notranslate"><span class="pre">pip</span></code></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install bio-corgi
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>bio-corgi
 </pre></div>
 </div>
 <div class="admonition warning">
@@ -89,7 +93,7 @@
 <p>Do not try just <cite>pip install corgi</cite> because that is a different package.</p>
 </div>
 <p>To install the latest version from the repository, you can use this command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install git+https://github.com/rbturnbull/corgi.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/rbturnbull/corgi.git
 </pre></div>
 </div>
 <div class="admonition note">
@@ -100,15 +104,16 @@
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
 <p>To make predictions, run the <code class="docutils literal notranslate"><span class="pre">corgi</span></code> command line tool:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>corgi infer --pretrained &lt;model pickle file&gt; --fasta &lt;input fasta file&gt; --output-csv &lt;results&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>corgi<span class="w"> </span>--file<span class="w"> </span>&lt;input<span class="w"> </span>seq<span class="w"> </span>file&gt;
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Soon models will be able to be automatically downloaded by corgi.</p>
-</div>
+<p>This will create a directory with the predictions in a CSV file and in fasta format.</p>
 <p>For more information about the other options, see the help with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>corgi --help
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>corgi<span class="w"> </span>--help
+</pre></div>
+</div>
+<p>For help on training a model with corgi, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>corgi-train<span class="w"> </span>--help
 </pre></div>
 </div>
 </section>
