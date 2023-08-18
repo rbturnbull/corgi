@@ -11,6 +11,8 @@ from rich.console import Console
 from rich.table import Table
 from rich.box import SIMPLE
 from Bio import SeqIO
+from Bio.SeqIO import FastaIO
+
 import time
 
 from fastai.losses import CrossEntropyLossFlat
@@ -266,6 +268,8 @@ class Corgi(ta.TorchApp):
 
         # Write all the sequences to fasta files
         if save_filtered:
+            record_to_string = FastaIO.as_fasta
+
             output_dir.mkdir(parents=True, exist_ok=True)
             
             file_handles = {}
@@ -288,9 +292,9 @@ class Corgi(ta.TorchApp):
                     if category not in file_handles:
                         file_path = output_dir / f"{category}.fasta"
                         file_handles[category] = open(file_path, "w")
-                        console.print(f"Writing {category} sequences to: {file_path}")
 
-                    SeqIO.write(record, file_handles[category], "fasta")
+                    file_handle = file_handles[category]
+                    file_handle.write(record_to_string(record))
 
             for file_handle in file_handles.values():
                 file_handle.close()
