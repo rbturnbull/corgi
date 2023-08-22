@@ -1,0 +1,77 @@
+LOCUS       NC_010663               1066 bp    RNA     linear   VRL 13-AUG-2018
+DEFINITION  Heliothis armigera cypovirus 5 segment 9, complete sequence.
+ACCESSION   NC_010663
+VERSION     NC_010663.1
+DBLINK      BioProject: PRJNA485481
+KEYWORDS    RefSeq.
+SOURCE      Cypovirus 5 (Heliothis armigera cytoplasmic polyhedrosis virus 5)
+  ORGANISM  Cypovirus 5
+            Viruses; Riboviria; Orthornavirae; Duplornaviricota;
+            Resentoviricetes; Reovirales; Spinareoviridae; Cypovirus.
+REFERENCE   1  (bases 1 to 1066)
+  AUTHORS   Tan,L., Zhang,J., Li,Y., Li,Y., Jiang,H., Cao,X. and Hu,Y.
+  TITLE     The complete nucleotide sequence of the type 5 Helicoverpa armigera
+            cytoplasmic polyhedrosis virus genome
+  JOURNAL   Virus Genes 36 (3), 587-593 (2008)
+   PUBMED   18368473
+REFERENCE   2  (bases 1 to 1066)
+  AUTHORS   Li,Y. and Hu,Y.
+  TITLE     Heliothis armigera cytoplasmic polyhedrosis virus 5 segment 9
+  JOURNAL   Unpublished
+REFERENCE   3  (bases 1 to 1066)
+  CONSRTM   NCBI Genome Project
+  TITLE     Direct Submission
+  JOURNAL   Submitted (08-MAY-2008) National Center for Biotechnology
+            Information, NIH, Bethesda, MD 20894, USA
+REFERENCE   4  (bases 1 to 1066)
+  AUTHORS   Li,Y. and Hu,Y.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (24-AUG-2005) Microbiology, College of Life Sciences,
+            Wuhan University, Wuhan, Hubei 430072, China
+COMMENT     PROVISIONAL REFSEQ: This record has not yet been subject to final
+            NCBI review. The reference sequence was derived from DQ178179.
+            COMPLETENESS: full length.
+FEATURES             Location/Qualifiers
+     source          1..1066
+                     /organism="Cypovirus 5"
+                     /mol_type="genomic RNA"
+                     /host="Heliothis armigera"
+                     /db_xref="taxon:205899"
+                     /segment="9"
+                     /country="China"
+                     /synonym="Heliothis armigera cytoplasmic polyhedrosis
+                     virus 5"
+     gene            70..975
+                     /locus_tag="HaCPV_s9gp1"
+                     /db_xref="GeneID:6276360"
+     CDS             70..975
+                     /locus_tag="HaCPV_s9gp1"
+                     /codon_start=1
+                     /product="non-structural protein"
+                     /protein_id="YP_001883316.1"
+                     /db_xref="GeneID:6276360"
+                     /translation="MLSACMVEIRRPKLTENNERIPGQFDTIKGLQVPAVAKLVAKVN
+                     ERQGEFSKVGISREQRKLIWCDSGLMLCAINRGDILYRENDENERKKQEYGRMMSEAV
+                     TGEEDAPASRLGMACLLRIKWEEGANEILDELDDSLEEVCESIKLAKNDISELEKYIK
+                     FEKRYETTRFCNDVRFILSGKMLRGNGVKLPLLRYLYEDCSLKQILMEGNVNQILSES
+                     YVSIKKQSGKITKLVPTKIACKKTDKDLIVKLISKVRFYGTDISYPFIKKGFATVPVA
+                     YERETDWDVKPVLGSQTVLNYDEAY"
+ORIGIN      
+        1 agttttaaac ctctgatcga actccaaatt cgataaatct ttccgacaac ctaatacaaa
+       61 tttttcaaga tgctttccgc gtgtatggtc gaaatccgta gacccaaact taccgaaaat
+      121 aatgaaagaa ttccaggaca atttgacaca atcaaaggac ttcaagtacc agctgtggct
+      181 aaattagtag ctaaggtaaa cgagagacaa ggtgaatttt caaaagtggg tatatcaagg
+      241 gaacagcgta aattgatctg gtgtgattca ggattaatgt tgtgtgctat taatcgcgga
+      301 gatatattat atcgtgagaa tgatgaaaat gaaagaaaga aacaagagta tggaagaatg
+      361 atgtccgaag ctgtaactgg cgaagaagat gctcccgctt caagacttgg aatggcttgt
+      421 ttgttacgta ttaaatggga ggaaggtgcg aatgagattt tagacgagct tgatgacagt
+      481 ctagaagagg tatgtgagtc cataaaattg gcaaagaatg atatctcaga attggagaag
+      541 tacattaagt ttgaaaaacg atatgagaca acgagatttt gtaatgatgt aagattcatt
+      601 ttgagtggga aaatgctacg tggcaatggg gttaagttac cattgttaag atatttatat
+      661 gaagactgct cattaaagca gatattaatg gagggaaacg ttaatcaaat tctgagtgaa
+      721 tcgtatgtat cgattaagaa gcagtcgggt aaaataacca aattggtacc tacaaaaata
+      781 gcgtgtaaga aaacagacaa agatttaatt gttaagttaa tttcgaaagt tagattttat
+      841 ggtactgaca tatcttaccc gtttatcaag aaaggttttg cgactgtgcc tgtagcgtac
+      901 gagagagaga cagattggga tgtaaaacca gtattaggat cgcaaacagt tctgaattat
+      961 gatgaagcgt attaattatg gaaatgtcta ggatcggaag tattacgacg gaatgttgct
+     1021 tgatgtgtag gttggtgatg agggtttaac cccagaggtg aattgc

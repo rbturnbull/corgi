@@ -1,3 +1,4 @@
+from pathlib import Path
 import unittest
 import pandas as pd
 import numpy as np
@@ -6,6 +7,7 @@ from fastai.data.core import DataLoaders
 
 from corgi import dataloaders, tensor
 
+test_data = Path(__file__).parent / "testdata"
 
 def test_dataframe():
     data = [
@@ -85,3 +87,21 @@ class TestStratifiedDL(unittest.TestCase):
                 self.assertEqual( len(set(batch.numpy()) & set(group)), 1 )
 
         
+def test_create_seqbank_dataloaders():
+    dls = dataloaders.create_seqbank_dataloaders(
+        csv=test_data/"accessions.csv",
+        seqbank=test_data/"seqbank.h5",
+    )
+    assert isinstance(dls, DataLoaders)
+    assert isinstance(dls.valid, dataloaders.TfmdDL)
+    assert isinstance(dls.train, dataloaders.TfmdDL)
+    assert dls.n_inp == 1
+    assert dls.classification_tree.render_equal(
+        """
+        root
+        ├── Virus
+        ├── Eukaryota
+        ├── Plant
+        └── Bacteria
+        """        
+    )
