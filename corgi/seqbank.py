@@ -1,9 +1,13 @@
+from typing import Union
+import numpy as np
 from pathlib import Path
 import h5py
+from Bio.SeqRecord import SeqRecord
+from Bio import SeqIO
 from zlib import adler32
 from attrs import define
 
-from .tensor import TensorDNA
+from .tensor import TensorDNA, dna_seq_to_numpy
 
 class SeqBankError(Exception):
     pass
@@ -13,6 +17,7 @@ class SeqBankError(Exception):
 class SeqBank():
     path:Path
     read_h5:object = None
+    write_h5:object = None
     
     def __getstate__(self):
         # Only returns required elements
@@ -24,11 +29,40 @@ class SeqBank():
         accession_hash = str(adler32(accession.encode('ascii')))
         return f"/{accession_hash[-6:-3]}/{accession_hash[-3:]}/{accession}"
 
-    def __getitem__(self, accession:str) -> TensorDNA:
-        if not hasattr(self, 'read_h5'):
+    def get_read_h5(self):
+        if not self.read_h5:
             self.read_h5 = h5py.File(self.path, "r")
+        return self.read_h5
 
+    def __getitem__(self, accession:str) -> TensorDNA:
         try:
-            return self.read_h5[self.key(accession)]
+            key = self.key(accession)
+            file = self.get_read_h5()
+            return file[key][:]
         except Exception as err:
             raise SeqBankError(f"Failed to read {accession} in SeqBank {self.path}:\n{err}")
+
+    def __contains__(self, accession:str) -> bool:
+        return self.key(accession) in self.get_read_h5()
+
+    def add(self, seq:Union[str, SeqRecord, np.ndarray], accession:str):
+        if isinstance(seq, SeqRecord):
+            seq = str(seq.seq)
+        if isinstance(seq, str):
+            seq = dna_seq_to_numpy(seq)
+
+        if not self.write_h5:
+            self.write_h5 = h5py.File(self.path, "a")
+        
+        return self.write_h5.create_dataset(
+            self.key(accession),
+            data=seq,
+            dtype="u1",
+            compression="gzip",
+            compression_opts=9,
+        )
+
+    def add_file(self, path:Path, format="fasta"):
+        with open(path) as f:
+            for record in SeqIO.parse(f, format):
+                self.add(record.seq, record.id)
