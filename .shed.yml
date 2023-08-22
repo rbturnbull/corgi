@@ -1,0 +1,9 @@
+categories:
+- Machine Learning
+- Sequence Analysis
+description: Classifier of ORGanelles (Inter alia)
+homepage_url: https://rbturnbull.github.io/corgi/
+long_description: Classifies DNA sequences using deep learning.
+name: corgi
+owner: rturnbull
+remote_repository_url: https://github.com/rbturnbull/corgi
