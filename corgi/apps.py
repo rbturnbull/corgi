@@ -12,10 +12,9 @@ from rich.table import Table
 from rich.box import SIMPLE
 from Bio import SeqIO
 from Bio.SeqIO import FastaIO
+from polytorch import PolyLoss, HierarchicalData, CategoricalData, total_size
 
 import time
-
-from fastai.losses import CrossEntropyLossFlat
 
 console = Console()
 
@@ -37,8 +36,9 @@ class Corgi(ta.TorchApp):
 
     def dataloaders(
         self,
-        csv: Path = ta.Param(help="The CSV which has the sequences to use."),
-        base_dir: Path = ta.Param(help="The base directory with the RefSeq HDF5 files."),
+        csv: Path = ta.Param(help="The CSV which has the sequences to use. Required columns are 'accession', 'hierarchy', 'type', 'partition'."),
+        seqbank:Path = ta.Param(help="The HDF5 file with the sequences."),
+        validation_partition:int = ta.Param(default=0, help="The value to use for ."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
         dataloader_type: dataloaders.DataloaderType = ta.Param(
             default=dataloaders.DataloaderType.PLAIN, case_sensitive=False
@@ -55,17 +55,23 @@ class Corgi(ta.TorchApp):
         """
         if csv is None:
             raise Exception("No CSV given")
-        if base_dir is None:
-            raise Exception("No base_dir given")
-        dls = dataloaders.create_dataloaders_refseq_path(
+        if seqbank is None:
+            raise Exception("No seqbank given")
+
+        dls = dataloaders.create_seqbank_dataloaders(
             csv, 
-            base_dir=base_dir, 
+            seqbank=seqbank, 
             batch_size=batch_size, 
             dataloader_type=dataloader_type, 
             deform_lambda=deform_lambda, 
             validation_seq_length=validation_seq_length,
+            validation_partition=validation_partition,
         )
-        self.categories = dls.vocab
+        self.classification_tree = dls.classification_tree
+        self.output_types = [
+            HierarchicalData(root=self.classification_tree),
+            CategoricalData(4),
+        ]        
         return dls
 
     def model(
@@ -147,7 +153,9 @@ class Corgi(ta.TorchApp):
         Returns:
             nn.Module: The created model.
         """
-        num_classes = len(self.categories)
+        assert self.classification_tree
+
+        num_classes = total_size(self.output_types)
 
         # if cnn_dims_start not given then calculate it from the MACC
         if not cnn_dims_start:
@@ -164,50 +172,51 @@ class Corgi(ta.TorchApp):
                 num_classes=num_classes,
             )
 
-        if cnn_only:
-            return models.ConvClassifier(
-                num_embeddings=5,  # i.e. the size of the vocab which is N, A, C, G, T
-                kernel_size=kernel_size,
-                factor=factor,
-                cnn_layers=cnn_layers,
-                num_classes=num_classes,
-                kernel_size_maxpool=kernel_size_maxpool,
-                final_bias=final_bias,
-                dropout=dropout,
-                cnn_dims_start=cnn_dims_start,
-                penultimate_dims=penultimate_dims,
-                include_length=include_length,
-                transformer_layers=transformer_layers,
-                transformer_heads=transformer_heads,
-            )
-
-        return models.ConvRecurrantClassifier(
-            num_classes=num_classes,
-            embedding_dim=embedding_dim,
-            filters=filters,
+        return models.ConvClassifier(
+            num_embeddings=5,  # i.e. the size of the vocab which is N, A, C, G, T
+            kernel_size=kernel_size,
+            factor=factor,
             cnn_layers=cnn_layers,
-            lstm_dims=lstm_dims,
-            final_layer_dims=final_layer_dims,
-            dropout=dropout,
+            output_types=self.output_types,
             kernel_size_maxpool=kernel_size_maxpool,
             final_bias=final_bias,
+            dropout=dropout,
+            cnn_dims_start=cnn_dims_start,
+            penultimate_dims=penultimate_dims,
+            include_length=include_length,
+            transformer_layers=transformer_layers,
+            transformer_heads=transformer_heads,
         )
 
-    def metrics(self):
-        average = "macro"
-        return [
-            accuracy,
-            F1Score(average=average),
-            Precision(average=average),
-            Recall(average=average),
-            RocAuc(average=average),
-        ]
+        # return models.ConvRecurrantClassifier(
+        #     num_classes=num_classes,
+        #     embedding_dim=embedding_dim,
+        #     filters=filters,
+        #     cnn_layers=cnn_layers,
+        #     lstm_dims=lstm_dims,
+        #     final_layer_dims=final_layer_dims,
+        #     dropout=dropout,
+        #     kernel_size_maxpool=kernel_size_maxpool,
+        #     final_bias=final_bias,
+        # )
 
-    def monitor(self):
-        return "f1_score"
+    # def metrics(self):
+    #     return []
+    #     average = "macro"
+    #     return [
+    #         accuracy,
+    #         F1Score(average=average),
+    #         Precision(average=average),
+    #         Recall(average=average),
+    #         RocAuc(average=average),
+    #     ]
 
-    # def loss_func(self, label_smoothing:float=ta.Param(0.1, help="The amount of label smoothing.")):
-    #     return CrossEntropyLossFlat(label_smoothing=label_smoothing)
+    # def monitor(self):
+    #     return "f1_score"
+
+    def loss_func(self):
+        assert self.output_types
+        return PolyLoss(data_types=self.output_types, feature_axis=1)
 
     def inference_dataloader(
         self,

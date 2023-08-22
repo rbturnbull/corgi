@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
+from polytorch import split_tensor, total_size
 
 from rich.console import Console
 console = Console()
@@ -263,9 +264,10 @@ class ConvClassifier(nn.Module):
         self,
         embedding_dim=8,
         cnn_layers=6,
-        num_classes=5,
+        output_types=None,
         cnn_dims_start=64,
         kernel_size_maxpool=2,
+        return_penultimate:bool=False,
         num_embeddings=5,  # i.e. the size of the vocab which is N, A, C, G, T
         kernel_size=3,
         factor=2,
@@ -284,8 +286,9 @@ class ConvClassifier(nn.Module):
 
         self.embedding_dim = embedding_dim
         self.cnn_layers = cnn_layers
-        self.num_classes = num_classes
+        self.output_types = output_types
         self.kernel_size_maxpool = kernel_size_maxpool
+        self.return_penultimate = return_penultimate
 
         self.num_embeddings = num_embeddings
         self.kernel_size = kernel_size
@@ -352,13 +355,8 @@ class ConvClassifier(nn.Module):
         self.average_pool = nn.AdaptiveAvgPool1d(1)
 
         current_dims += int(include_length)
-        self.final = nn.Sequential(
-            # nn.Linear(in_features=current_dims, out_features=current_dims, bias=True),
-            # nn.ReLU(),
-            nn.Linear(in_features=current_dims, out_features=penultimate_dims, bias=True),
-            nn.ReLU(),
-            nn.Linear(in_features=penultimate_dims, out_features=num_classes, bias=final_bias),
-        )
+        self.penultimate = nn.Linear(in_features=current_dims, out_features=penultimate_dims, bias=True)
+        self.final = nn.Linear(in_features=penultimate_dims, out_features=total_size(self.output_types), bias=final_bias)
 
     def forward(self, x):
         # Convert to int because it may be simply a byte
@@ -394,19 +392,15 @@ class ConvClassifier(nn.Module):
             length_tensor = torch.full( (x.shape[0], 1), length/self.length_scaling, device=x.device )
             x = torch.cat([x, length_tensor], dim=1)
 
-        predictions = self.final(x)
+        penultimate_result = self.penultimate(x)
+        predictions = self.final(F.relu(penultimate_result))
 
-        return predictions
+        split_predictions = split_tensor(predictions, self.output_types, feature_axis=1)
 
-    def new_final(self, output_size):
-        final_in_features = list(self.final.modules())[1].in_features
-
-        self.final = nn.Sequential(
-            nn.Linear(in_features=final_in_features, out_features=final_in_features, bias=True),
-            nn.ReLU(),
-            nn.Linear(in_features=final_in_features, out_features=output_size, bias=final_bias),
-        )
-
+        if self.return_penultimate:
+            return split_predictions, penultimate_result
+    
+        return split_predictions
 
 class SequentialDebug(nn.Sequential):
     def forward(self, input):

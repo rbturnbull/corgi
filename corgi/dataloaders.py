@@ -2,6 +2,7 @@ import torch
 from enum import Enum
 import random
 from itertools import chain
+from attrs import define
 
 import gzip
 import pandas as pd
@@ -10,6 +11,8 @@ import numpy as np
 from rich.progress import track
 
 from Bio import SeqIO
+from fastcore.foundation import mask2idxs
+from fastai.data.transforms import IndexSplitter 
 
 from fastcore.foundation import L
 from fastcore.dispatch import typedispatch
@@ -20,25 +23,25 @@ from fastai.callback.data import WeightedDL
 from fastai.data.block import DataBlock, TransformBlock, CategoryBlock
 from fastai.torch_core import display_df
 from fastai.data.transforms import ColSplitter, ColReader, RandomSplitter
+from hierarchicalsoftmax import HierarchicalSoftmaxLoss, SoftmaxNode
 
-from .tensor import TensorDNA, dna_seq_to_numpy, dna_seq_to_tensor
-from .transforms import RandomSliceBatch, SliceTransform, RowToTensorDNA, PadBatchX, DeterministicSliceBatch, DeformBatch
-from .refseq import RefSeqCategory
+from .tensor import TensorDNA, dna_seq_to_tensor
+from .transforms import RandomSliceBatch, SliceTransform, GetTensorDNA, PadBatchX, DeterministicSliceBatch, DeformBatch
+from .hierarchy import create_hierarchy
+from .seqbank import SeqBank
+
+@define
+class AccessionDetail:
+    validation:bool
+    node_id:int
+    type:int
 
 
-def fasta_open(fasta_path):
-    if fasta_path.suffix == ".gz":
-        return gzip.open(fasta_path, "rt")
-    return open(fasta_path, "rt")
-
-
-def fasta_seq_count(fasta_path):
-    seq_count = 0
-    with fasta_open(fasta_path) as fasta:
-        for line in fasta:
-            if line.startswith(">"):
-                seq_count += 1
-    return seq_count
+def open_path(path:Path):
+    path = Path(path)
+    if path.suffix == ".gz":
+        return gzip.open(path, "rt")
+    return open(path, "rt")
 
 
 @delegates()
@@ -83,10 +86,6 @@ def show_batch(x: TensorDNA, y, samples, ctxs=None, max_n=20, trunc_at=150, **kw
     df = pd.DataFrame(ctxs, columns=["x", "y"])
     display_df(df)
     return ctxs
-
-
-def get_sequence_as_tensor(row):
-    return TensorDNA(row["sequence"])
 
 
 def create_datablock_refseq(categories, validation_column="validation", validation_prob=0.2, vocab=None) -> DataBlock:
@@ -134,46 +133,60 @@ class DataloaderType(str, Enum):
     STRATIFIED = "STRATIFIED"
 
 
-def create_dataloaders_refseq_path(
-    dataframe_path: Path, 
-    base_dir: Path, 
+class AccessionSplitter:
+    def __init__(self, accession_details:dict):
+        self.accession_details = accession_details
+
+    def __call__(self, objects):
+        validation_indexes = mask2idxs(self.accession_details[object].validation for object in objects)
+        return IndexSplitter(validation_indexes)(objects)
+
+
+class AccessionGetter():
+    def __init__(self, accession_details:dict, attribute:str):
+        self.accession_details = accession_details
+        self.attribute = attribute
+
+    def __call__(self, accession:str):
+        return getattr(self.accession_details[accession], self.attribute)
+
+
+def create_seqbank_dataloaders(
+    csv:Path, 
+    seqbank:Path, 
     batch_size:int=64, 
+    validation_partition:int=1,
     deform_lambda: float = None,
     validation_seq_length:int=1_000, 
+    verbose:bool=False,
+    label_smoothing:float=0.0,
+    gamma:float=0.0,
     **kwargs
 ):
-    dataframe_path = Path(dataframe_path)
+    seqbank = SeqBank(seqbank)
+    csv = Path(csv)
+    df = pd.read_csv(csv)
 
-    print('Training using:\t', dataframe_path)
-    if dataframe_path.suffix == ".parquet":
-        df = pd.read_parquet(str(dataframe_path), engine="pyarrow")
-    else:
-        df = pd.read_csv(str(dataframe_path))
-
-    print(f'Dataframe has {len(df)} sequences.')
-    dls = create_dataloaders_refseq(
-        df, 
-        batch_size=batch_size, 
-        base_dir=base_dir, 
-        deform_lambda=deform_lambda, 
-        validation_seq_length=validation_seq_length, 
-        **kwargs
+    # Build Hiearchy Tree
+    assert 'hierarchy' in df.columns, f"Cannot find 'hierarchy' column in {csv}."
+    classification_tree, classification_to_node, classification_to_node_id = create_hierarchy(
+        df['hierarchy'].unique(), 
+        label_smoothing=label_smoothing, 
+        gamma=gamma,
     )
-    return dls
 
-
-def create_dataloaders_refseq(
-    df: pd.DataFrame,
-    base_dir: Path,
-    batch_size=64,
-    dataloader_type: DataloaderType = DataloaderType.PLAIN,
-    verbose: bool = True,
-    validation_seq_length:int = 1_000,
-    deform_lambda: float = None,
-    **kwargs,
-) -> DataLoaders:
-    categories = [RefSeqCategory(name, base_dir=base_dir) for name in df.category.unique()]
-
+    accession_details = {}
+    assert 'partition' in df.columns, f"Cannot find 'partition' column in {csv}."
+    assert 'type' in df.columns, f"Cannot find 'type' column in {csv}."
+    for _, row in df.iterrows():
+        accession_details[row['accession']] = AccessionDetail(
+            validation=(row['partition'] == validation_partition),
+            node_id=classification_to_node_id[row['hierarchy']],
+            type=row['type'],
+        )
+    
+    del df
+    
     # Set up batch transforms
     before_batch = [
         RandomSliceBatch(only_split_index=0), 
@@ -184,141 +197,29 @@ def create_dataloaders_refseq(
 
     dataloaders_kwargs = dict(bs=batch_size, drop_last=False, before_batch=before_batch)
 
-    validation_column = "validation"
-    random.seed(42)
-    if validation_column not in df:
-        df[validation_column] = 0
-        value_counts = df.category.value_counts()
-        validation_per_category = int(0.2 * value_counts.min())
+    getters = [
+        GetTensorDNA(seqbank),
+        AccessionGetter(accession_details, 'node_id'),
+        AccessionGetter(accession_details, 'type'),
+    ]
 
-        for name in df.category.unique():
-            indexes_for_category = df.index[df.category == name]
-            validation_indexes = random.sample(list(indexes_for_category.values), validation_per_category)
-            df.loc[validation_indexes, validation_column] = 1
+    blocks = (
+        TransformBlock, 
+        TransformBlock, 
+        TransformBlock, 
+        # CategoryBlock(vocab=["nuclear", "mitochondrion", "plastid", "plasmid"], sort=False),
+    )
+    datablock = DataBlock(
+        blocks=blocks,
+        splitter=AccessionSplitter(accession_details),
+        getters=getters,
+        n_inp=1,
+    )
+    dls = datablock.dataloaders(set(accession_details.keys()), verbose=verbose, **dataloaders_kwargs)
 
-    print("Creating Datablock")
-    vocab = df['category'].unique()
-    datablock = create_datablock_refseq(categories, validation_column=validation_column, vocab=vocab, **kwargs)
+    dls.classification_tree = classification_tree
 
-    dataloader_type = str(dataloader_type).upper()
-    if validation_column in df:
-        training_df = df[df[validation_column] == 0].reset_index()
-
-        if dataloader_type == "STRATIFIED":
-            print("Creating groups for balancing dataset")
-            groups = [training_df.index[training_df['category'] == name] for name in vocab]
-
-            dataloaders_kwargs['dl_type'] = StratifiedDL
-            dataloaders_kwargs['dl_kwargs'] = [dict(groups=groups), dict()]
-        elif dataloader_type == "WEIGHTED":
-            print("Creating weights for balancing dataset")
-            weights = np.zeros((len(training_df),))
-            value_counts = training_df['category'].value_counts()
-            for name in df.category.unique():
-                weight = value_counts.max() / value_counts[name]
-                print(f"\tWeight for {name}: {weight}")
-                weights[training_df['category'] == name] = weight
-
-            dataloaders_kwargs['dl_type'] = WeightedDL
-            dataloaders_kwargs['dl_kwargs'] = [dict(wgts=weights), dict()]
-        elif dataloader_type == "PLAIN":
-            pass
-        else:
-            raise Exception(f"dataloader type {dataloader_type} not understood")
-
-    print("Creating Dataloaders")
-    return datablock.dataloaders(df, verbose=verbose, **dataloaders_kwargs)
-
-
-def create_dataloaders(df: pd.DataFrame, batch_size=64, **kwargs) -> DataLoaders:
-    datablock = create_datablock(**kwargs)
-    return datablock.dataloaders(df, bs=batch_size, drop_last=False)
-
-
-def fasta_to_dataframe(
-    fasta_path,
-    max_seqs=None,
-    validation_from_filename=True,
-    validation_prob=0.2,
-):
-    """
-    Creates a pandas dataframe from a fasta file.
-
-    If validation_from_filename is True then it checks if 'valid' or 'train' is in the filename,
-    otherwise it falls back to using the validation_prob.
-    If 'valid' or 'train' is in the filename and validation_from_filename is True then validation_prob is ignored.
-    """
-    fasta_path = Path(fasta_path)
-    print(f"Processing:\t{fasta_path}")
-
-    if not fasta_path.exists():
-        raise FileNotFoundError(f"Cannot find fasta file {fasta_path}.")
-
-    seq_count = fasta_seq_count(fasta_path)
-    print(f"{seq_count} sequences")
-    if max_seqs and seq_count >= max_seqs:
-        print(f"Limiting to maximum number of sequences: {max_seqs}")
-        seq_count = max_seqs
-
-    data = []
-    fasta = fasta_open(fasta_path)
-
-    if validation_from_filename:
-        if "valid" in str(fasta_path):
-            validation = 1
-        elif "train" in str(fasta_path):
-            validation = 0
-        else:
-            validation_from_filename = False
-
-    seqs = SeqIO.parse(fasta, "fasta")
-    for seq_index, seq in enumerate(track(seqs, total=seq_count, description=f"Reading fasta file:")):
-        if max_seqs and seq_index >= max_seqs:
-            break
-
-        if not validation_from_filename:
-            validation = int(random.random() < validation_prob)
-
-        seq_as_numpy = dna_seq_to_tensor(seq.seq)
-        data.append([seq.id, seq.description, seq_as_numpy, validation])
-
-    fasta.close()
-
-    df = pd.DataFrame(data, columns=["id", "description", "sequence", "validation"])
-    df["file"] = str(fasta_path)
-    df["category"] = fasta_path.name.split(".")[0]
-    return df
-
-
-def fastas_to_dataframe(fasta_paths, **kwargs):
-    dfs = [fasta_to_dataframe(fasta_path, **kwargs) for fasta_path in fasta_paths]
-    return pd.concat(dfs)
-
-
-def create_dataloaders_from_fastas(fasta_paths, batch_size=64, seq_length=None, **kwargs) -> DataLoaders:
-    """
-    Creates a DataLoaders object from a list of fasta paths.
-    """
-    df = fastas_to_dataframe(fasta_paths, **kwargs)
-    return create_dataloaders(df, batch_size=batch_size, seq_length=seq_length)
-
-
-class FastaDataloader:
-    def __init__(self, fasta_files, device):
-        self.fasta_files = list(fasta_files)
-        self.device = device
-
-    def __iter__(self):
-        self.randomize()
-        self.before_iter()
-        self.__idxs = self.get_idxs()  # called in context of main process (not workers/subprocesses)
-        for b in _loaders[self.fake_l.num_workers == 0](self.fake_l):
-            if self.device is not None:
-                b = to_device(b, self.device)
-            yield self.after_batch(b)
-        self.after_iter()
-        if hasattr(self, 'it'):
-            del self.it
+    return dls
 
 
 class SeqIODataloader:

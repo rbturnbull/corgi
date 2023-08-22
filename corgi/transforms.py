@@ -11,6 +11,7 @@ from Bio.SeqRecord import SeqRecord
 from scipy.stats import nbinom
 
 from .tensor import TensorDNA
+from .seqbank import SeqBank
 
 
 class SplitTransform(Transform):
@@ -80,19 +81,15 @@ class CharsToTensorDNA(Transform):
         return TensorDNA(seq_as_numpy)
 
 
-class RowToTensorDNA(Transform):
-    def __init__(self, categories, **kwargs):
-        super().__init__(**kwargs)
-        self.category_dict = {category.name: category for category in categories}
+@dataclass
+class GetTensorDNA(Transform):
+    seqbank:SeqBank
 
     def encodes(self, row: pd.Series):
-        # print('row', row)
-        # print('type sequence', type(row['sequence']))
-        # print(' sequence', row['sequence'])
-        # import pdb; pdb.set_trace()
-        if 'sequence' in row:
-            return row['sequence']  # hack
-        return TensorDNA(self.category_dict[row['category']].get_seq(row["accession"]))
+        return TensorDNA(self.seqbank[row['accession']])
+
+    def encodes(self, accession: str):
+        return TensorDNA(self.seqbank[accession])
 
 
 class RandomSliceBatch(SplitTransform):

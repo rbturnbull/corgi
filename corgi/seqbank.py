@@ -2,6 +2,7 @@ from typing import Union
 import numpy as np
 from pathlib import Path
 import h5py
+from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio import SeqIO
 from zlib import adler32
@@ -45,14 +46,21 @@ class SeqBank():
     def __contains__(self, accession:str) -> bool:
         return self.key(accession) in self.get_read_h5()
 
-    def add(self, seq:Union[str, SeqRecord, np.ndarray], accession:str):
-        if isinstance(seq, SeqRecord):
-            seq = str(seq.seq)
-        if isinstance(seq, str):
-            seq = dna_seq_to_numpy(seq)
+    def add(self, seq:Union[str, Seq, SeqRecord, np.ndarray], accession:str):
+        key = self.key(accession)
 
         if not self.write_h5:
             self.write_h5 = h5py.File(self.path, "a")
+
+        if key in self.write_h5:
+            return self.write_h5[key]
+        
+        if isinstance(seq, SeqRecord):
+            seq = seq.seq
+        if isinstance(seq, Seq):
+            seq = str(seq)
+        if isinstance(seq, str):
+            seq = dna_seq_to_numpy(seq)
         
         return self.write_h5.create_dataset(
             self.key(accession),
@@ -65,4 +73,4 @@ class SeqBank():
     def add_file(self, path:Path, format="fasta"):
         with open(path) as f:
             for record in SeqIO.parse(f, format):
-                self.add(record.seq, record.id)
+                self.add(record, record.id)
