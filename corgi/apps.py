@@ -13,6 +13,7 @@ from rich.box import SIMPLE
 from Bio import SeqIO
 from Bio.SeqIO import FastaIO
 from polytorch import PolyLoss, HierarchicalData, CategoricalData, total_size
+from polytorch.metrics import HierarchicalGreedyAccuracy, CategoricalAccuracy
 
 import time
 
@@ -200,19 +201,15 @@ class Corgi(ta.TorchApp):
         #     final_bias=final_bias,
         # )
 
-    # def metrics(self):
-    #     return []
-    #     average = "macro"
-    #     return [
-    #         accuracy,
-    #         F1Score(average=average),
-    #         Precision(average=average),
-    #         Recall(average=average),
-    #         RocAuc(average=average),
-    #     ]
+    def metrics(self):
+        return [
+            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=1, data_index=0, name="greedy_accuracy_depth_one"),
+            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=2, data_index=0, name="greedy_accuracy_depth_two"),
+            CategoricalAccuracy(data_index=1, name="dna_type_accuracy"),
+        ]
 
-    # def monitor(self):
-    #     return "f1_score"
+    def monitor(self):
+        return "greedy_accuracy_depth_two"
 
     def loss_func(self):
         assert self.output_types

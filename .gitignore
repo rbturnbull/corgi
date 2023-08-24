@@ -185,3 +185,4 @@ neg.py
 validate_model_tiara.sh
 validate_model.sh
 tune.sh
+outputs/
