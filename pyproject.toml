@@ -39,8 +39,10 @@ cryptography = "^36.0.1"
 PyMySQL = "^1.0.2"
 termgraph = "^0.5.3"
 torchapp = ">=0.3.1"
-hierarchicalsoftmax = "^0.1.4"
+hierarchicalsoftmax = "^1.0.0"
 attrs = "^23.1.0"
+polytorch = {git = "https://github.com/rbturnbull/polytorch.git", branch = "hierarchical"}
+
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
