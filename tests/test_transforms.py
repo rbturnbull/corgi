@@ -22,35 +22,6 @@ class TestTransforms(unittest.TestCase):
         y = transform(x)
         self.assertEqual(y.shape, (60,))
 
-    def test_row_to_tensor(self):
-        test_data_dir = Path(__file__).parent/"testdata"
-        categories = [
-            refseq.RefSeqCategory("plastid", base_dir=test_data_dir),
-            refseq.RefSeqCategory("mitochondrion", base_dir=test_data_dir),
-        ]
-        accessions = [
-            "AAA1",
-            "BBB2",
-        ]
-        generate = False
-        if generate:
-            with h5py.File(categories[0].h5_path(), "w") as h5:
-                h5.create_dataset( categories[0].dataset_key(accessions[0]), data=np.array([1,1,1]))
-            with h5py.File(categories[1].h5_path(), "w") as h5:
-                h5.create_dataset(categories[1].dataset_key(accessions[1]), data=np.array([2,2,3,4]))
-
-
-        data = [
-            dict(category="plastid", accession=accessions[0]),
-            dict(category="mitochondrion", accession=accessions[1]),
-        ]
-        df = pd.DataFrame(data)
-
-        transform = transforms.RowToTensorDNA(categories)
-        self.assertEqual( "AAA [3]", str(transform(df.loc[0])) )
-        self.assertEqual( "CCGT [4]", str(transform(df.loc[1])) )
-
-
     def test_random_slice_batch(self):
         import random
         random.seed(0)

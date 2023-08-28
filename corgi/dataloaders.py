@@ -29,6 +29,7 @@ from .tensor import TensorDNA, dna_seq_to_tensor
 from .transforms import RandomSliceBatch, SliceTransform, GetTensorDNA, PadBatchX, DeterministicSliceBatch, DeformBatch
 from .hierarchy import create_hierarchy
 from .seqbank import SeqBank
+from .seqdict import SeqDict
 
 @define
 class AccessionDetail:
@@ -42,6 +43,34 @@ def open_path(path:Path):
     if path.suffix == ".gz":
         return gzip.open(path, "rt")
     return open(path, "rt")
+
+
+class SeqDictSplitter:
+    def __init__(self, seqdict:SeqDict, partition:int=1):
+        self.seqdict = seqdict
+        self.partition = partition
+
+    def __call__(self, objects):
+        validation_indexes = mask2idxs(self.seqdict[object].partition == self.partition for object in objects)
+        return IndexSplitter(validation_indexes)(objects)
+
+
+class SeqDictNodeIdGetter:
+    def __init__(self, seqdict:SeqDict):
+        self.seqdict = seqdict
+
+    def __call__(self, accession:str):
+        return self.seqdict[accession].node_id
+
+
+class SeqDictTypeGetter:
+    def __init__(self, seqdict:SeqDict):
+        self.seqdict = seqdict
+
+    def __call__(self, accession:str):
+        return self.seqdict[accession].type.value
+
+
 
 
 @delegates()
@@ -218,6 +247,52 @@ def create_seqbank_dataloaders(
     dls = datablock.dataloaders(set(accession_details.keys()), verbose=verbose, **dataloaders_kwargs)
 
     dls.classification_tree = classification_tree
+
+    return dls
+
+
+def create_seqlist_dataloaders(
+    seqdict:SeqDict, 
+    seqbank:SeqBank, 
+    batch_size:int=64, 
+    validation_partition:int=1,
+    deform_lambda: float = None,
+    validation_seq_length:int=1_000, 
+    verbose:bool=False,
+    label_smoothing:float=0.0,
+    gamma:float=0.0,
+    **kwargs
+):    
+    # Set up batch transforms
+    before_batch = [
+        RandomSliceBatch(only_split_index=0), 
+        DeterministicSliceBatch(seq_length=validation_seq_length, only_split_index=1),
+    ]
+    if deform_lambda is not None:
+        before_batch.append(DeformBatch(deform_lambda=deform_lambda))
+
+    dataloaders_kwargs = dict(bs=batch_size, drop_last=False, before_batch=before_batch)
+
+    getters = [
+        GetTensorDNA(seqbank),
+        SeqDictNodeIdGetter(seqdict),
+        SeqDictTypeGetter(seqdict),
+    ]
+
+    blocks = (
+        TransformBlock, 
+        TransformBlock, 
+        TransformBlock, 
+    )
+    datablock = DataBlock(
+        blocks=blocks,
+        splitter=SeqDictSplitter(seqdict, validation_partition),
+        getters=getters,
+        n_inp=1,
+    )
+    dls = datablock.dataloaders(set(seqdict.keys()), verbose=verbose, **dataloaders_kwargs)
+
+    dls.classification_tree = seqdict.classification_tree
 
     return dls
 

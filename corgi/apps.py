@@ -14,6 +14,8 @@ from Bio import SeqIO
 from Bio.SeqIO import FastaIO
 from polytorch import PolyLoss, HierarchicalData, CategoricalData, total_size
 from polytorch.metrics import HierarchicalGreedyAccuracy, CategoricalAccuracy
+from .seqdict import SeqDict, DNAType
+from .seqbank import SeqBank
 
 import time
 
@@ -58,9 +60,12 @@ class Corgi(ta.TorchApp):
             raise Exception("No CSV given")
         if seqbank is None:
             raise Exception("No seqbank given")
+        
+        seqdict = SeqDict.load(seqdict)
+        seqbank = SeqBank(seqbank)
 
-        dls = dataloaders.create_seqbank_dataloaders(
-            csv, 
+        dls = dataloaders.create_seqlist_dataloaders(
+            seqdict=seqdict, 
             seqbank=seqbank, 
             batch_size=batch_size, 
             dataloader_type=dataloader_type, 
@@ -71,8 +76,8 @@ class Corgi(ta.TorchApp):
         self.classification_tree = dls.classification_tree
         self.output_types = [
             HierarchicalData(root=self.classification_tree),
-            CategoricalData(4),
-        ]        
+            CategoricalData(len(DNAType.values()), labels=DNAType.values()),
+        ]
         return dls
 
     def model(
