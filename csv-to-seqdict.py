@@ -2,11 +2,16 @@ import typer
 import pandas as pd
 from pathlib import Path
 from corgi.hierarchy import create_hierarchy
-from corgi.seqdict import SeqDict, SeqDetail
+from corgi.seqdict import SeqDict
 from rich.progress import track
 
-
-def main(csv: Path, seqdict_path:Path, gamma:float = 0.0, label_smoothing:float = 0.0):
+#  
+def main(
+    csv: Path = typer.Argument(...,help="The csv which has the sequences to use. Required columns are 'accession', 'hierarchy', 'type', 'partition'"), 
+    seqdict_path:Path = typer.Argument(...,help="The path to a file to save the seqdict to."), 
+    gamma:float = 0.0, 
+    label_smoothing:float = 0.0,
+):
     df = pd.read_csv(csv)
 
     # Build Hiearchy Tree

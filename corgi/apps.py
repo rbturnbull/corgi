@@ -39,7 +39,7 @@ class Corgi(ta.TorchApp):
 
     def dataloaders(
         self,
-        csv: Path = ta.Param(help="The CSV which has the sequences to use. Required columns are 'accession', 'hierarchy', 'type', 'partition'."),
+        seqdict: Path = ta.Param(help="The seqdict which has the sequences to use.."),
         seqbank:Path = ta.Param(help="The HDF5 file with the sequences."),
         validation_partition:int = ta.Param(default=0, help="The value to use for ."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
@@ -56,8 +56,8 @@ class Corgi(ta.TorchApp):
             inputs (Path): The input file.
             batch_size (int): The number of elements to use in a batch for training and prediction. Defaults to 32.
         """
-        if csv is None:
-            raise Exception("No CSV given")
+        if seqdict is None:
+            raise Exception("No seqdict given")
         if seqbank is None:
             raise Exception("No seqbank given")
         
@@ -76,7 +76,7 @@ class Corgi(ta.TorchApp):
         self.classification_tree = dls.classification_tree
         self.output_types = [
             HierarchicalData(root=self.classification_tree),
-            CategoricalData(len(DNAType.values()), labels=DNAType.values()),
+            CategoricalData(len(DNAType), labels=[element.value for element in DNAType]),
         ]
         return dls
 
