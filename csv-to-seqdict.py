@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 from corgi.hierarchy import create_hierarchy
 from corgi.seqdict import SeqDict, SeqDetail
+from rich.progress import track
 
 
 def main(csv: Path, seqdict_path:Path, gamma:float = 0.0, label_smoothing:float = 0.0):
@@ -21,7 +22,7 @@ def main(csv: Path, seqdict_path:Path, gamma:float = 0.0, label_smoothing:float 
 
     assert 'partition' in df.columns, f"Cannot find 'partition' column in {csv}."
     assert 'type' in df.columns, f"Cannot find 'type' column in {csv}."
-    for _, row in df.iterrows():
+    for _, row in track(df.iterrows(), total=len(df)):
         seqdict.add(
             accession=row['accession'],
             partition=int(row['partition']),
