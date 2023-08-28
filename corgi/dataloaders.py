@@ -17,7 +17,7 @@ from fastai.data.transforms import IndexSplitter
 from fastcore.foundation import L
 from fastcore.dispatch import typedispatch
 from fastcore.meta import delegates
-
+from rich.progress import track
 from fastai.data.core import TfmdDL, DataLoaders, get_empty_df
 from fastai.callback.data import WeightedDL
 from fastai.data.block import DataBlock, TransformBlock, CategoryBlock
@@ -178,12 +178,21 @@ def create_seqbank_dataloaders(
     accession_details = {}
     assert 'partition' in df.columns, f"Cannot find 'partition' column in {csv}."
     assert 'type' in df.columns, f"Cannot find 'type' column in {csv}."
-    for _, row in df.iterrows():
+    missing = set()
+    for _, row in track(df.iterrows(), description="Reading CSV", total=len(df)):
         accession_details[row['accession']] = AccessionDetail(
             validation=(row['partition'] == validation_partition),
             node_id=classification_to_node_id[row['hierarchy']],
             type=row['type'],
         )
+        # if row['accession'] not in seqbank:
+        #     missing.add(row['accession'])
+
+    if missing:
+        with open("MISSING.txt", "w") as f:
+            for accession in missing:
+                print(accession, file=f)
+        raise ValueError(f"WARNING: {len(missing)} accessions in {csv} are missing from {seqbank}. Written to MISSING.txt")
     
     del df
     
