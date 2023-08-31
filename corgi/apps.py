@@ -39,9 +39,9 @@ class Corgi(ta.TorchApp):
 
     def dataloaders(
         self,
-        seqdict: Path = ta.Param(help="The seqdict which has the sequences to use.."),
+        seqdict: Path = ta.Param(help="The seqdict which has the sequences to use."),
         seqbank:Path = ta.Param(help="The HDF5 file with the sequences."),
-        validation_partition:int = ta.Param(default=0, help="The value to use for ."),
+        validation_partition:int = ta.Param(default=1, help="The partition to use for validation."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
         dataloader_type: dataloaders.DataloaderType = ta.Param(
             default=dataloaders.DataloaderType.PLAIN, case_sensitive=False
@@ -61,10 +61,14 @@ class Corgi(ta.TorchApp):
         if seqbank is None:
             raise Exception("No seqbank given")
         
+        print(f"Loading seqdict {seqdict}")
         seqdict = SeqDict.load(seqdict)
+
+        print(f"Loading seqbank {seqbank}")
         seqbank = SeqBank(seqbank)
 
-        dls = dataloaders.create_seqlist_dataloaders(
+        print(f"Creating dataloaders with batch_size {batch_size} and validation partition {validation_partition}.")
+        dls = dataloaders.create_seqdict_dataloaders(
             seqdict=seqdict, 
             seqbank=seqbank, 
             batch_size=batch_size, 

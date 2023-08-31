@@ -260,7 +260,7 @@ def create_seqbank_dataloaders(
     return dls
 
 
-def create_seqlist_dataloaders(
+def create_seqdict_dataloaders(
     seqdict:SeqDict, 
     seqbank:SeqBank, 
     batch_size:int=64, 

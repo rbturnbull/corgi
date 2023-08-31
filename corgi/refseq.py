@@ -21,10 +21,10 @@ from pathlib import Path
 from . import tensor
 
 
-def open_fasta(fasta_path, use_gzip):
-    if use_gzip:
-        return gzip.open(fasta_path, "rt")
-    return open(fasta_path, "rt")
+def open_gzip(path:Path):
+    if path.suffix == ".gz":
+        return gzip.open(path, "rt")
+    return open(path, "rt")
 
 
 REFSEQ_CATEGORIES = [
