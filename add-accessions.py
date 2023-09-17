@@ -11,6 +11,8 @@ def main(
     seqbank_path:Path = typer.Argument(...,help="The path to seqbank."), 
     base_dir:Path = typer.Argument(...,help="The path to download the fasta files."), 
     email:str = typer.Argument(...,help="The email to use for downloading sequences."),
+    batch_size:int = 1,
+    sleep:float=1.0,
 ):    
     print(f"Loading seqdict {seqdict_path}")
     seqdict = SeqDict.load(seqdict_path)
@@ -27,7 +29,7 @@ def main(
     # print("accessions_to_add", len(accessions_to_add))
 
     accessions_to_add = seqdict.keys()
-    seqbank.add_accessions(accessions_to_add, base_dir=base_dir, email=email, batch_size=1)
+    seqbank.add_accessions(accessions_to_add, base_dir=base_dir, email=email, batch_size=batch_size, sleep=sleep)
 
 
 if __name__ == "__main__":

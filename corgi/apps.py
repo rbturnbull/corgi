@@ -16,12 +16,17 @@ from polytorch import PolyLoss, HierarchicalData, CategoricalData, total_size
 from polytorch.metrics import HierarchicalGreedyAccuracy, CategoricalAccuracy
 from .seqdict import SeqDict, DNAType
 from .seqbank import SeqBank
+import numpy as np
 
 import time
 
 console = Console()
 
 from . import dataloaders, models, refseq, transforms
+
+def set_alpha(tree, k=0.5):
+    for node in tree.pre_order_iter():
+        node.alpha = np.power(k, len(node.ancestors))
 
 
 class Corgi(ta.TorchApp):
@@ -48,6 +53,7 @@ class Corgi(ta.TorchApp):
         ),
         validation_seq_length:int = 1_000,
         deform_lambda:float = ta.Param(default=None, help="The lambda for the deform transform."),
+        tips_mode:bool = True,
     ) -> DataLoaders:
         """
         Creates a FastAI DataLoaders object which Corgi uses in training and prediction.
@@ -78,6 +84,10 @@ class Corgi(ta.TorchApp):
             validation_partition=validation_partition,
         )
         self.classification_tree = dls.classification_tree
+        self.classification_tree.tips_mode = tips_mode
+        self.classification_tree.index_tips_mode()
+        set_alpha(self.classification_tree)
+
         self.output_types = [
             HierarchicalData(root=self.classification_tree),
             CategoricalData(len(DNAType), labels=[element.value for element in DNAType]),
@@ -214,11 +224,12 @@ class Corgi(ta.TorchApp):
         return [
             HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=1, data_index=0, name="greedy_accuracy_depth_one"),
             HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=2, data_index=0, name="greedy_accuracy_depth_two"),
+            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=3, data_index=0, name="greedy_accuracy_depth_three"),
             CategoricalAccuracy(data_index=1, name="dna_type_accuracy"),
         ]
 
     def monitor(self):
-        return "greedy_accuracy_depth_two"
+        return "greedy_accuracy_depth_one"
 
     def loss_func(self):
         assert self.output_types

@@ -53,7 +53,21 @@ class SeqBank():
             raise SeqBankError(f"Failed to read {accession} in SeqBank {self.path}:\n{err}")
 
     def __contains__(self, accession:str) -> bool:
-        return self.key(accession) in self.get_read_h5()
+        try:
+            return self.key(accession) in self.get_read_h5()
+        except Exception:
+            return False
+
+    def delete(self, accession:str):
+        key = self.key(accession)
+        f = self.get_read_h5()
+        if key in f:
+            try:
+                del f[key]
+            except KeyError:
+                # f.create_dataset(key, "") # replace data in case there is a problem with it
+                # f[key] = "" 
+                del f[key]
 
     def add(self, seq:Union[str, Seq, SeqRecord, np.ndarray], accession:str, all_accessions=None):
         key = self.key(accession)
@@ -147,7 +161,19 @@ class SeqBank():
         net_handle.close()
         self.add_file(local_path, all_accessions=all_accessions)
 
-    def add_accessions(self, accessions, base_dir:Path, email:str=None, all_accessions=None, batch_size=200):
+    def missing_accessions(self, accessions, get:bool=False):
+        missing = set()
+        for accession in track(accessions):
+            if accession not in self:
+                missing.add(accession)
+            elif get:
+                try:
+                    data = self[accession]
+                except Exception:
+                    missing.add(accession)
+        return missing
+
+    def add_accessions(self, accessions, base_dir:Path, email:str=None, all_accessions=None, batch_size=200, sleep:float=1.0):
         to_download = []
         for accession in track(accessions):
             if accession in self:
@@ -156,6 +182,7 @@ class SeqBank():
             to_download.append(accession)
             if len(to_download) >= batch_size:
                 self.download_accessions(to_download, base_dir=base_dir, email=email, all_accessions=all_accessions)
+                time.sleep(sleep)
                 to_download = []
         
         self.download_accessions(to_download, base_dir=base_dir, email=email, all_accessions=all_accessions)

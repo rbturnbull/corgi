@@ -56,7 +56,8 @@ class SeqDict(UserDict):
     def set_indexes(self):
         self.classification_tree.set_indexes_if_unset()
         for detail in self.values():
-            detail.node_id = self.classification_tree.node_to_id[detail.node]
+            if detail.node:
+                detail.node_id = self.classification_tree.node_to_id[detail.node]
 
     def save(self, path:Path):
         self.set_indexes()
