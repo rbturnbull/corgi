@@ -15,7 +15,7 @@ from Bio.SeqIO import FastaIO
 from polytorch import PolyLoss, HierarchicalData, CategoricalData, total_size
 from polytorch.metrics import HierarchicalGreedyAccuracy, CategoricalAccuracy
 from .seqdict import SeqDict, DNAType
-from .seqbank import SeqBank
+from seqbank import SeqBank
 import numpy as np
 
 import time

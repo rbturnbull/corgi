@@ -28,7 +28,7 @@ from hierarchicalsoftmax import HierarchicalSoftmaxLoss, SoftmaxNode
 from .tensor import TensorDNA, dna_seq_to_tensor
 from .transforms import RandomSliceBatch, SliceTransform, GetTensorDNA, PadBatchX, DeterministicSliceBatch, DeformBatch
 from .hierarchy import create_hierarchy
-from .seqbank import SeqBank
+from seqbank import SeqBank
 from .seqdict import SeqDict
 
 @define

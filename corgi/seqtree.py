@@ -3,51 +3,32 @@ from attrs import define, field
 from hierarchicalsoftmax import SoftmaxNode
 from collections import UserDict
 import pickle
-from enum import Enum
-
-
-class DNAType(Enum):
-    NUCLEAR = 0
-    MITOCHONDRION = 1
-    PLASTID = 2
-    PLASMID = 3
-
-
-def to_dna_type(value) -> DNAType:
-    if isinstance(value, int):
-        return DNAType(value)
-    elif isinstance(value, str):
-        return DNAType[value.upper()]
-
-    return value
 
 
 @define
 class SeqDetail:
     partition:int
-    type:DNAType = field(converter=to_dna_type)
     node:SoftmaxNode = field(default=None, eq=False)
     node_id:int = None
 
     def __getstate__(self):
-        return (self.partition, self.type, self.node_id)
+        return (self.partition, self.node_id)
 
     def __setstate__(self, state):
-        self.partition, self.type, self.node_id = state
+        self.partition, self.node_id = state
         self.node = None
 
 
-class SeqDict(UserDict):
-    def __init__(self):
+class SeqTree(UserDict):
+    def __init__(self, classification_tree=None):
         super().__init__()
-        self.classification_tree = SoftmaxNode("root")
+        self.classification_tree = classification_tree or SoftmaxNode("root")
 
-    def add(self, accession:str, node:SoftmaxNode, partition:int, type:DNAType):
+    def add(self, accession:str, node:SoftmaxNode, partition:int):
         assert node.root == self.classification_tree
         assert accession not in self, f"Accession {accession} already exists in SeqDict"
         detail = SeqDetail(
             partition=partition,
-            type=type,
             node=node,
         )
         self[accession] = detail
@@ -74,7 +55,3 @@ class SeqDict(UserDict):
         if detail.node is not None:
             return detail.node
         return self.classification_tree.node_list[detail.node_id]
-
-
-
-

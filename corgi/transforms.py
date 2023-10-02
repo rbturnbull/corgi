@@ -11,7 +11,7 @@ from Bio.SeqRecord import SeqRecord
 from scipy.stats import nbinom
 
 from .tensor import TensorDNA
-from .seqbank import SeqBank
+from seqbank import SeqBank
 
 
 class SplitTransform(Transform):
@@ -85,11 +85,9 @@ class CharsToTensorDNA(Transform):
 class GetTensorDNA(Transform):
     seqbank:SeqBank
 
-    def encodes(self, row: pd.Series):
-        return TensorDNA(self.seqbank[row['accession']])
-
     def encodes(self, accession: str):
-        return TensorDNA(self.seqbank[accession])
+        array = torch.frombuffer(self.seqbank[accession], dtype=torch.uint8)
+        return TensorDNA(array)
 
 
 class RandomSliceBatch(SplitTransform):

@@ -4,7 +4,7 @@ from rich.progress import track
 from pathlib import Path
 from corgi.seqdict import SeqDict
 
-from corgi.seqbank import SeqBank
+from seqbank import SeqBank
 #  
 def main(
     seqdict_path:Path = typer.Argument(...,help="The seqdict which has the sequences to use."), 

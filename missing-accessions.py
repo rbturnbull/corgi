@@ -4,7 +4,7 @@ from rich.progress import track
 from pathlib import Path
 from corgi.seqdict import SeqDict
 
-from corgi.seqbank import SeqBank
+from seqbank import SeqBank
 #  
 def main(
     seqdict_path:Path = typer.Argument(...,help="The seqdict which has the sequences to use."), 
@@ -19,7 +19,7 @@ def main(
     seqbank = SeqBank(seqbank_path)
 
     accessions_to_add = seqdict.keys()
-    missing = seqbank.missing_accessions(accessions_to_add, get=get)
+    missing = seqbank.missing(accessions_to_add)
     print(missing)
     print(len(missing), 'missing')
 

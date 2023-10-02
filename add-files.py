@@ -5,7 +5,7 @@ from rich.progress import track
 from pathlib import Path
 from corgi.seqdict import SeqDict
 
-from corgi.seqbank import SeqBank
+from seqbank import SeqBank
 #  
 def main(
     seqbank_path:Path = typer.Argument(...,help="The path to seqbank."), 
