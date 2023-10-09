@@ -14,7 +14,7 @@ from Bio import SeqIO
 from Bio.SeqIO import FastaIO
 from polytorch import PolyLoss, HierarchicalData, CategoricalData, total_size
 from polytorch.metrics import HierarchicalGreedyAccuracy, CategoricalAccuracy
-from .seqdict import SeqDict, DNAType
+from .seqtree import SeqTree
 from seqbank import SeqBank
 import numpy as np
 
@@ -44,7 +44,7 @@ class Corgi(ta.TorchApp):
 
     def dataloaders(
         self,
-        seqdict: Path = ta.Param(help="The seqdict which has the sequences to use."),
+        seqtree: Path = ta.Param(help="The seqtree which has the sequences to use."),
         seqbank:Path = ta.Param(help="The HDF5 file with the sequences."),
         validation_partition:int = ta.Param(default=1, help="The partition to use for validation."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
@@ -62,20 +62,20 @@ class Corgi(ta.TorchApp):
             inputs (Path): The input file.
             batch_size (int): The number of elements to use in a batch for training and prediction. Defaults to 32.
         """
-        if seqdict is None:
-            raise Exception("No seqdict given")
+        if seqtree is None:
+            raise Exception("No seqtree given")
         if seqbank is None:
             raise Exception("No seqbank given")
         
-        print(f"Loading seqdict {seqdict}")
-        seqdict = SeqDict.load(seqdict)
+        print(f"Loading seqtree {seqtree}")
+        seqtree = SeqTree.load(seqtree)
 
         print(f"Loading seqbank {seqbank}")
         seqbank = SeqBank(seqbank)
 
         print(f"Creating dataloaders with batch_size {batch_size} and validation partition {validation_partition}.")
-        dls = dataloaders.create_seqdict_dataloaders(
-            seqdict=seqdict, 
+        dls = dataloaders.create_seqtree_dataloaders(
+            seqtree=seqtree, 
             seqbank=seqbank, 
             batch_size=batch_size, 
             dataloader_type=dataloader_type, 
@@ -85,12 +85,12 @@ class Corgi(ta.TorchApp):
         )
         self.classification_tree = dls.classification_tree
         self.classification_tree.tips_mode = tips_mode
-        self.classification_tree.index_tips_mode()
-        set_alpha(self.classification_tree)
+        if tips_mode:
+            self.classification_tree.index_tips_mode()
+            set_alpha(self.classification_tree)
 
         self.output_types = [
             HierarchicalData(root=self.classification_tree),
-            CategoricalData(len(DNAType), labels=[element.value for element in DNAType]),
         ]
         return dls
 
@@ -225,7 +225,7 @@ class Corgi(ta.TorchApp):
             HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=1, data_index=0, name="greedy_accuracy_depth_one"),
             HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=2, data_index=0, name="greedy_accuracy_depth_two"),
             HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=3, data_index=0, name="greedy_accuracy_depth_three"),
-            CategoricalAccuracy(data_index=1, name="dna_type_accuracy"),
+            # CategoricalAccuracy(data_index=1, name="dna_type_accuracy"),
         ]
 
     def monitor(self):

@@ -2385,6 +2385,17 @@ gmpy = ["gmpy2 (>=2.1.0a4)"]
 tests = ["pytest (>=4.6)"]
 
 [[package]]
+name = "multitax"
+version = "1.3.1"
+description = "Python package to obtain, parse and explore biological and custom taxonomies"
+optional = false
+python-versions = ">=3.4"
+files = [
+    {file = "multitax-1.3.1-py3-none-any.whl", hash = "sha256:3905a8a8921d6e4a880a7644e81212484e33701b842ee7aea435d2844e00ad27"},
+    {file = "multitax-1.3.1.tar.gz", hash = "sha256:1896344d2691616995813c110d89e65d7cf5d21000a3c3f55a8b1e1956fdd5a5"},
+]
+
+[[package]]
 name = "murmurhash"
 version = "1.0.9"
 description = "Cython bindings for MurmurHash"
@@ -5835,4 +5846,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "08466b6c9c95df48ffb047511abe0cf922dbb8a62b416344a955ad3061607d0c"
+content-hash = "fdb94d289e52ea1d5e183442a312dcc95b57d35dadb466b06310c4a6d1e50f89"

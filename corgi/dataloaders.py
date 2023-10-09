@@ -29,7 +29,7 @@ from .tensor import TensorDNA, dna_seq_to_tensor
 from .transforms import RandomSliceBatch, SliceTransform, GetTensorDNA, PadBatchX, DeterministicSliceBatch, DeformBatch
 from .hierarchy import create_hierarchy
 from seqbank import SeqBank
-from .seqdict import SeqDict
+from .seqtree import SeqTree
 
 @define
 class AccessionDetail:
@@ -45,30 +45,30 @@ def open_path(path:Path):
     return open(path, "rt")
 
 
-class SeqDictSplitter:
-    def __init__(self, seqdict:SeqDict, partition:int=1):
-        self.seqdict = seqdict
+class SeqTreeSplitter:
+    def __init__(self, seqtree:SeqTree, partition:int=1):
+        self.seqtree = seqtree
         self.partition = partition
 
     def __call__(self, objects):
-        validation_indexes = mask2idxs(self.seqdict[object].partition == self.partition for object in objects)
+        validation_indexes = mask2idxs(self.seqtree[object].partition == self.partition for object in objects)
         return IndexSplitter(validation_indexes)(objects)
 
 
-class SeqDictNodeIdGetter:
-    def __init__(self, seqdict:SeqDict):
-        self.seqdict = seqdict
+class SeqTreeNodeIdGetter:
+    def __init__(self, seqtree:SeqTree):
+        self.seqtree = seqtree
 
     def __call__(self, accession:str):
-        return self.seqdict[accession].node_id
+        return self.seqtree[accession].node_id
 
 
-class SeqDictTypeGetter:
-    def __init__(self, seqdict:SeqDict):
-        self.seqdict = seqdict
+class SeqTreeTypeGetter:
+    def __init__(self, seqtree:SeqTree):
+        self.seqtree = seqtree
 
     def __call__(self, accession:str):
-        return self.seqdict[accession].type.value
+        return self.seqtree[accession].type.value
 
 
 
@@ -260,8 +260,8 @@ def create_seqbank_dataloaders(
     return dls
 
 
-def create_seqdict_dataloaders(
-    seqdict:SeqDict, 
+def create_seqtree_dataloaders(
+    seqtree:SeqTree, 
     seqbank:SeqBank, 
     batch_size:int=64, 
     validation_partition:int=1,
@@ -284,8 +284,8 @@ def create_seqdict_dataloaders(
 
     getters = [
         GetTensorDNA(seqbank),
-        SeqDictNodeIdGetter(seqdict),
-        SeqDictTypeGetter(seqdict),
+        SeqTreeNodeIdGetter(seqtree),
+        # SeqTreeTypeGetter(seqtree),
     ]
 
     blocks = (
@@ -295,13 +295,13 @@ def create_seqdict_dataloaders(
     )
     datablock = DataBlock(
         blocks=blocks,
-        splitter=SeqDictSplitter(seqdict, validation_partition),
+        splitter=SeqTreeSplitter(seqtree, validation_partition),
         getters=getters,
         n_inp=1,
     )
-    dls = datablock.dataloaders(set(seqdict.keys()), verbose=verbose, **dataloaders_kwargs)
+    dls = datablock.dataloaders(set(seqtree.keys()), verbose=verbose, **dataloaders_kwargs)
 
-    dls.classification_tree = seqdict.classification_tree
+    dls.classification_tree = seqtree.classification_tree
 
     return dls
 
