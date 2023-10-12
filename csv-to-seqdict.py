@@ -2,13 +2,13 @@ import typer
 import pandas as pd
 from pathlib import Path
 from corgi.hierarchy import create_hierarchy
-from corgi.seqdict import SeqDict
+from corgi.seqtree import SeqTree
 from rich.progress import track
 
 #  
 def main(
     csv: Path = typer.Argument(...,help="The csv which has the sequences to use. Required columns are 'accession', 'hierarchy', 'type', 'partition'"), 
-    seqdict_path:Path = typer.Argument(...,help="The path to a file to save the seqdict to."), 
+    seqtree_path:Path = typer.Argument(...,help="The path to a file to save the seqtree to."), 
     gamma:float = 0.0, 
     label_smoothing:float = 0.0,
 ):
@@ -22,13 +22,13 @@ def main(
         gamma=gamma,
     )
 
-    seqdict = SeqDict()
-    seqdict.classification_tree = classification_tree
+    seqtree = SeqTree()
+    seqtree.classification_tree = classification_tree
 
     assert 'partition' in df.columns, f"Cannot find 'partition' column in {csv}."
     assert 'type' in df.columns, f"Cannot find 'type' column in {csv}."
     for _, row in track(df.iterrows(), total=len(df)):
-        seqdict.add(
+        seqtree.add(
             accession=row['accession'],
             partition=int(row['partition']),
             node=classification_to_node[row['hierarchy']],
@@ -38,7 +38,7 @@ def main(
     del df
 
     # Save
-    seqdict.save(seqdict_path)
+    seqtree.save(seqtree_path)
 
 
 

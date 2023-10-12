@@ -275,7 +275,7 @@ def create_seqtree_dataloaders(
     # Set up batch transforms
     before_batch = [
         RandomSliceBatch(only_split_index=0), 
-        DeterministicSliceBatch(seq_length=validation_seq_length, only_split_index=1),
+        DeterministicSliceBatch(seq_length=validation_partition, only_split_index=1),
     ]
     if deform_lambda is not None:
         before_batch.append(DeformBatch(deform_lambda=deform_lambda))
@@ -285,11 +285,9 @@ def create_seqtree_dataloaders(
     getters = [
         GetTensorDNA(seqbank),
         SeqTreeNodeIdGetter(seqtree),
-        # SeqTreeTypeGetter(seqtree),
     ]
 
     blocks = (
-        TransformBlock, 
         TransformBlock, 
         TransformBlock, 
     )

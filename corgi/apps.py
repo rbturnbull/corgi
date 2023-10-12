@@ -96,6 +96,7 @@ class Corgi(ta.TorchApp):
 
     def model(
         self,
+        pretrained:Path = ta.Param(None, help="A pretrained model to finetune."),
         embedding_dim: int = ta.Param(
             default=8,
             help="The size of the embeddings for the nucleotides (N, A, G, C, T).",
@@ -176,6 +177,12 @@ class Corgi(ta.TorchApp):
         assert self.classification_tree
 
         num_classes = total_size(self.output_types)
+
+        if pretrained:
+            pretrained_learner = load_learner(pretrained)
+            model = pretrained_learner.model
+            model.replace_output_types(self.output_types, final_bias=final_bias)
+            return model
 
         # if cnn_dims_start not given then calculate it from the MACC
         if not cnn_dims_start:

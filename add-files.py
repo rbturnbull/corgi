@@ -3,7 +3,7 @@ import typer
 from rich.progress import track
 
 from pathlib import Path
-from corgi.seqdict import SeqDict
+from corgi.seqtree import SeqTree
 
 from seqbank import SeqBank
 #  

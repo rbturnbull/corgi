@@ -1,51 +1,51 @@
-from corgi.seqdict import SeqDict, DNAType
+from corgi.seqtree import SeqTree, DNAType
 import tempfile
 from pathlib import Path
 from hierarchicalsoftmax import SoftmaxNode
 
 
-def test_seqdict():
-    seqdict = SeqDict()
-    assert type(seqdict) == SeqDict
-    assert type(seqdict.classification_tree) == SoftmaxNode
+def test_seqtree():
+    seqtree = SeqTree()
+    assert type(seqtree) == SeqTree
+    assert type(seqtree.classification_tree) == SoftmaxNode
 
     # create node
-    bacteria = SoftmaxNode("bacteria", parent=seqdict.classification_tree)
-    plant = SoftmaxNode("plant", parent=seqdict.classification_tree)
+    bacteria = SoftmaxNode("bacteria", parent=seqtree.classification_tree)
+    plant = SoftmaxNode("plant", parent=seqtree.classification_tree)
 
-    detail = seqdict.add("accession1", bacteria, 0, "NUCLEAR")
+    detail = seqtree.add("accession1", bacteria, 0, "NUCLEAR")
     assert detail.partition == 0
     assert detail.type == DNAType.NUCLEAR
     
-    detail = seqdict.add("accession2", plant, 1, DNAType.PLASTID)
+    detail = seqtree.add("accession2", plant, 1, DNAType.PLASTID)
     assert detail.partition == 1
     assert detail.type == DNAType.PLASTID
 
-    detail = seqdict.add("accession3", plant, 2, 1)
+    detail = seqtree.add("accession3", plant, 2, 1)
     assert detail.partition == 2
     assert detail.type == DNAType.MITOCHONDRION
 
-    assert set(seqdict.keys()) == set("accession1 accession2 accession3".split())
+    assert set(seqtree.keys()) == set("accession1 accession2 accession3".split())
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         tmpdirname = Path(tmpdirname)
-        filepath = tmpdirname/"seqdict.pkl"
-        seqdict.save(filepath)
+        filepath = tmpdirname/"seqtree.pkl"
+        seqtree.save(filepath)
     
         assert filepath.exists()
-        seqdict2 = SeqDict.load(filepath)
-        assert type(seqdict2) == SeqDict
-        assert type(seqdict2.classification_tree) == SoftmaxNode
-        assert len(seqdict2) == len(seqdict)
+        seqtree2 = SeqTree.load(filepath)
+        assert type(seqtree2) == SeqTree
+        assert type(seqtree2.classification_tree) == SoftmaxNode
+        assert len(seqtree2) == len(seqtree)
 
-        for accession in seqdict.keys():
-            assert seqdict2[accession] == seqdict[accession]
-            assert seqdict2[accession].node_id is not None
+        for accession in seqtree.keys():
+            assert seqtree2[accession] == seqtree[accession]
+            assert seqtree2[accession].node_id is not None
         
         
-def test_seqdict_load():
-    seqdict = SeqDict.load(Path(__file__).parent/"testdata/seqdict.pkl")
-    assert seqdict.classification_tree.render_equal(
+def test_seqtree_load():
+    seqtree = SeqTree.load(Path(__file__).parent/"testdata/seqtree.pkl")
+    assert seqtree.classification_tree.render_equal(
         """
         root
         ├── Virus
@@ -54,25 +54,25 @@ def test_seqdict_load():
         └── Bacteria
         """        
     )  
-    assert len(seqdict) == 5
-    assert seqdict["NC_010663.1"].partition == 0
-    assert seqdict["NC_010663.1"].type == DNAType.NUCLEAR
-    assert seqdict.node("NC_010663.1").name == "Virus"
+    assert len(seqtree) == 5
+    assert seqtree["NC_010663.1"].partition == 0
+    assert seqtree["NC_010663.1"].type == DNAType.NUCLEAR
+    assert seqtree.node("NC_010663.1").name == "Virus"
 
-    assert seqdict["NC_024664.1"].partition == 1
-    assert seqdict["NC_024664.1"].type == DNAType.MITOCHONDRION
-    assert seqdict.node("NC_024664.1").name == "Eukaryota"
+    assert seqtree["NC_024664.1"].partition == 1
+    assert seqtree["NC_024664.1"].type == DNAType.MITOCHONDRION
+    assert seqtree.node("NC_024664.1").name == "Eukaryota"
 
-    assert seqdict["NC_036112.1"].partition == 0
-    assert seqdict["NC_036112.1"].type == DNAType.PLASTID
-    assert seqdict.node("NC_036112.1").name == "Plant"
+    assert seqtree["NC_036112.1"].partition == 0
+    assert seqtree["NC_036112.1"].type == DNAType.PLASTID
+    assert seqtree.node("NC_036112.1").name == "Plant"
 
-    assert seqdict["NC_036113.1"].partition == 1
-    assert seqdict["NC_036113.1"].type == DNAType.PLASTID
-    assert seqdict.node("NC_036113.1").name == "Plant"
+    assert seqtree["NC_036113.1"].partition == 1
+    assert seqtree["NC_036113.1"].type == DNAType.PLASTID
+    assert seqtree.node("NC_036113.1").name == "Plant"
 
-    assert seqdict["NZ_JAJNFP010000161.1"].partition == 0
-    assert seqdict["NZ_JAJNFP010000161.1"].type == DNAType.NUCLEAR
-    assert seqdict.node("NZ_JAJNFP010000161.1").name == "Bacteria"
+    assert seqtree["NZ_JAJNFP010000161.1"].partition == 0
+    assert seqtree["NZ_JAJNFP010000161.1"].type == DNAType.NUCLEAR
+    assert seqtree.node("NZ_JAJNFP010000161.1").name == "Bacteria"
 
 
