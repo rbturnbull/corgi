@@ -187,3 +187,8 @@ validate_model.sh
 tune.sh
 outputs/
 *.catalog
+refseq220-seqtree-easy-order-100.svg
+refseq220-seqtree-easy-order-100b.svg
+train-dfam.sh
+train-repbase.sh
+train.sh
