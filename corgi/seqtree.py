@@ -18,6 +18,9 @@ class SeqDetail:
         self.partition, self.node_id = state
         self.node = None
 
+class AlreadyExists(Exception):
+    pass
+
 
 class SeqTree(UserDict):
     def __init__(self, classification_tree=None):
@@ -26,7 +29,11 @@ class SeqTree(UserDict):
 
     def add(self, accession:str, node:SoftmaxNode, partition:int):
         assert node.root == self.classification_tree
-        assert accession not in self, f"Accession {accession} already exists in SeqTree"
+        if accession in self:
+            old_node = self.node(accession)
+            if not node == old_node:
+                raise AlreadyExists(f"Accession {accession} already exists in SeqTree at node {self.node(accession)}. Cannot change to {node}")
+
         detail = SeqDetail(
             partition=partition,
             node=node,
