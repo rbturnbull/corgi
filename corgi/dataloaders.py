@@ -3,6 +3,7 @@ from enum import Enum
 import random
 from itertools import chain
 from attrs import define
+from typing import List
 
 import gzip
 import pandas as pd
@@ -30,6 +31,7 @@ from .transforms import RandomSliceBatch, SliceTransform, GetTensorDNA, PadBatch
 from .hierarchy import create_hierarchy
 from seqbank import SeqBank
 from .seqtree import SeqTree
+import random
 
 
 def open_path(path:Path):
@@ -236,3 +238,62 @@ class SeqIODataloader:
         if batch:
             batch = self.pad(batch)
             yield batch
+
+
+class HierarchicalDL(TfmdDL):
+    def __init__(self, seqtree:SeqTree, classification_tree:SoftmaxNode, seed:int=42, dataset=None, bs=None, groups=None, **kwargs):
+        super().__init__(dataset=dataset, bs=bs, **kwargs)
+        self.classification_tree = classification_tree
+
+        # Add items to nodes
+        for node in classification_tree.postorder():
+            node.items = set()
+    
+        # Loop Through Tree and add accessions
+        for index, accession in enumerate(seqtree): # should this be self.items
+            node = seqtree.node[accession]
+            node.items.add(index)
+
+        # Get epoch size from the minimum number of items before it could repeat and create initial queues
+        random.seed(seed)
+        for node in classification_tree.postorder():
+            child_min_items_before_repeat = min([child.min_items_before_repeat for child in node.children])
+            node.min_items_before_repeat = len(node.items) + child_min_items_before_repeat*len(node.children)
+
+            self.queue_node(node)
+
+        self.n = classification_tree.min_items_before_repeat
+
+    def node_queue(self, node):
+        if not hasattr(node, 'queue'):
+            node.queue = []
+
+        if len(node.queue) == 0:
+            new_items = list(node.items + node.children)
+            random.shuffle(new_items)  
+            node.queue += new_items
+
+        return node.queue
+
+    def next_idx(self, node=None):
+        """
+        Return the next index to reference the dataset.
+        """
+        node = node or self.classification_tree
+        queue = self.node_queue(node)
+        
+        item = queue.pop()
+        if isinstance(item, SoftmaxNode):
+            return self.next_idx(item)
+        
+        return item
+
+    def get_idxs(self) -> List[int]:
+        """
+        Return a list of indices to reference the dataset.
+        """
+        indexes = []
+        for _ in range(self.n):
+            indexes.append(self.next_idx())
+        return indexes
+        
