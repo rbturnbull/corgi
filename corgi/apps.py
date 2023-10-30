@@ -78,8 +78,6 @@ class Corgi(ta.TorchApp):
             validation_partition=validation_partition,
             validation_length=validation_length,
         )
-
-
         self.classification_tree = dls.classification_tree
         self.classification_tree.tips_mode = tips_mode
         if tips_mode:
