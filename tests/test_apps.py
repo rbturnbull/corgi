@@ -14,7 +14,6 @@ def mock_init(self):
     super(Corgi, self).__init__()
 
 
-
 @patch("corgi.apps.Corgi.__init__", new=mock_init)
 class TestCorgi(TorchAppTestCase):
     app_class = Corgi
