@@ -260,7 +260,7 @@ class HierarchicalDataloader(TfmdDL):
             if exclude_partition is not None and exclude_partition == detail.partition:
                 continue
             
-            node = detail.node   
+            node = seqtree.node(accession)
 
             # Only allow leaf/tip nodes to have items
             if not node.is_leaf:

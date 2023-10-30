@@ -1,15 +1,14 @@
 from pathlib import Path
-import unittest
-import pandas as pd
-import numpy as np
-from fastai.data.block import DataBlock
-from fastai.data.core import DataLoaders
 from hierarchicalsoftmax import SoftmaxNode
+from seqbank import SeqBank
 from corgi.seqtree import SeqTree
+from corgi import dataloaders
+from corgi.transforms import GetTensorDNA, RandomSliceBatch, GetXY
+from corgi.tensor import TensorDNA
 
-from corgi import dataloaders, tensor
 
 test_data = Path(__file__).parent / "testdata"
+
 
 
 def test_hierarchical_dataloader():
@@ -32,7 +31,7 @@ def test_hierarchical_dataloader():
         for i in range(node.count):
             seqtree.add(f"{node}-{i}", node, i % partitions)
             
-    dl = dataloaders.HierarchicalDataloader(seqtree=seqtree, classification_tree=classification_tree, batch_size=4)
+    dl = dataloaders.HierarchicalDataloader(seqtree=seqtree, batch_size=4)
 
     # Check min_items_before_repeat
     assert dl.n == 24
@@ -72,3 +71,21 @@ def test_hierarchical_dataloader():
     for batch, expected_batch in zip(dl, expected_batches_epoch1):
         assert batch == expected_batch
     
+
+def test_hierarchical_dataloader_transforms():
+    seqtree = SeqTree.load(test_data/"seqtree.pkl")
+    seqbank = SeqBank(test_data/"seqbank.sb")
+    dl = dataloaders.HierarchicalDataloader(
+        seqtree=seqtree, 
+        batch_size=4, 
+        after_item=GetXY(seqbank=seqbank, seqtree=seqtree),
+        before_batch=RandomSliceBatch(maximum=4000),
+    )   
+    
+    for x,y in dl:
+        assert x.shape[0] == 4
+        assert y.shape[0] == 4
+        
+        assert x.shape[1] <= 4000
+        assert type(x) == TensorDNA
+
