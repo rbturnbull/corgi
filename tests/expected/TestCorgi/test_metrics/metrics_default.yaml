@@ -1,4 +1,6 @@
 params: {}
-output: '[<function accuracy at <HEX>>, <fastai.metrics.AccumMetric object at <HEX>>,
-  <fastai.metrics.AccumMetric object at <HEX>>, <fastai.metrics.AccumMetric object
-  at <HEX>>, <fastai.metrics.AccumMetric object at <HEX>>]'
+output: '[HierarchicalGreedyAccuracy(data_index=0, feature_axis=-1, function=None,
+  name=''greedy_accuracy_depth_one'', root=root, max_depth=1), HierarchicalGreedyAccuracy(data_index=0,
+  feature_axis=-1, function=None, name=''greedy_accuracy_depth_two'', root=root, max_depth=2),
+  HierarchicalGreedyAccuracy(data_index=0, feature_axis=-1, function=None, name=''greedy_accuracy_depth_three'',
+  root=root, max_depth=3)]'
