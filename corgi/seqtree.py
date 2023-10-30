@@ -62,3 +62,4 @@ class SeqTree(UserDict):
         if detail.node is not None:
             return detail.node
         return self.classification_tree.node_list[detail.node_id]
+    
