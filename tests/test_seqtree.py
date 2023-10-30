@@ -1,4 +1,4 @@
-from corgi.seqtree import SeqTree, DNAType
+from corgi.seqtree import SeqTree
 import tempfile
 from pathlib import Path
 from hierarchicalsoftmax import SoftmaxNode

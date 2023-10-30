@@ -240,38 +240,58 @@ class SeqIODataloader:
             yield batch
 
 
-class HierarchicalDL(TfmdDL):
-    def __init__(self, seqtree:SeqTree, classification_tree:SoftmaxNode, seed:int=42, dataset=None, bs=None, groups=None, **kwargs):
-        super().__init__(dataset=dataset, bs=bs, **kwargs)
-        self.classification_tree = classification_tree
+class HierarchicalDataloader(TfmdDL):
+    def __init__(self, seqtree:SeqTree, exclude_partition:int=None, seed:int=42, batch_size=None, **kwargs):
+        # Later put in seqbank:SeqBank
+        classification_tree = seqtree.classification_tree
+        self.seqtree = seqtree
+        self.exclude_partition = exclude_partition
+        self.seed = seed
+
+        dataset = []
+        count = 0
 
         # Add items to nodes
-        for node in classification_tree.postorder():
-            node.items = set()
+        for node in classification_tree.post_order_iter():
+            node.idxs = set()
     
         # Loop Through Tree and add accessions
-        for index, accession in enumerate(seqtree): # should this be self.items
-            node = seqtree.node[accession]
-            node.items.add(index)
+        for accession, detail in seqtree.items(): # should this be self.items
+            if exclude_partition is not None and exclude_partition == detail.partition:
+                continue
+            
+            node = detail.node   
+
+            # Only allow leaf/tip nodes to have items
+            if not node.is_leaf:
+                continue
+
+            node.idxs.add(count)
+            dataset.append(accession)
+            count += 1
 
         # Get epoch size from the minimum number of items before it could repeat and create initial queues
         random.seed(seed)
-        for node in classification_tree.postorder():
-            child_min_items_before_repeat = min([child.min_items_before_repeat for child in node.children])
-            node.min_items_before_repeat = len(node.items) + child_min_items_before_repeat*len(node.children)
+        for node in classification_tree.post_order_iter():
+            assert node.children or node.idxs, f"Node {node} has no children or idxs"
+            child_min_items_before_repeat = min([child.min_items_before_repeat for child in node.children]) if node.children else 0
 
-            self.queue_node(node)
+            if not node.children:
+                node.min_items_before_repeat = len(node.idxs)
+            else:
+                child_min_items_before_repeat = min([child.min_items_before_repeat for child in node.children])
+                node.min_items_before_repeat = child_min_items_before_repeat * len(node.children)
 
+            # Initialize queue            
+            node.queue = None
+
+        super().__init__(dataset=dataset, batch_size=batch_size, **kwargs)
         self.n = classification_tree.min_items_before_repeat
 
     def node_queue(self, node):
-        if not hasattr(node, 'queue'):
-            node.queue = []
-
-        if len(node.queue) == 0:
-            new_items = list(node.items + node.children)
-            random.shuffle(new_items)  
-            node.queue += new_items
+        if not node.queue:
+            node.queue = list(node.idxs) if node.idxs else list(node.children)
+            random.shuffle(node.queue)  
 
         return node.queue
 
@@ -279,8 +299,9 @@ class HierarchicalDL(TfmdDL):
         """
         Return the next index to reference the dataset.
         """
-        node = node or self.classification_tree
+        node = node or self.seqtree.classification_tree
         queue = self.node_queue(node)
+        # print(node, node.queue)
         
         item = queue.pop()
         if isinstance(item, SoftmaxNode):
@@ -294,6 +315,8 @@ class HierarchicalDL(TfmdDL):
         """
         indexes = []
         for _ in range(self.n):
-            indexes.append(self.next_idx())
+            next_index = self.next_idx()
+            # print('\t---- index', len(indexes), next_index)
+            indexes.append(next_index)
         return indexes
         
