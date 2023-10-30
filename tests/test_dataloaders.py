@@ -3,8 +3,9 @@ from hierarchicalsoftmax import SoftmaxNode
 from seqbank import SeqBank
 from corgi.seqtree import SeqTree
 from corgi import dataloaders
-from corgi.transforms import GetTensorDNA, RandomSliceBatch, GetXY
+from corgi.transforms import GetTensorDNA, RandomSliceBatch, GetXY, DeterministicSliceBatch
 from corgi.tensor import TensorDNA
+from fastai.data.core import TfmdDL
 
 
 test_data = Path(__file__).parent / "testdata"
@@ -82,10 +83,38 @@ def test_hierarchical_dataloader_transforms():
         before_batch=RandomSliceBatch(maximum=4000),
     )   
     
+    total = 0
     for x,y in dl:
         assert x.shape[0] == 4
         assert y.shape[0] == 4
         
         assert x.shape[1] <= 4000
         assert type(x) == TensorDNA
+        total += x.shape[0]
+    
+    assert total == dl.n
 
+
+def test_validation_dataloader():
+    seqtree = SeqTree.load(test_data/"seqtree.pkl")
+    seqbank = SeqBank(test_data/"seqbank.sb")
+    validation_length = 567
+
+    keys = list(seqtree.keys())
+
+    dl = TfmdDL(
+        dataset=keys,
+        batch_size=4, 
+        after_item=GetXY(seqbank=seqbank, seqtree=seqtree),
+        before_batch=DeterministicSliceBatch(seq_length=validation_length),
+    )   
+    
+    total = 0
+    for x,y in dl:
+        assert x.shape[0] == y.shape[0]
+        
+        assert x.shape[1] == validation_length
+        assert type(x) == TensorDNA
+        total += x.shape[0]
+
+    assert total == len(keys)
