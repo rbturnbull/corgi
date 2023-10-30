@@ -1,14 +1,10 @@
-import torch
-from enum import Enum
 import random
-from itertools import chain
-from attrs import define
+import random
+from typing import List
 
 import gzip
 import pandas as pd
 from pathlib import Path
-import numpy as np
-from rich.progress import track
 
 from Bio import SeqIO
 from fastcore.foundation import mask2idxs
@@ -16,20 +12,17 @@ from fastai.data.transforms import IndexSplitter
 
 from fastcore.foundation import L
 from fastcore.dispatch import typedispatch
-from fastcore.meta import delegates
-from rich.progress import track
 from fastai.data.core import TfmdDL, DataLoaders, get_empty_df
-from fastai.callback.data import WeightedDL
-from fastai.data.block import DataBlock, TransformBlock, CategoryBlock
 from fastai.torch_core import display_df
-from fastai.data.transforms import ColSplitter, ColReader, RandomSplitter
-from hierarchicalsoftmax import HierarchicalSoftmaxLoss, SoftmaxNode
+from hierarchicalsoftmax import SoftmaxNode
+
+from seqbank import SeqBank
 
 from .tensor import TensorDNA, dna_seq_to_tensor
-from .transforms import RandomSliceBatch, SliceTransform, GetTensorDNA, PadBatchX, DeterministicSliceBatch, DeformBatch
-from .hierarchy import create_hierarchy
-from seqbank import SeqBank
+from .transforms import PadBatchX, DeterministicSliceBatch, GetXY, RandomSliceBatch
+
 from .seqtree import SeqTree
+
 
 
 def open_path(path:Path):
@@ -38,55 +31,6 @@ def open_path(path:Path):
         return gzip.open(path, "rt")
     return open(path, "rt")
 
-
-class SeqTreeSplitter:
-    def __init__(self, seqtree:SeqTree, partition:int=1):
-        self.seqtree = seqtree
-        self.partition = partition
-
-    def __call__(self, objects):
-        validation_indexes = mask2idxs(self.seqtree[object].partition == self.partition for object in objects)
-        return IndexSplitter(validation_indexes)(objects)
-
-
-class SeqTreeNodeIdGetter:
-    def __init__(self, seqtree:SeqTree):
-        self.seqtree = seqtree
-
-    def __call__(self, accession:str):
-        return self.seqtree[accession].node_id
-
-
-@delegates()
-class StratifiedDL(TfmdDL):
-    def __init__(self, dataset=None, bs=None, groups=None, **kwargs):
-        super().__init__(dataset=dataset, bs=bs, **kwargs)
-        self.groups = [list(group) for group in groups] if groups else None
-        self.min_length = None
-        if not self.groups or not self.shuffle:
-            return
-
-        for group in self.groups:
-            if self.min_length is None:
-                self.min_length = len(group)
-                continue
-            self.min_length = min(self.min_length, len(group))
-        self.queues = [self.shuffle_fn(group) for group in self.groups]
-        self.n = self.min_length * len(self.queues)
-
-    def get_idxs(self):
-        if not self.groups or not self.shuffle:
-            return super().get_idxs()
-
-        epoch_indexes = []
-        for i, queue in enumerate(self.queues):
-            if len(queue) < self.min_length:
-                queue += self.shuffle_fn(self.groups[i])
-
-            epoch_indexes.append(queue[: self.min_length])
-            self.queues[i] = queue[self.min_length :]
-
-        return list(chain(*zip(*epoch_indexes)))
 
 
 @typedispatch
@@ -99,56 +43,6 @@ def show_batch(x: TensorDNA, y, samples, ctxs=None, max_n=20, trunc_at=150, **kw
     df = pd.DataFrame(ctxs, columns=["x", "y"])
     display_df(df)
     return ctxs
-
-
-class DataloaderType(str, Enum):
-    PLAIN = "PLAIN"
-    WEIGHTED = "WEIGHTED"
-    STRATIFIED = "STRATIFIED"
-
-
-def create_seqtree_dataloaders(
-    seqtree:SeqTree, 
-    seqbank:SeqBank, 
-    batch_size:int=64, 
-    validation_partition:int=1,
-    deform_lambda: float = None,
-    validation_seq_length:int=1_000, 
-    verbose:bool=False,
-    label_smoothing:float=0.0,
-    gamma:float=0.0,
-    **kwargs
-):    
-    # Set up batch transforms
-    before_batch = [
-        RandomSliceBatch(only_split_index=0), 
-        DeterministicSliceBatch(seq_length=validation_partition, only_split_index=1),
-    ]
-    if deform_lambda is not None:
-        before_batch.append(DeformBatch(deform_lambda=deform_lambda))
-
-    dataloaders_kwargs = dict(bs=batch_size, drop_last=False, before_batch=before_batch)
-
-    getters = [
-        GetTensorDNA(seqbank),
-        SeqTreeNodeIdGetter(seqtree),
-    ]
-
-    blocks = (
-        TransformBlock, 
-        TransformBlock, 
-    )
-    datablock = DataBlock(
-        blocks=blocks,
-        splitter=SeqTreeSplitter(seqtree, validation_partition),
-        getters=getters,
-        n_inp=1,
-    )
-    dls = datablock.dataloaders(set(seqtree.keys()), verbose=verbose, **dataloaders_kwargs)
-
-    dls.classification_tree = seqtree.classification_tree
-
-    return dls
 
 
 class SeqIODataloader:
@@ -236,3 +130,154 @@ class SeqIODataloader:
         if batch:
             batch = self.pad(batch)
             yield batch
+
+
+class HierarchicalDataloader(TfmdDL):
+    def __init__(self, seqtree:SeqTree, exclude_partition:int=None, seed:int=42, batch_size=None, **kwargs):
+        # Later put in seqbank:SeqBank
+        classification_tree = seqtree.classification_tree
+        self.seqtree = seqtree
+        self.exclude_partition = exclude_partition
+        self.seed = seed
+
+        dataset = []
+        count = 0
+
+        # Add items to nodes
+        for node in classification_tree.post_order_iter():
+            node.idxs = set()
+    
+        # Loop Through Tree and add accessions
+        for accession, detail in seqtree.items(): # should this be self.items
+            if exclude_partition is not None and exclude_partition == detail.partition:
+                continue
+            
+            node = seqtree.node(accession)
+
+            # Only allow leaf/tip nodes to have items
+            if not node.is_leaf:
+                continue
+
+            node.idxs.add(count)
+            dataset.append(accession)
+            count += 1
+
+        # Get epoch size from the minimum number of items before it could repeat and create initial queues
+        random.seed(seed)
+        for node in classification_tree.post_order_iter():
+            if node.children:
+                child_min_items_before_repeat = min([
+                    child.min_items_before_repeat 
+                    for child in node.children 
+                    if child.min_items_before_repeat
+                ])
+                node.min_items_before_repeat = child_min_items_before_repeat * len(node.children)
+            elif node.idxs:
+                node.min_items_before_repeat = len(node.idxs)  
+            else:
+                node.min_items_before_repeat = None
+
+            # Initialize queue            
+            node.queue = None
+
+        super().__init__(dataset=dataset, batch_size=batch_size, **kwargs)
+        self.n = classification_tree.min_items_before_repeat
+
+    def node_queue(self, node):
+        if not node.queue:
+            node.queue = list(node.idxs) if node.idxs else list(node.children)
+            random.shuffle(node.queue)  
+
+        return node.queue
+
+    def next_idx(self, node=None):
+        """
+        Return the next index to reference the dataset.
+        """
+        node = node or self.seqtree.classification_tree
+        queue = self.node_queue(node)
+        # print(node, node.queue)
+
+        if not queue:
+            return None
+        
+        item = queue.pop()
+        if isinstance(item, SoftmaxNode):
+            return self.next_idx(item)
+        
+        return item
+
+    def get_idxs(self) -> List[int]:
+        """
+        Return a list of indices to reference the dataset.
+        """
+        indexes = []
+        while len(indexes) < self.n:
+            next_index = self.next_idx()
+            if next_index:
+                indexes.append(next_index)
+        return indexes
+        
+
+def create_training_dataloader(
+    seqtree:SeqTree, 
+    seqbank:SeqBank, 
+    batch_size:int, 
+    validation_partition:int, 
+    minimum: int = 150, 
+    maximum: int = 3_000,
+) -> HierarchicalDataloader:
+    return HierarchicalDataloader(
+        seqtree=seqtree, 
+        batch_size=batch_size, 
+        exclude_partition=validation_partition,
+        after_item=GetXY(seqbank=seqbank, seqtree=seqtree),
+        before_batch=RandomSliceBatch(maximum=maximum, minimum=minimum),
+    )   
+
+
+def create_validation_dataloader(
+    seqtree:SeqTree, 
+    seqbank:SeqBank, 
+    batch_size:int, 
+    validation_partition:int, 
+    validation_length:int,
+) -> TfmdDL:
+    accessions = []
+    for accession, details in seqtree.items():
+        if details.partition == validation_partition:
+            accessions.append(accession)
+
+    return TfmdDL(
+        dataset=accessions,
+        batch_size=batch_size, 
+        after_item=GetXY(seqbank=seqbank, seqtree=seqtree),
+        before_batch=DeterministicSliceBatch(seq_length=validation_length),
+    )   
+
+
+def create_dataloaders(
+    seqtree:SeqTree, 
+    seqbank:SeqBank, 
+    batch_size:int, 
+    validation_partition:int,
+    validation_length:int=1_000,    
+    minimum: int = 150, 
+    maximum: int = 3_000, 
+) -> DataLoaders:
+    train_dl = create_training_dataloader(
+        seqtree=seqtree, 
+        seqbank=seqbank, 
+        batch_size=batch_size,
+        validation_partition=validation_partition,
+        minimum=minimum, 
+        maximum=maximum, 
+    )
+    valid_dl = create_validation_dataloader(
+        seqtree=seqtree, 
+        seqbank=seqbank, 
+        batch_size=batch_size,
+        validation_length=validation_length, 
+        validation_partition=validation_partition,
+    )
+    return DataLoaders(train_dl, valid_dl)

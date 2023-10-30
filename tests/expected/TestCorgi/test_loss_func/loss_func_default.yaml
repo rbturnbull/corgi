@@ -1,2 +1,2 @@
 params: {}
-output: None
+output: PolyLoss()

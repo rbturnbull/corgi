@@ -1,2 +1,2 @@
 params: {}
-output: f1_score
+output: greedy_accuracy_depth_one

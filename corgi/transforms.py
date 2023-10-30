@@ -12,6 +12,7 @@ from scipy.stats import nbinom
 
 from .tensor import TensorDNA
 from seqbank import SeqBank
+from .seqtree import SeqTree
 
 
 class SplitTransform(Transform):
@@ -88,6 +89,16 @@ class GetTensorDNA(Transform):
     def encodes(self, accession: str):
         array = torch.frombuffer(self.seqbank[accession], dtype=torch.uint8)
         return TensorDNA(array)
+
+
+@dataclass
+class GetXY(Transform):
+    seqbank:SeqBank
+    seqtree:SeqTree
+
+    def encodes(self, accession: str):
+        array = torch.frombuffer(self.seqbank[accession], dtype=torch.uint8)
+        return TensorDNA(array), self.seqtree[accession].node_id
 
 
 class RandomSliceBatch(SplitTransform):

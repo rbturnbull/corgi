@@ -48,11 +48,8 @@ class Corgi(ta.TorchApp):
         seqbank:Path = ta.Param(help="The HDF5 file with the sequences."),
         validation_partition:int = ta.Param(default=1, help="The partition to use for validation."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
-        dataloader_type: dataloaders.DataloaderType = ta.Param(
-            default=dataloaders.DataloaderType.PLAIN, case_sensitive=False
-        ),
-        validation_seq_length:int = 1_000,
-        deform_lambda:float = ta.Param(default=None, help="The lambda for the deform transform."),
+        validation_length:int = 1_000,
+        # deform_lambda:float = ta.Param(default=None, help="The lambda for the deform transform."),
         tips_mode:bool = True,
     ) -> DataLoaders:
         """
@@ -74,14 +71,12 @@ class Corgi(ta.TorchApp):
         seqbank = SeqBank(seqbank)
 
         print(f"Creating dataloaders with batch_size {batch_size} and validation partition {validation_partition}.")
-        dls = dataloaders.create_seqtree_dataloaders(
-            seqtree=seqtree, 
-            seqbank=seqbank, 
-            batch_size=batch_size, 
-            dataloader_type=dataloader_type, 
-            deform_lambda=deform_lambda, 
-            validation_seq_length=validation_seq_length,
+        dls = dataloaders.create_dataloaders(
+            seqtree=seqtree,
+            seqbank=seqbank,
+            batch_size=batch_size,
             validation_partition=validation_partition,
+            validation_length=validation_length,
         )
         self.classification_tree = dls.classification_tree
         self.classification_tree.tips_mode = tips_mode
