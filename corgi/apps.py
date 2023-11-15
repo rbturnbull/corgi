@@ -63,7 +63,10 @@ class Corgi(ta.TorchApp):
             raise Exception("No seqtree given")
         if seqbank is None:
             raise Exception("No seqbank given")
-        
+
+        seqtree = Path(seqtree)
+        seqbank = Path(seqbank)
+
         print(f"Loading seqtree {seqtree}")
         seqtree = SeqTree.load(seqtree)
 
@@ -78,6 +81,7 @@ class Corgi(ta.TorchApp):
             validation_partition=validation_partition,
             validation_length=validation_length,
         )
+        dls.classification_tree = seqtree.classification_tree
         self.classification_tree = dls.classification_tree
         self.classification_tree.tips_mode = tips_mode
         if tips_mode:

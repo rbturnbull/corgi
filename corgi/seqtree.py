@@ -3,7 +3,7 @@ from attrs import define, field
 from hierarchicalsoftmax import SoftmaxNode
 from collections import UserDict
 import pickle
-
+from seqbank import SeqBank
 
 @define
 class SeqDetail:
@@ -63,3 +63,13 @@ class SeqTree(UserDict):
             return detail.node
         return self.classification_tree.node_list[detail.node_id]
     
+    def accessions_in_partition(self, partition:int):
+        accessions = []
+        for accession, detail in self.items():
+            if detail.partition == partition:
+                accessions.append(accession)
+        return accessions
+
+    def export_partition(self, seqbank:SeqBank, output:Path, partition:int, format:str=""):
+        """ Outputs sequences for a partition into a file. """
+        seqbank.export(output, accessions=self.accessions_in_partition(partition), format=format)
