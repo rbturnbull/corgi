@@ -73,3 +73,4 @@ class SeqTree(UserDict):
     def export_partition(self, seqbank:SeqBank, output:Path, partition:int, format:str=""):
         """ Outputs sequences for a partition into a file. """
         seqbank.export(output, accessions=self.accessions_in_partition(partition), format=format)
+

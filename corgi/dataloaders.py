@@ -219,7 +219,7 @@ class HierarchicalDataloader(TfmdDL):
         return indexes
         
 
-def create_training_dataloader(
+def create_hierarchical_training_dataloader(
     seqtree:SeqTree, 
     seqbank:SeqBank, 
     batch_size:int, 
@@ -231,6 +231,27 @@ def create_training_dataloader(
         seqtree=seqtree, 
         batch_size=batch_size, 
         exclude_partition=validation_partition,
+        after_item=GetXY(seqbank=seqbank, seqtree=seqtree),
+        before_batch=RandomSliceBatch(maximum=maximum, minimum=minimum),
+    )   
+
+
+def create_training_dataloader(
+    seqtree:SeqTree, 
+    seqbank:SeqBank, 
+    batch_size:int, 
+    validation_partition:int, 
+    minimum: int = 150, 
+    maximum: int = 3_000,
+) -> TfmdDL:
+    accessions = []
+    for accession, details in seqtree.items():
+        if details.partition != validation_partition:
+            accessions.append(accession)
+
+    return TfmdDL(
+        dataset=accessions,
+        batch_size=batch_size, 
         after_item=GetXY(seqbank=seqbank, seqtree=seqtree),
         before_batch=RandomSliceBatch(maximum=maximum, minimum=minimum),
     )   
@@ -264,8 +285,11 @@ def create_dataloaders(
     validation_length:int=1_000,    
     minimum: int = 150, 
     maximum: int = 3_000, 
+    hierarchical: bool = False,
 ) -> DataLoaders:
-    train_dl = create_training_dataloader(
+    
+    training_dataloader_func = create_hierarchical_training_dataloader if hierarchical else create_training_dataloader
+    train_dl = training_dataloader_func(
         seqtree=seqtree, 
         seqbank=seqbank, 
         batch_size=batch_size,
@@ -273,6 +297,7 @@ def create_dataloaders(
         minimum=minimum, 
         maximum=maximum, 
     )
+
     valid_dl = create_validation_dataloader(
         seqtree=seqtree, 
         seqbank=seqbank, 
