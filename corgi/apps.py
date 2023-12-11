@@ -51,6 +51,7 @@ class Corgi(ta.TorchApp):
         validation_length:int = 1_000,
         # deform_lambda:float = ta.Param(default=None, help="The lambda for the deform transform."),
         tips_mode:bool = True,
+        max_seqs:int = None,
     ) -> DataLoaders:
         """
         Creates a FastAI DataLoaders object which Corgi uses in training and prediction.
@@ -80,6 +81,7 @@ class Corgi(ta.TorchApp):
             batch_size=batch_size,
             validation_partition=validation_partition,
             validation_length=validation_length,
+            max_seqs=max_seqs,
         )
         dls.classification_tree = seqtree.classification_tree
         self.classification_tree = dls.classification_tree

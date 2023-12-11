@@ -19,7 +19,7 @@ from hierarchicalsoftmax import SoftmaxNode
 from seqbank import SeqBank
 
 from .tensor import TensorDNA, dna_seq_to_tensor
-from .transforms import PadBatchX, DeterministicSliceBatch, GetXY, RandomSliceBatch
+from .transforms import PadBatchX, DeterministicSliceBatch, GetXY, RandomSliceBatch, PadBatch
 
 from .seqtree import SeqTree
 
@@ -236,6 +236,12 @@ def create_hierarchical_training_dataloader(
     )   
 
 
+class CorgiDataloaders(DataLoaders):
+    def new_empty(self):
+        loaders = [dl.new([]) for dl in self.loaders]
+        return type(self)(*loaders, path=self.path, device=self.device)
+
+
 def create_training_dataloader(
     seqtree:SeqTree, 
     seqbank:SeqBank, 
@@ -243,16 +249,21 @@ def create_training_dataloader(
     validation_partition:int, 
     minimum: int = 150, 
     maximum: int = 3_000,
+    max_seqs: int = 0,
 ) -> TfmdDL:
     accessions = []
     for accession, details in seqtree.items():
         if details.partition != validation_partition:
             accessions.append(accession)
 
+    if max_seqs:
+        accessions = accessions[:max_seqs]
+
     return TfmdDL(
         dataset=accessions,
         batch_size=batch_size, 
-        after_item=GetXY(seqbank=seqbank, seqtree=seqtree),
+        shuffle=True,
+        after_item=GetXY(seqbank=seqbank, seqtree=seqtree, maximum=maximum, deterministic=False),
         before_batch=RandomSliceBatch(maximum=maximum, minimum=minimum),
     )   
 
@@ -272,8 +283,9 @@ def create_validation_dataloader(
     return TfmdDL(
         dataset=accessions,
         batch_size=batch_size, 
-        after_item=GetXY(seqbank=seqbank, seqtree=seqtree),
-        before_batch=DeterministicSliceBatch(seq_length=validation_length),
+        shuffle=False,
+        after_item=GetXY(seqbank=seqbank, seqtree=seqtree, maximum=validation_length, deterministic=True),
+        before_batch=PadBatch(),
     )   
 
 
@@ -286,6 +298,7 @@ def create_dataloaders(
     minimum: int = 150, 
     maximum: int = 3_000, 
     hierarchical: bool = False,
+    max_seqs:int = 0,
 ) -> DataLoaders:
     
     training_dataloader_func = create_hierarchical_training_dataloader if hierarchical else create_training_dataloader
@@ -296,6 +309,7 @@ def create_dataloaders(
         validation_partition=validation_partition,
         minimum=minimum, 
         maximum=maximum, 
+        max_seqs=max_seqs,
     )
 
     valid_dl = create_validation_dataloader(
@@ -305,4 +319,5 @@ def create_dataloaders(
         validation_length=validation_length, 
         validation_partition=validation_partition,
     )
-    return DataLoaders(train_dl, valid_dl)
+    dls = CorgiDataloaders(train_dl, valid_dl)
+    return dls

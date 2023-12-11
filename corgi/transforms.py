@@ -1,10 +1,11 @@
 from dataclasses import dataclass
+from typing import Optional
 import pandas as pd
 import random
 import torch
 from torch import tensor
 import torch.nn as nn
-
+from zlib import adler32
 from fastcore.transform import Transform
 import numpy as np
 from Bio.SeqRecord import SeqRecord
@@ -34,7 +35,7 @@ class SplitTransform(Transform):
         return b
 
 
-def slice_tensor(tensor, size, start_index=None):
+def slice_tensor(tensor, size, start_index=None, pad:bool=True):
     original_length = tensor.shape[0]
     if start_index is None:
         if original_length <= size:
@@ -42,7 +43,7 @@ def slice_tensor(tensor, size, start_index=None):
         else:
             start_index = random.randrange(0, original_length - size)
     end_index = start_index + size
-    if end_index > original_length:
+    if end_index > original_length and pad:
         sliced = tensor[start_index:]
         sliced = nn.ConstantPad1d((0, end_index - original_length), 0)(sliced)
     else:
@@ -95,9 +96,20 @@ class GetTensorDNA(Transform):
 class GetXY(Transform):
     seqbank:SeqBank
     seqtree:SeqTree
+    deterministic:bool=False
+    maximum:Optional[int]=None
 
     def encodes(self, accession: str):
-        array = torch.frombuffer(self.seqbank[accession], dtype=torch.uint8)
+        data = self.seqbank[accession]
+        length = len(data)
+
+        # Truncate if necessary
+        if self.maximum and length > self.maximum:
+            rng = np.random.RandomState(adler32(accession.encode("ascii"))) if self.deterministic else np.random
+            start_index = rng.randint(0, length - self.maximum)
+            data = data[start_index:start_index+self.maximum]
+
+        array = torch.frombuffer(data, dtype=torch.uint8)
         return TensorDNA(array), self.seqtree[accession].node_id
 
 
