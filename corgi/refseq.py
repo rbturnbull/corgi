@@ -19,13 +19,6 @@ DNA_PREFIXES = {"NC", "AC", "NZ", "NT", "NW", "NG"}
 
 RANKS = ("superkingdom", "kingdom", "phylum", "class", "order")
 
-def my_open(file):
-    file = Path(file)
-    if file.suffix.lower() == ".gz":
-        return gzip.open(file, 'rb')
-    return open(file, "r")
-
-
 
 class DNAType(Enum):
     NUCLEAR = "Nuclear"
@@ -35,6 +28,30 @@ class DNAType(Enum):
 
     def __str__(self):
         return str(self.value)
+
+
+def my_open(file):
+    file = Path(file)
+    if file.suffix.lower() == ".gz":
+        return gzip.open(file, 'rb')
+    return open(file, "r")
+
+
+def line_count(file:Path):
+    """ Adapted from https://stackoverflow.com/a/9631635 """
+    def blocks(stream, size=65536):
+        while True:
+            b = stream.read(size)
+            if not b: break
+            yield b
+
+    with my_open(file) as f:
+        if isinstance(f, gzip.GzipFile):
+            count = (sum(bl.count(b"\n") for bl in blocks(f)))
+        else:
+            count = (sum(bl.count("\n") for bl in blocks(f)))
+    
+    return count
 
 
 def get_refseq_release() -> int:
@@ -89,6 +106,8 @@ def refseq_to_seqtree(
 ):
     catalog = catalog or get_catalogue()
     print(f"Using catalog: {catalog}")
+    count = line_count(catalog)
+    print(f"{count} lines in catalog")
 
     root = SoftmaxNode("root", rank="root", nseq=0)
     seqtree = SeqTree(root)
@@ -111,9 +130,7 @@ def refseq_to_seqtree(
     taxonomy = NcbiTx()
 
     with my_open(catalog) as f:
-        # count = sum(1 for line in f)
-        # f.seek(0)
-        for line in track(f, description="Processing RefSeq: "):
+        for line in track(f, description="Processing RefSeq: ", total=count):
             if isinstance(line, bytes):
                 line = line.decode()
             components = line.split("\t")
