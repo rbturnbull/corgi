@@ -8,6 +8,7 @@ from appdirs import user_cache_dir
 from torchapp.download import cached_download
 from rich.progress import track
 from .seqtree import SeqTree
+import gzip
 
 import typer
 
@@ -17,6 +18,13 @@ app = typer.Typer()
 DNA_PREFIXES = {"NC", "AC", "NZ", "NT", "NW", "NG"}
 
 RANKS = ("superkingdom", "kingdom", "phylum", "class", "order")
+
+def my_open(file):
+    file = Path(file)
+    if file.suffix.lower() == ".gz":
+        return gzip.open(file, 'rb')
+    return open(file, "r")
+
 
 
 class DNAType(Enum):
@@ -97,16 +105,17 @@ def refseq_to_seqtree(
         ranks = ranks.split(",")
 
     if isinstance(restrict_ranks, str):
-        restrict_ranks_list = restrict_ranks.split(",")
         restrict_ranks = set(restrict_ranks.split(","))
 
     print('Loading taxonomy...')
     taxonomy = NcbiTx()
 
-    with open(catalog) as f:
-        count = sum(1 for line in f)
-        f.seek(0)
-        for line in track(f, total=count, description="Processing RefSeq: "):
+    with my_open(catalog) as f:
+        # count = sum(1 for line in f)
+        # f.seek(0)
+        for line in track(f, description="Processing RefSeq: "):
+            if isinstance(line, bytes):
+                line = line.decode()
             components = line.split("\t")
             accession = components[2]
             prefix = accession[:2]
