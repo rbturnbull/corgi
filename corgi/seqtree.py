@@ -19,6 +19,7 @@ class SeqDetail:
         self.partition, self.node_id = state
         self.node = None
 
+
 class AlreadyExists(Exception):
     pass
 
@@ -75,3 +76,5 @@ class SeqTree(UserDict):
         """ Outputs sequences for a partition into a file. """
         seqbank.export(output, accessions=self.accessions_in_partition(partition), format=format)
 
+    def render(self, **kwargs):
+        self.classification_tree.render(**kwargs)

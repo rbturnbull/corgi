@@ -6,6 +6,7 @@ from typing import List
 from enum import Enum
 from appdirs import user_cache_dir
 from torchapp.download import cached_download
+from rich.progress import track
 from .seqtree import SeqTree
 
 import typer
@@ -25,7 +26,7 @@ class DNAType(Enum):
     PLASMID = "Plasmid"
 
     def __str__(self):
-        return self.value
+        return str(self.value)
 
 
 def get_refseq_release() -> int:
@@ -76,6 +77,7 @@ def refseq_to_seqtree(
     catalog:Path=None,
     ranks:str="superkingdom,kingdom,phylum,class,order",
     restrict_ranks:str="class,order",
+    print_tree:bool=False,
 ):
     catalog = catalog or get_catalogue()
     print(f"Using catalog: {catalog}")
@@ -87,20 +89,24 @@ def refseq_to_seqtree(
     type_nodes = {}
     type_taxon_to_node = {}
     for type_obj in DNAType:
-        type = str(type_obj)
-        type_nodes[type] = SoftmaxNode(type, parent=root, rank="type", nseq=0)
-        type_taxon_to_node[type] = {}
+        type_str = str(type_obj)
+        type_nodes[type_str] = SoftmaxNode(type_str, parent=root, rank="type", nseq=0)
+        type_taxon_to_node[type_str] = {}
 
     if isinstance(ranks, str):
         ranks = ranks.split(",")
 
     if isinstance(restrict_ranks, str):
+        restrict_ranks_list = restrict_ranks.split(",")
         restrict_ranks = set(restrict_ranks.split(","))
 
+    print('Loading taxonomy...')
     taxonomy = NcbiTx()
 
     with open(catalog) as f:
-        for line in f:
+        count = sum(1 for line in f)
+        f.seek(0)
+        for line in track(f, total=count, description="Processing RefSeq: "):
             components = line.split("\t")
             accession = components[2]
             prefix = accession[:2]
@@ -115,20 +121,20 @@ def refseq_to_seqtree(
 
             # Get the type of DNA by seeing what files it is in
             if "mitochondrion" in files:
-                type_str = DNAType.MITOCHONDRION
+                type_obj = DNAType.MITOCHONDRION
             elif "plastid" in files:
-                type_str = DNAType.PLASTID
+                type_obj = DNAType.PLASTID
             elif "plasmid" in files:
-                type_str = DNAType.PLASMID
+                type_obj = DNAType.PLASMID
             else:
-                type_str = DNAType.NUCLEAR
-            type_str = str(type_str)
+                type_obj = DNAType.NUCLEAR
+            type_str = str(type_obj)
 
             # Get the node for this taxon
             node = get_node(taxon, taxonomy, type_taxon_to_node[type_str], type_nodes[type_str], ranks=ranks)
-            
+
             # Skip if not in one of the allowed ranks (e.g. class, order)
-            if node.rank != restrict_ranks:
+            if node.rank not in restrict_ranks:
                 continue
 
             # Skip if we have too many sequences for this leaf node
@@ -146,7 +152,11 @@ def refseq_to_seqtree(
 
     if render:
         print(f'Rendering seqtree to {render}')
-        seqtree.render(filepath=render)
+
+    for node in root.post_order_iter():
+        node.render_str = f"{node.name} ({node.nseq})" if node.nseq else node.name
+
+    seqtree.render(filepath=render, attr="render_str", print=print_tree)
 
 
 if __name__ == "__main__":
