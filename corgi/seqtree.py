@@ -5,6 +5,7 @@ from collections import UserDict
 import pickle
 from seqbank import SeqBank
 
+
 @define
 class SeqDetail:
     partition:int
