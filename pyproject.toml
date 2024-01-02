@@ -79,3 +79,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 corgi-train = "corgi.apps:Corgi.main"
 corgi = "corgi.apps:Corgi.inference_only_main"
+refseq-to-seqtree = "corgi.refseq:app"
