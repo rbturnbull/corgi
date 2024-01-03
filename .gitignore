@@ -192,3 +192,5 @@ refseq220-seqtree-easy-order-100b.svg
 train-dfam.sh
 train-repbase.sh
 train.sh
+*.out
+*.slurm

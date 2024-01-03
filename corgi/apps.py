@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 from typing import List
 from torch import nn
@@ -5,24 +6,21 @@ import pandas as pd
 from fastai.data.core import DataLoaders
 from torchapp.util import copy_func, call_func, change_typer_to_defaults, add_kwargs
 from fastai.learner import Learner, load_learner
-from fastai.metrics import accuracy, Precision, Recall, RocAuc, F1Score
 import torchapp as ta
 from rich.console import Console
 from rich.table import Table
 from rich.box import SIMPLE
-from Bio import SeqIO
 from Bio.SeqIO import FastaIO
-from polytorch import PolyLoss, HierarchicalData, CategoricalData, total_size
-from polytorch.metrics import HierarchicalGreedyAccuracy, CategoricalAccuracy
-from .seqtree import SeqTree
-from seqbank import SeqBank
 import numpy as np
+from polytorch import PolyLoss, HierarchicalData, total_size
+from polytorch.metrics import HierarchicalGreedyAccuracy
+from seqbank import SeqBank
 
-import time
+from . import dataloaders, models, refseq, transforms
+from .seqtree import SeqTree
 
 console = Console()
 
-from . import dataloaders, models, refseq, transforms
 
 def set_alpha(tree, k=0.5):
     for node in tree.pre_order_iter():

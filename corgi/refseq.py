@@ -47,9 +47,9 @@ def line_count(file:Path):
 
     with my_open(file) as f:
         if isinstance(f, gzip.GzipFile):
-            count = (sum(bl.count(b"\n") for bl in blocks(f)))
+            count = (sum(bl.count(b"\n") for bl in track(blocks(f), description="Counting lines:")))
         else:
-            count = (sum(bl.count("\n") for bl in blocks(f)))
+            count = (sum(bl.count("\n") for bl in track(blocks(f), description="Counting lines:")))
     
     return count
 
@@ -97,6 +97,7 @@ def get_node(taxon, taxonomy, taxon_to_node, root, ranks):
 def refseq_to_seqtree(
     output:Path, 
     render:Path=None, 
+    accessions:Path=None,
     partitions:int=5, 
     max_seqs:int=100, 
     catalog:Path=None,
@@ -183,6 +184,10 @@ def refseq_to_seqtree(
         node.render_str = f"{node.name} ({node.nseq})" if node.nseq else node.name
 
     seqtree.render(filepath=render, attr="render_str", print=print_tree)
+
+    if accessions:
+        print(f"Writing accessions to file {accessions}")
+        seqtree.accessions_to_file(accessions)
 
 
 if __name__ == "__main__":

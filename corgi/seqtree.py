@@ -78,3 +78,9 @@ class SeqTree(UserDict):
 
     def render(self, **kwargs):
         self.classification_tree.render(**kwargs)
+
+    def accessions_to_file(self, file:Path) -> None:
+        """ Writes all the accessions of this SeqTree to a file. """
+        with open(file, "w") as f:
+            for accession in self.keys():
+                print(accession, file=f)
