@@ -31,24 +31,15 @@ class Corgi(ta.TorchApp):
     """
     corgi - Classifier for ORganelle Genomes Inter alia
     """
-
-    def __init__(self):
-        super().__init__()
-        self.categories = refseq.REFSEQ_CATEGORIES  # This will be overridden by the dataloader
-        self.category_counts = self.copy_method(self.category_counts)
-        add_kwargs(to_func=self.category_counts, from_funcs=self.dataloaders)
-        self.category_counts_cli = self.copy_method(self.category_counts)
-        change_typer_to_defaults(self.category_counts)
-
     def dataloaders(
         self,
         seqtree: Path = ta.Param(help="The seqtree which has the sequences to use."),
         seqbank:Path = ta.Param(help="The HDF5 file with the sequences."),
-        validation_partition:int = ta.Param(default=1, help="The partition to use for validation."),
+        validation_partition:int = ta.Param(default=0, help="The partition to use for validation."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
         validation_length:int = 1_000,
         # deform_lambda:float = ta.Param(default=None, help="The lambda for the deform transform."),
-        tips_mode:bool = True,
+        tips_mode:bool = False,
         max_seqs:int = None,
     ) -> DataLoaders:
         """
@@ -159,7 +150,7 @@ class Corgi(ta.TorchApp):
             tune_min=512,
             tune_max=2048,
         ),
-        include_length: bool = False,
+        include_length: bool = True,
         transformer_heads: int = ta.Param(8, help="The number of heads in the transformer."),
         transformer_layers: int = ta.Param(0, help="The number of layers in the transformer. If zero then no transformer is used."),
         macc:int = ta.Param(
@@ -228,14 +219,16 @@ class Corgi(ta.TorchApp):
 
     def metrics(self):
         return [
-            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=1, data_index=0, name="greedy_accuracy_depth_one"),
-            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=2, data_index=0, name="greedy_accuracy_depth_two"),
-            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=3, data_index=0, name="greedy_accuracy_depth_three"),
-            # CategoricalAccuracy(data_index=1, name="dna_type_accuracy"),
+            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=1, data_index=0, name="type_accuracy"),
+            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=2, data_index=0, name="superkingdom_accuracy"),
+            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=3, data_index=0, name="kingdom_accuracy"),
+            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=4, data_index=0, name="phylum_accuracy"),
+            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=5, data_index=0, name="class_accuracy"),
+            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=6, data_index=0, name="order_accuracy"),
         ]
 
     def monitor(self):
-        return "greedy_accuracy_depth_one"
+        return "superkingdom_accuracy"
 
     def loss_func(self):
         assert self.output_types
