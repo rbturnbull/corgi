@@ -1,9 +1,11 @@
+from typing import List, Optional
 from pathlib import Path
 from attrs import define, field
 from hierarchicalsoftmax import SoftmaxNode
 from collections import UserDict
 import pickle
 from seqbank import SeqBank
+import typer
 
 
 @define
@@ -50,6 +52,9 @@ class SeqTree(UserDict):
                 detail.node_id = self.classification_tree.node_to_id[detail.node]
 
     def save(self, path:Path):
+        path = Path(path)
+        path.parent.mkdir(exist_ok=True, parents=True)
+
         self.set_indexes()
         with open(path, 'wb') as handle:
             pickle.dump(self, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -66,17 +71,24 @@ class SeqTree(UserDict):
         return self.classification_tree.node_list[detail.node_id]
     
     def accessions_in_partition(self, partition:int):
-        accessions = []
         for accession, detail in self.items():
             if detail.partition == partition:
-                accessions.append(accession)
-        return accessions
+                yield accession
 
-    def export_partition(self, seqbank:SeqBank, output:Path, partition:int, format:str=""):
-        """ Outputs sequences for a partition into a file. """
-        seqbank.export(output, accessions=self.accessions_in_partition(partition), format=format)
+    def accessions(self, partition:Optional[int] = None):
+        return self.keys() if partition is None else self.accessions_in_partition(partition)
+            
+    def export(self, seqbank:SeqBank, output:Path, partition:Optional[int], format:str=""):
+        """ 
+        Outputs sequences for a partition into a file. 
+        
+        If the partition is given then only the accessions in the partition are exported.
+        The format of the exported file. If not given, then it will be inferred from the file extension of the output.
+        """
+        seqbank.export(output, accessions=self.accessions(partition=partition), format=format)
 
     def render(self, **kwargs):
+        """ Renders the SeqTree. """
         self.classification_tree.render(**kwargs)
 
     def accessions_to_file(self, file:Path) -> None:
@@ -84,3 +96,76 @@ class SeqTree(UserDict):
         with open(file, "w") as f:
             for accession in self.keys():
                 print(accession, file=f)
+
+    def intersection_seqbank(self, seqbank:SeqBank) -> List[str]:
+        """ 
+        Removes any accession that is not found in a SeqBank. 
+        
+        Returns a list of missing accessions.
+        """
+        my_accessions = self.keys()
+        missing = seqbank.missing(my_accessions)
+        for accession in missing:
+            del self[accession]
+        return missing
+    
+
+
+app = typer.Typer()
+
+@app.command()
+def intersection_seqbank(
+    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
+    seqbank:Path = typer.Argument(...,help="The path to the SeqBank."), 
+    output:Path = typer.Argument(...,help="The path to the SeqBank."),
+):
+    """ 
+    Takes a SeqTree and removes any accession that is not found in a SeqBank.
+
+    Saves the output SeqTree to `output`.
+    """
+    seqtree = SeqTree.load(seqtree)
+    seqbank = SeqBank(seqbank)
+    seqtree.intersection_seqbank(seqbank)
+    seqtree.save(output)
+
+
+@app.command()
+def accessions(
+    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
+    partition:Optional[int] = typer.Option(None,help="The index of the partition to list."), 
+):
+    """ 
+    Prints a list of accessions in a SeqTree. 
+    
+    If a partition is given, then only the accessions for that partition are given.
+    """
+    seqtree = SeqTree.load(seqtree)
+    for accession in seqtree.accessions(partition=partition):
+        print(accession)
+    
+
+@app.command()
+def export(
+    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
+    output:Path = typer.Argument(...,help="The path to the output file."), 
+    partition:Optional[int] = typer.Option(None,help="The index of the partition to include in the export. If not given then all accesions will be exported."), 
+    format:str = typer.Option("",help="The format of the exported file. If not given, then it will be inferred from the file extension of the output."), 
+):
+    seqtree = SeqTree.load(seqtree)
+    seqbank = SeqBank(seqbank)
+    seqbank.export(output, accessions=seqtree.accessions(partition), format=format)
+
+
+@app.command()
+def render(
+    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
+    output:Optional[Path] = typer.Option(None, help="The path to save the rendered tree."),
+    print:bool = typer.Option(True, help="Whether or not to print the tree to the screen.")
+):
+    seqtree = SeqTree.load(seqtree)
+    seqtree.render(filepath=output, print=print)
+
+
+if __name__ == "__main__":
+    app()
