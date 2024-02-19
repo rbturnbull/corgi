@@ -251,9 +251,6 @@ class CorgiDataloaders(DataLoaders):
         loaders = [dl.new([]) for dl in self.loaders]
         return type(self)(*loaders, path=self.path, device=self.device, classification_tree=self.classification_tree)
 
-    # def __setstate__(self, d):
-    #     return super().__setstate__(d)
-
 
 def create_training_dataloader(
     seqtree:SeqTree, 
@@ -287,11 +284,15 @@ def create_validation_dataloader(
     batch_size:int, 
     validation_partition:int, 
     validation_length:int,
+    max_seqs: int = 0,
 ) -> TfmdDL:
     accessions = []
     for accession, details in seqtree.items():
         if details.partition == validation_partition:
             accessions.append(accession)
+
+    if max_seqs:
+        accessions = accessions[:max_seqs]
 
     return TfmdDL(
         dataset=accessions,
@@ -312,8 +313,7 @@ def create_dataloaders(
     maximum: int = 3_000, 
     hierarchical: bool = False,
     max_seqs:int = 0,
-) -> CorgiDataloaders:
-    
+) -> CorgiDataloaders:    
     training_dataloader_func = create_hierarchical_training_dataloader if hierarchical else create_training_dataloader
     train_dl = training_dataloader_func(
         seqtree=seqtree, 
@@ -331,6 +331,7 @@ def create_dataloaders(
         batch_size=batch_size,
         validation_length=validation_length, 
         validation_partition=validation_partition,
+        max_seqs=max_seqs,
     )
     dls = CorgiDataloaders(train_dl, valid_dl, classification_tree=seqtree.classification_tree)
     return dls

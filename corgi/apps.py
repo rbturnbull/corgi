@@ -250,7 +250,7 @@ class Corgi(ta.TorchApp):
         **kwargs,
     ):
         self.dataloader = dataloaders.SeqIODataloader(files=file, device=learner.dls.device, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
-        # self.classification_tree = learner.dls.classification_tree # TODO: Add back in
+        self.classification_tree = learner.dls.classification_tree
         return self.dataloader
 
     # def output_results(
@@ -357,7 +357,6 @@ class Corgi(ta.TorchApp):
     def output_results(
         self,
         results,
-        seqtree:Path=None, # HACK
         output_csv: Path = ta.Param(default=None, help="A path to output the results as a CSV."),
         output_tips_csv: Path = ta.Param(default=None, help="A path to output the results as a CSV which only stores the probabilities at the tips."),
         output_fasta: Path = ta.Param(default=None, help="A path to output the results in FASTA format."),
@@ -368,13 +367,8 @@ class Corgi(ta.TorchApp):
         **kwargs,
     ):
         
-        # Hack - this should be saved from the learner
-        seqtree = SeqTree.load(seqtree)
-        self.classification_tree = seqtree.classification_tree
-
         assert self.classification_tree # This should be saved from the learner
         
-
         classification_probabilities = node_probabilities(results[0], root=self.classification_tree)
         category_names = [self.node_to_str(node) for node in self.classification_tree.node_list if not node.is_root]
         chunk_details = pd.DataFrame(self.dataloader.chunk_details, columns=["file", "original_id", "chunk"])
