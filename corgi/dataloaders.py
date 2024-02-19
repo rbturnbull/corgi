@@ -237,9 +237,22 @@ def create_hierarchical_training_dataloader(
 
 
 class CorgiDataloaders(DataLoaders):
+    def __init__(
+        self, 
+        *loaders, # `DataLoader` objects to wrap
+        path:str='.', # Path to store export objects
+        device=None, # Device to put `DataLoaders`
+        classification_tree:SoftmaxNode=None,
+    ):
+        super().__init__(*loaders, path=path, device=device)
+        self.classification_tree = classification_tree
+
     def new_empty(self):
         loaders = [dl.new([]) for dl in self.loaders]
-        return type(self)(*loaders, path=self.path, device=self.device)
+        return type(self)(*loaders, path=self.path, device=self.device, classification_tree=self.classification_tree)
+
+    # def __setstate__(self, d):
+    #     return super().__setstate__(d)
 
 
 def create_training_dataloader(
@@ -299,7 +312,7 @@ def create_dataloaders(
     maximum: int = 3_000, 
     hierarchical: bool = False,
     max_seqs:int = 0,
-) -> DataLoaders:
+) -> CorgiDataloaders:
     
     training_dataloader_func = create_hierarchical_training_dataloader if hierarchical else create_training_dataloader
     train_dl = training_dataloader_func(
@@ -319,5 +332,6 @@ def create_dataloaders(
         validation_length=validation_length, 
         validation_partition=validation_partition,
     )
-    dls = CorgiDataloaders(train_dl, valid_dl)
+    dls = CorgiDataloaders(train_dl, valid_dl, classification_tree=seqtree.classification_tree)
     return dls
+

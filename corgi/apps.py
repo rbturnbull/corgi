@@ -17,16 +17,16 @@ from polytorch import PolyLoss, HierarchicalData, total_size
 from polytorch.metrics import HierarchicalGreedyAccuracy
 from seqbank import SeqBank
 from hierarchicalsoftmax.inference import node_probabilities, greedy_predictions, render_probabilities
-
+from hierarchicalsoftmax.nodes import SoftmaxNode
 from . import dataloaders, models, refseq, transforms
 from .seqtree import SeqTree
 
 console = Console()
 
 
-def set_alpha(tree, k=0.5):
+def set_alpha(tree, phi=0.5):
     for node in tree.pre_order_iter():
-        node.alpha = np.power(k, len(node.ancestors))
+        node.alpha = np.power(phi, len(node.ancestors))
 
 
 class Corgi(ta.TorchApp):
@@ -40,6 +40,7 @@ class Corgi(ta.TorchApp):
         validation_partition:int = ta.Param(default=0, help="The partition to use for validation."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
         validation_length:int = 1_000,
+        phi:float=ta.Param(default=1.0, tune_max=2.0, tune_min=0.1, help="A multiplication factor for the loss at each level of the tree."),
         # deform_lambda:float = ta.Param(default=None, help="The lambda for the deform transform."),
         tips_mode:bool = False,
         max_seqs:int = None,
@@ -55,7 +56,8 @@ class Corgi(ta.TorchApp):
             raise Exception("No seqtree given")
         if seqbank is None:
             raise Exception("No seqbank given")
-
+        
+        # Set the factors for the loss at each node
         seqtree = Path(seqtree)
         seqbank = Path(seqbank)
 
@@ -79,7 +81,8 @@ class Corgi(ta.TorchApp):
         self.classification_tree.tips_mode = tips_mode
         if tips_mode:
             self.classification_tree.index_tips_mode()
-            set_alpha(self.classification_tree)
+        
+        set_alpha(self.classification_tree, phi=phi)
 
         self.output_types = [
             HierarchicalData(root=self.classification_tree),
@@ -340,6 +343,17 @@ class Corgi(ta.TorchApp):
 
     #     chart.draw()
 
+    def node_to_str(self, node:SoftmaxNode) -> str:
+        """ 
+        Converts the node
+        """
+        # return "/".join([str(n) for n in node.ancestors[1:]] + [str(node)])
+        result = str(node)
+        ancestors = node.ancestors[1:]
+        if ancestors:
+            result = f"{ancestors[0]}/{result}"
+        return result
+
     def output_results(
         self,
         results,
@@ -360,11 +374,9 @@ class Corgi(ta.TorchApp):
 
         assert self.classification_tree # This should be saved from the learner
         
-        def node_lineage_string(node) -> str:
-            return "/".join([str(n) for n in node.ancestors[1:]] + [str(node)])
 
         classification_probabilities = node_probabilities(results[0], root=self.classification_tree)
-        category_names = [node_lineage_string(node) for node in self.classification_tree.node_list if not node.is_root]
+        category_names = [self.node_to_str(node) for node in self.classification_tree.node_list if not node.is_root]
         chunk_details = pd.DataFrame(self.dataloader.chunk_details, columns=["file", "original_id", "chunk"])
         predictions_df = pd.DataFrame(classification_probabilities.numpy(), columns=category_names)
 
@@ -391,7 +403,7 @@ class Corgi(ta.TorchApp):
         )
 
         results_df['greedy_prediction'] = [
-            node_lineage_string(node)
+            self.node_to_str(node)
             for node in predictions
         ]
 
@@ -472,14 +484,14 @@ class Corgi(ta.TorchApp):
         if output_tips_csv:
             output_tips_csv = Path(output_tips_csv)
             output_tips_csv.parent.mkdir(exist_ok=True, parents=True)
-            non_tips = [node_lineage_string(node) for node in self.classification_tree.node_list if not node.is_leaf]
+            non_tips = [self.node_to_str(node) for node in self.classification_tree.node_list if not node.is_leaf]
             tips_df = results_df.drop(columns=non_tips)
             tips_df.to_csv(output_tips_csv, index=False)
 
         if output_csv:
             output_csv = Path(output_csv)
             output_csv.parent.mkdir(exist_ok=True, parents=True)
-            console.print(f"Writing results for {len(results_df)} repeats to: {output_csv}")
+            console.print(f"Writing results for {len(results_df)} sequences to: {output_csv}")
             results_df.to_csv(output_csv, index=False)
 
         # if self.vector:
