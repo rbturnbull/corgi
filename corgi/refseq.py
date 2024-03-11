@@ -98,7 +98,7 @@ def refseq_to_seqtree(
     output:Path, 
     render:Path=None, 
     accessions:Path=None,
-    partitions:int=5, 
+    partitions:int=6, 
     max_seqs:int=100, 
     catalog:Path=None,
     ranks:str="superkingdom,kingdom,phylum,class,order",

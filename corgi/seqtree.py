@@ -4,8 +4,39 @@ from attrs import define, field
 from hierarchicalsoftmax import SoftmaxNode
 from collections import UserDict
 import pickle
+from Bio.Seq import Seq
 from seqbank import SeqBank
+from Bio.SeqRecord import SeqRecord
+from Bio import SeqIO
+
+from seqbank.io import get_file_format
+from seqbank.transform import bytes_to_str
+import numpy as np
+import hashlib
 import typer
+
+
+def str_to_int_hash(s:str)->int:
+    hash_object = hashlib.md5(s.encode())
+    hash_digest = hash_object.digest()
+
+    # Convert the hash to an integer
+    seed_number = int.from_bytes(hash_digest, 'big')
+    seed_number = seed_number % (2**32) # The maximum value is 2**32-1 for a numpy seed
+
+    return seed_number
+
+
+def node_to_str(node:SoftmaxNode) -> str:
+    """ 
+    Converts the node to a string
+    """
+    # return "/".join([str(n) for n in node.ancestors[1:]] + [str(node)])
+    result = str(node)
+    ancestors = node.ancestors[1:]
+    if ancestors:
+        result = f"{ancestors[0]}/{result}"
+    return result
 
 
 @define
@@ -78,14 +109,39 @@ class SeqTree(UserDict):
     def accessions(self, partition:Optional[int] = None):
         return self.keys() if partition is None else self.accessions_in_partition(partition)
             
-    def export(self, seqbank:SeqBank, output:Path, partition:Optional[int], format:str=""):
-        """ 
-        Outputs sequences for a partition into a file. 
-        
+    def export(self, seqbank:SeqBank, output:Path|str, length:int=0, format:str="", seed:int=0):
+        """
+        Outputs sequences from a seqbank into a file. 
+
         If the partition is given then only the accessions in the partition are exported.
         The format of the exported file. If not given, then it will be inferred from the file extension of the output.
+
+        The slice is taken from a random position in the sequence that is at least `length` long.
+
+        Random seed can be set with `seed`.
         """
-        seqbank.export(output, accessions=self.accessions(partition=partition), format=format)
+        format = format or get_file_format(output)
+        with open(output, "w") as f:
+            for accession, detail in self.items():
+                data = seqbank[accession]
+                
+                # If the sequence is long enough, take a random slice
+                if length and length > len(data):
+                    start_max = len(data) - length
+                    my_seed = seed + str_to_int_hash(accession)
+                    np.random.seed(my_seed % 2**32)
+                    start = np.random.randint(0, start_max)
+                    data = data[start:start+length]
+
+                seq_string = bytes_to_str(data)
+                node_str = node_to_str(detail.node)
+                record = SeqRecord(
+                    Seq(seq_string),
+                    id=f"{accession}#{node_str}",
+                    description="",
+                )
+
+                SeqIO.write(record, f, format)
 
     def render(self, **kwargs):
         """ Renders the SeqTree. """
@@ -148,13 +204,16 @@ def accessions(
 @app.command()
 def export(
     seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
+    seqbank:Path = typer.Argument(...,help="The path to the SeqBank."), 
     output:Path = typer.Argument(...,help="The path to the output file."), 
+    length:int = typer.Option(None,help="If used then a subsequence this maximum length is selected."),
+    seed:int = typer.Option(42,help="The random seed to use when slicing the length."),
     partition:Optional[int] = typer.Option(None,help="The index of the partition to include in the export. If not given then all accesions will be exported."), 
     format:str = typer.Option("",help="The format of the exported file. If not given, then it will be inferred from the file extension of the output."), 
 ):
     seqtree = SeqTree.load(seqtree)
     seqbank = SeqBank(seqbank)
-    seqbank.export(output, accessions=seqtree.accessions(partition), format=format)
+    seqtree.export(seqbank, output, accessions=seqtree.accessions(partition), format=format, length=length, seed=seed)
 
 
 @app.command()

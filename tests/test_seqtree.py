@@ -1,7 +1,8 @@
-from corgi.seqtree import SeqTree
+
 import tempfile
 from pathlib import Path
 from hierarchicalsoftmax import SoftmaxNode
+from corgi.seqtree import SeqTree, str_to_int_hash
 
 
 def test_seqtree():
@@ -109,3 +110,6 @@ def test_seqtree_load():
     assert seqtree.node("NZ_JAJNFP010000161.1").name == "Bacteria"
 
 
+def test_str_to_int_hash():
+    assert str_to_int_hash("hello") == 269993362
+    assert str_to_int_hash("This is a test string!3289470#") == 989461991
