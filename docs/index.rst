@@ -18,6 +18,8 @@ Welcome to corgi's documentation!
    :caption: Contents:
 
    quickstart
+   seqtree
+   preprocessing
    api
    cli
    credits
