@@ -1,1 +1,0 @@
-RUN=tiara-stratified-tune3 ; poetry run corgi tune --output-dir ../$RUN --base-dir ../../refseqcsv/tiara-training/ --csv ../../refseqcsv/tiara-training/tiara-training-seqs.csv  --embedding-dim 8 --epochs 1000 --dataloader-type stratified --batch-size 24 --cnn-only --runs 10 --method tpe --engine optuna --id $RUN --wandb
