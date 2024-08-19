@@ -114,7 +114,6 @@ class CorgiDataModule(L.LightningDataModule):
     skewness:float=5
     loc:float=600
     scale:float=1000
-
     num_workers:int|None = None
 
     def setup(self, stage=None):
@@ -137,14 +136,14 @@ class CorgiDataModule(L.LightningDataModule):
             validation_accessions = validation_accessions[:self.max_items]
 
         self.train_dataset = CorgiTrainingDataset(
-            training_accessions, 
+            accessions=training_accessions, 
             seqtree=self.seqtree, 
             seqbank=self.seqbank, 
             deterministic=False, 
             maximum=self.maximum_length,
         )
         self.val_dataset = CorgiTrainingDataset(
-            validation_accessions,
+            accessions=validation_accessions,
             seqtree=self.seqtree,
             seqbank=self.seqbank,
             deterministic=True,

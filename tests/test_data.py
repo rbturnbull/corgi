@@ -1,6 +1,12 @@
+from pathlib import Path
 import torch
 from torch import Tensor
-from corgi.data import CollateRandomLength, CollateFixedLength
+from seqbank import SeqBank
+from corgi.seqtree import SeqTree
+from corgi.data import CollateRandomLength, CollateFixedLength, CorgiDataModule
+
+
+TEST_DATA = Path(__file__).parent / "testdata"
 
 
 def test_collate_random_lengths():
@@ -46,3 +52,39 @@ def test_collate_fixed():
     assert x[0].tolist() == [1,2,3,4] + [0]*16
     assert x[1].tolist() == [1,2,3,4,1,2,3,4,1,2,3,4,1,1,1] + [0]*5
 
+
+def test_train_dataloader():
+    seqtree = SeqTree.load(TEST_DATA/"seqtree.pkl")
+    seqbank = SeqBank(TEST_DATA/"seqbank.sb")
+    data = CorgiDataModule(
+        seqtree=seqtree, 
+        seqbank=seqbank, 
+        validation_partition=1, 
+        batch_size=4, 
+        maximum_length=667,
+        num_workers=0,
+    )
+    data.setup()
+    dataloader = data.train_dataloader()
+    x,y = next(iter(dataloader))
+    assert x.shape == (2, 663)
+    assert y.shape == (2,)
+
+
+def test_val_dataloader():
+    seqtree = SeqTree.load(TEST_DATA/"seqtree.pkl")
+    seqbank = SeqBank(TEST_DATA/"seqbank.sb")
+    data = CorgiDataModule(
+        seqtree=seqtree, 
+        seqbank=seqbank, 
+        validation_partition=1, 
+        batch_size=4, 
+        maximum_length=667,
+        validation_length=999,
+        num_workers=0,
+    )
+    data.setup()
+    dataloader = data.val_dataloader()
+    x,y = next(iter(dataloader))
+    assert x.shape == (2, 999)
+    assert y.shape == (2,)

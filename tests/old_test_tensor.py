@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from corgi import tensor
+from corgi.archive import tensor
 
 
 class TestTensor(unittest.TestCase):
