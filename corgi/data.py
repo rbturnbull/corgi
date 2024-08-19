@@ -31,40 +31,47 @@ def slice_tensor(tensor, size, start_index=None, pad:bool=True):
 
 
 @dataclass
-class CollateFixedLength():
-    seq_length:int
-
-    def slice(self, tensor):
-        return (slice_tensor(tensor[0], self.seq_length, start_index=0),) + tensor[1:]
+class Collate():
+    def get_length(self) -> int:
+        raise NotImplementedError
 
     def __call__(self, batch):
-        return list(map(self.slice, batch))
+        x_batch, y_batch = zip(*batch)
+        length = self.get_length()
+
+        return torch.stack(tuple(slice_tensor(x, length) for x in x_batch)), torch.tensor(y_batch)
 
 
 @dataclass
-class CollateRandomLength():
+class CollateFixedLength(Collate):
+    length:int
+
+    def get_length(self):
+        return self.length
+    
+
+@dataclass
+class CollateRandomLength(Collate):
     minimum_length:int
     maximum_length:int
-    distribution:rv_continuous
+    skewness:float=5
+    loc:float=600
+    scale:float=1000
+    seed:int=42
 
     def __post_init__(self):
         assert self.minimum_length > 0
         assert self.minimum_length <= self.maximum_length
+        self.random_state = np.random.default_rng(self.seed)
+        self.distribution = skewnorm(self.skewness, loc=self.loc, scale=self.scale)
 
-    def generate_length(self) -> int:
+    def get_length(self) -> int:
         while True:
-            seq_len = int(self.distribution.rvs())
+            seq_len = int(self.distribution.rvs(random_state=self.random_state))
             if seq_len < self.minimum_length or seq_len > self.maximum_length:
                 continue
             return seq_len
 
-    def __call__(self, batch):
-        seq_len = self.generate_length()
-
-        def slice(tensor):
-            return (slice_tensor(tensor[0], seq_len),) + tensor[1:]
-
-        return list(map(slice, batch))
 
 
 @dataclass(kw_only=True)
@@ -145,13 +152,12 @@ class CorgiDataModule(L.LightningDataModule):
         )
 
     def train_dataloader(self):
-        distribution = skewnorm(self.skewness, loc=self.loc, scale=self.scale)
         return DataLoader(
             self.train_dataset, 
             batch_size=self.batch_size, 
             num_workers=self.num_workers, 
             shuffle=True, 
-            collate_fn=CollateRandomLength(self.minimum_length, self.maximum_length, distribution=distribution),
+            collate_fn=CollateRandomLength(self.minimum_length, self.maximum_length, skewness=self.skewness, loc=self.loc, scale=self.scale),
         )
 
     def val_dataloader(self):
