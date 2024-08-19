@@ -1,5 +1,4 @@
 import unittest
-from corgi.archive import tensor
 import torch
 
 from corgi import models
