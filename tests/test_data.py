@@ -81,7 +81,7 @@ def test_val_dataloader():
         batch_size=4, 
         maximum_length=667,
         validation_length=999,
-        num_workers=0,
+        num_workers=1,
     )
     data.setup()
     dataloader = data.val_dataloader()
