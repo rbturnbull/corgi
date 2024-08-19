@@ -2,7 +2,7 @@ from pathlib import Path
 from hierarchicalsoftmax import SoftmaxNode
 from seqbank import SeqBank
 from corgi.seqtree import SeqTree
-from corgi import dataloaders
+from corgi import data
 from corgi.transforms import GetTensorDNA, RandomSliceBatch, GetXY, DeterministicSliceBatch
 from corgi.tensor import TensorDNA
 from fastai.data.core import TfmdDL
@@ -34,7 +34,7 @@ def test_hierarchical_dataloader():
 
     # seqtree.save(test_data/"seqtree2.st")
             
-    dl = dataloaders.HierarchicalDataloader(seqtree=seqtree, batch_size=4)
+    dl = data.HierarchicalDataloader(seqtree=seqtree, batch_size=4)
 
     # Check min_items_before_repeat
     assert dl.n == 24
@@ -78,7 +78,7 @@ def test_hierarchical_dataloader():
 def test_create_training_dataloader():
     seqtree = SeqTree.load(test_data/"seqtree.pkl")
     seqbank = SeqBank(test_data/"seqbank.sb")
-    dl = dataloaders.create_training_dataloader(seqtree=seqtree, seqbank=seqbank, validation_partition=1, batch_size=4, maximum=567)
+    dl = data.create_training_dataloader(seqtree=seqtree, seqbank=seqbank, validation_partition=1, batch_size=4, maximum=567)
     total = 0
     for x,y in dl:
         assert x.shape[0] == 4
@@ -97,7 +97,7 @@ def test_validation_dataloader():
     validation_length = 567
     batch_size = 4
 
-    dl = dataloaders.create_validation_dataloader(
+    dl = data.create_validation_dataloader(
         seqtree=seqtree, 
         seqbank=seqbank, 
         batch_size=batch_size, 
@@ -123,7 +123,7 @@ def test_dataloaders():
     seqbank = SeqBank(test_data/"seqbank.sb")
     batch_size = 4
 
-    dls = dataloaders.create_dataloaders(seqtree=seqtree, seqbank=seqbank, batch_size=batch_size, validation_partition=0, validation_length=validation_length)
+    dls = data.create_dataloaders(seqtree=seqtree, seqbank=seqbank, batch_size=batch_size, validation_partition=0, validation_length=validation_length)
 
     total = 0
     for x,y in dls.valid:

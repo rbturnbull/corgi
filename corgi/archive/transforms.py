@@ -13,7 +13,7 @@ from scipy.stats import nbinom
 
 from .tensor import TensorDNA
 from seqbank import SeqBank
-from .seqtree import SeqTree
+from ..seqtree import SeqTree
 
 
 class SplitTransform(Transform):

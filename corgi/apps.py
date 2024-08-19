@@ -1,11 +1,7 @@
-import time
 from pathlib import Path
 from typing import List
 from torch import nn
 import pandas as pd
-from fastai.data.core import DataLoaders
-from torchapp.util import copy_func, call_func, change_typer_to_defaults, add_kwargs
-from fastai.learner import Learner, load_learner
 import torch
 import torchapp as ta
 from rich.console import Console
@@ -18,7 +14,9 @@ from polytorch.metrics import HierarchicalGreedyAccuracy
 from seqbank import SeqBank
 from hierarchicalsoftmax.inference import node_probabilities, greedy_predictions, render_probabilities
 from hierarchicalsoftmax.nodes import SoftmaxNode
-from . import dataloaders, models, refseq, transforms
+
+from . import data, models, refseq
+from .data import CorgiDataModule
 from .seqtree import SeqTree, node_to_str
 
 console = Console()
@@ -33,31 +31,27 @@ class Corgi(ta.TorchApp):
     """
     corgi - Classifier for ORganelle Genomes Inter alia
     """
-    def dataloaders(
+    @ta.method
+    def data(
         self,
         seqtree: Path = ta.Param(help="The seqtree which has the sequences to use."),
-        seqbank:Path = ta.Param(help="The HDF5 file with the sequences."),
+        seqbank:Path = ta.Param(help="The seqbank file with the sequences."),
         validation_partition:int = ta.Param(default=0, help="The partition to use for validation."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
-        validation_length:int = 1_000,
+        validation_length:int = ta.Param(default=1_000, help="The standard length of sequences to use for validation."),
         phi:float=ta.Param(default=1.0, tune=True, tune_max=1.2, tune_min=0.8, help="A multiplication factor for the loss at each level of the tree."),
         # deform_lambda:float = ta.Param(default=None, help="The lambda for the deform transform."),
         tips_mode:bool = False,
         max_seqs:int = None,
-    ) -> DataLoaders:
+    ) -> CorgiDataModule:
         """
-        Creates a FastAI DataLoaders object which Corgi uses in training and prediction.
-
-        Args:
-            inputs (Path): The input file.
-            batch_size (int): The number of elements to use in a batch for training and prediction. Defaults to 32.
+        Creates a Pytorch Lightning object which Corgi uses in training and prediction.
         """
         if seqtree is None:
             raise Exception("No seqtree given")
         if seqbank is None:
             raise Exception("No seqbank given")
         
-        # Set the factors for the loss at each node
         seqtree = Path(seqtree)
         seqbank = Path(seqbank)
 
@@ -68,7 +62,7 @@ class Corgi(ta.TorchApp):
         seqbank = SeqBank(seqbank)
 
         print(f"Creating dataloaders with batch_size {batch_size} and validation partition {validation_partition}.")
-        dls = dataloaders.create_dataloaders(
+        dls = data.create_dataloaders(
             seqtree=seqtree,
             seqbank=seqbank,
             batch_size=batch_size,
@@ -89,6 +83,7 @@ class Corgi(ta.TorchApp):
         ]
         return dls
 
+    @ta.method
     def model(
         self,
         pretrained:Path = ta.Param(None, help="A pretrained model to finetune."),
@@ -213,6 +208,7 @@ class Corgi(ta.TorchApp):
         #     final_bias=final_bias,
         # )
 
+    @ta.method
     def metrics(self):
         return [
             HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=1, data_index=0, name="type_accuracy"),
@@ -223,14 +219,17 @@ class Corgi(ta.TorchApp):
             HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=6, data_index=0, name="order_accuracy"),
         ]
 
+    @ta.method
     def monitor(self):
         return "superkingdom_accuracy"
 
-    def loss_func(self):
+    @ta.method
+    def loss_function(self):
         assert self.output_types
         return PolyLoss(data_types=self.output_types, feature_axis=1)
 
-    def inference_dataloader(
+    @ta.method
+    def prediction_dataloader(
         self,
         learner,
         file: List[Path] = ta.Param(None, help="A fasta file with sequences to be classified."),
@@ -240,7 +239,7 @@ class Corgi(ta.TorchApp):
         min_length:int = 128,
         **kwargs,
     ):
-        self.dataloader = dataloaders.SeqIODataloader(files=file, device=learner.dls.device, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
+        self.dataloader = data.SeqIODataloader(files=file, device=learner.dls.device, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
         self.classification_tree = learner.dls.classification_tree
         return self.dataloader
 
@@ -340,6 +339,7 @@ class Corgi(ta.TorchApp):
         """
         return node_to_str(node)
 
+    @ta.method
     def output_results(
         self,
         results,
@@ -415,6 +415,7 @@ class Corgi(ta.TorchApp):
                 accession = row['accession']
                 image_path = image_dir / Path(filepath).name / f"{accession}.{image_format}"
                 image_paths.append(image_path)
+
             render_probabilities(
                 root=self.classification_tree, 
                 filepaths=image_paths,
@@ -483,32 +484,35 @@ class Corgi(ta.TorchApp):
 
         return results_df
 
-    def category_counts_dataloader(self, dataloader, description):
-        from collections import Counter
+    # def category_counts_dataloader(self, dataloader, description):
+    #     from collections import Counter
 
-        counter = Counter()
-        for batch in dataloader:
-            counter.update(batch[1].cpu().numpy())
-        total = sum(counter.values())
+    #     counter = Counter()
+    #     for batch in dataloader:
+    #         counter.update(batch[1].cpu().numpy())
+    #     total = sum(counter.values())
 
-        table = Table(title=f"{description}: Categories in epoch", box=SIMPLE)
+    #     table = Table(title=f"{description}: Categories in epoch", box=SIMPLE)
 
-        table.add_column("Category", justify="right", style="cyan", no_wrap=True)
-        table.add_column("Count", justify="center")
-        table.add_column("Percentage")
+    #     table.add_column("Category", justify="right", style="cyan", no_wrap=True)
+    #     table.add_column("Count", justify="center")
+    #     table.add_column("Percentage")
 
-        for category_id, category in enumerate(self.categories):
-            count = counter[category_id]
-            table.add_row(category, str(count), f"{count/total*100:.1f}%")
+    #     for category_id, category in enumerate(self.categories):
+    #         count = counter[category_id]
+    #         table.add_row(category, str(count), f"{count/total*100:.1f}%")
 
-        table.add_row("Total", str(total), "")
+    #     table.add_row("Total", str(total), "")
 
-        console.print(table)
+    #     console.print(table)
 
-    def category_counts(self, **kwargs):
-        dataloaders = call_func(self.dataloaders, **kwargs)
-        self.category_counts_dataloader(dataloaders.train, "Training")
-        self.category_counts_dataloader(dataloaders.valid, "Validation")
+    # def category_counts(self, **kwargs):
+    #     dataloaders = call_func(self.dataloaders, **kwargs)
+    #     self.category_counts_dataloader(dataloaders.train, "Training")
+    #     self.category_counts_dataloader(dataloaders.valid, "Validation")
 
+
+    @ta.method
     def pretrained_location(self) -> str:
-        return "https://github.com/rbturnbull/corgi/releases/download/v0.3.1-alpha/corgi-0.3.pkl"
+        raise NotImplementedError("No default trained model location")
+        # return "https://github.com/rbturnbull/corgi/releases/download/v0.3.1-alpha/corgi-0.3.pkl"

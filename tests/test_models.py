@@ -1,7 +1,8 @@
 import unittest
+from corgi.archive import tensor
 import torch
 
-from corgi import models, tensor
+from corgi import models
 
 
 class TestModels(unittest.TestCase):
