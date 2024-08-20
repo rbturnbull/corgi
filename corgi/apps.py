@@ -34,28 +34,28 @@ class Corgi(ta.TorchApp):
     @ta.method
     def data(
         self,
-        seqtree: Path = ta.Param(help="The seqtree which has the sequences to use."),
-        seqbank:Path = ta.Param(help="The seqbank file with the sequences."),
+        seqtree: Path = ta.Param(default=None, help="The seqtree which has the sequences to use."),
+        seqbank: Path = ta.Param(help="The seqbank file with the sequences."),
         validation_partition:int = ta.Param(default=0, help="The partition to use for validation."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
         validation_length:int = ta.Param(default=1_000, help="The standard length of sequences to use for validation."),
         phi:float=ta.Param(default=1.0, tune=True, tune_max=1.2, tune_min=0.8, help="A multiplication factor for the loss at each level of the tree."),
         test_partition:int = ta.Param(default=0, help="The partition to retain for testing."),
-        minimum_length: int = 150,
-        maximum_length: int = 3_000,
-        skewness:float = 5,
-        loc:float = 600,
-        scale:float = 1000,
-        tips_mode:bool = False,
-        max_items:int = None,
+        minimum_length: int = ta.Param(default=150, help="The minimum length to truncate sequences in a training batch."),
+        maximum_length: int = ta.Param(default=3_000, help="The maximum length to truncate sequences in a training batch."),
+        skewness:float = ta.Param(default=5, help="The skewness of the distribution of sequence lengths in a batch."),
+        loc:float = ta.Param(default=600, help="A parameter to shift the centre of the distribution of sequence lengths."),
+        scale:float = ta.Param(default=1000, help="A parameter to scale the distribution of sequence lengths."),
+        # tips_mode:bool = False,
+        max_items:int = ta.Param(default=0, help="The maximum number of items to use for training. If zero then all items are used."),
     ) -> CorgiDataModule:
         """
         Creates a Pytorch Lightning object which Corgi uses in training and prediction.
         """
         if seqtree is None:
-            raise Exception("No seqtree given")
+            raise ValueError("No seqtree given")
         if seqbank is None:
-            raise Exception("No seqbank given")
+            raise ValueError("No seqbank given")
         
         seqtree = Path(seqtree)
         seqbank = Path(seqbank)
@@ -67,9 +67,11 @@ class Corgi(ta.TorchApp):
         seqbank = SeqBank(seqbank)
 
         self.classification_tree = seqtree.classification_tree
-        self.classification_tree.tips_mode = tips_mode
-        if tips_mode:
-            self.classification_tree.index_tips_mode()
+
+        
+        # self.classification_tree.tips_mode = tips_mode
+        # if tips_mode:
+        #     self.classification_tree.index_tips_mode()
         
         set_alphas_with_phi(self.classification_tree, phi=phi)
 
