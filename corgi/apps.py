@@ -15,7 +15,7 @@ from seqbank import SeqBank
 from hierarchicalsoftmax.inference import node_probabilities, greedy_predictions, render_probabilities
 from hierarchicalsoftmax.nodes import SoftmaxNode
 
-from . import data, models, refseq
+from .models import calc_cnn_dims_start, ConvClassifier
 from .data import CorgiDataModule
 from .seqtree import SeqTree, node_to_str
 
@@ -40,9 +40,14 @@ class Corgi(ta.TorchApp):
         batch_size: int = ta.Param(default=32, help="The batch size."),
         validation_length:int = ta.Param(default=1_000, help="The standard length of sequences to use for validation."),
         phi:float=ta.Param(default=1.0, tune=True, tune_max=1.2, tune_min=0.8, help="A multiplication factor for the loss at each level of the tree."),
-        # deform_lambda:float = ta.Param(default=None, help="The lambda for the deform transform."),
+        test_partition:int = ta.Param(default=0, help="The partition to retain for testing."),
+        minimum_length: int = 150,
+        maximum_length: int = 3_000,
+        skewness:float = 5,
+        loc:float = 600,
+        scale:float = 1000,
         tips_mode:bool = False,
-        max_seqs:int = None,
+        max_items:int = None,
     ) -> CorgiDataModule:
         """
         Creates a Pytorch Lightning object which Corgi uses in training and prediction.
@@ -61,17 +66,7 @@ class Corgi(ta.TorchApp):
         print(f"Loading seqbank {seqbank}")
         seqbank = SeqBank(seqbank)
 
-        print(f"Creating dataloaders with batch_size {batch_size} and validation partition {validation_partition}.")
-        dls = data.create_dataloaders(
-            seqtree=seqtree,
-            seqbank=seqbank,
-            batch_size=batch_size,
-            validation_partition=validation_partition,
-            validation_length=validation_length,
-            max_seqs=max_seqs,
-        )
-        dls.classification_tree = seqtree.classification_tree
-        self.classification_tree = dls.classification_tree
+        self.classification_tree = seqtree.classification_tree
         self.classification_tree.tips_mode = tips_mode
         if tips_mode:
             self.classification_tree.index_tips_mode()
@@ -81,7 +76,24 @@ class Corgi(ta.TorchApp):
         self.output_types = [
             HierarchicalData(root=self.classification_tree),
         ]
-        return dls
+
+        print(f"Creating dataloaders with batch_size {batch_size} and validation partition {validation_partition}.")
+        data = CorgiDataModule(
+            seqtree=seqtree,
+            seqbank=seqbank,
+            batch_size=batch_size,
+            validation_partition=validation_partition,
+            max_items=max_items,
+            minimum_length=minimum_length,
+            maximum_length=maximum_length,
+            validation_length=validation_length,
+            test_partition=test_partition,
+            skewness=skewness,
+            loc=loc,
+            scale=scale,
+        )
+
+        return data
 
     @ta.method
     def model(
@@ -169,7 +181,7 @@ class Corgi(ta.TorchApp):
         if not cnn_dims_start:
             assert macc
 
-            cnn_dims_start = models.calc_cnn_dims_start(
+            cnn_dims_start = calc_cnn_dims_start(
                 macc=macc,
                 seq_len=1024, # arbitary number
                 embedding_dim=embedding_dim,
@@ -180,7 +192,7 @@ class Corgi(ta.TorchApp):
                 num_classes=num_classes,
             )
 
-        return models.ConvClassifier(
+        return ConvClassifier(
             num_embeddings=5,  # i.e. the size of the vocab which is N, A, C, G, T
             kernel_size=kernel_size,
             factor=factor,
