@@ -143,9 +143,21 @@ class SeqTree(UserDict):
 
                 SeqIO.write(record, f, format)
 
-    def render(self, **kwargs):
+    def render(self, count:bool=False, **kwargs):
         """ Renders the SeqTree. """
-        self.classification_tree.render(**kwargs)
+        if count:
+            for key in self.keys():
+                node = self.node(key)
+                if not hasattr(node, "count"):
+                    node.count = 0
+                node.count += 1
+
+            for node in self.classification_tree.post_order_iter():
+                node.render_str = f"{node.name} ({node.count})" if getattr(node, "count", 0) else node.name
+
+            kwargs['attr'] = "render_str"
+
+        return self.classification_tree.render(**kwargs)
 
     def accessions_to_file(self, file:Path) -> None:
         """ Writes all the accessions of this SeqTree to a file. """
@@ -220,10 +232,11 @@ def export(
 def render(
     seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
     output:Optional[Path] = typer.Option(None, help="The path to save the rendered tree."),
-    print:bool = typer.Option(True, help="Whether or not to print the tree to the screen.")
+    print:bool = typer.Option(True, help="Whether or not to print the tree to the screen."),
+    count:bool = typer.Option(False, help="Whether or not to print the count of accessions at each node."),
 ):
     seqtree = SeqTree.load(seqtree)
-    seqtree.render(filepath=output, print=print)
+    seqtree.render(filepath=output, print=print, count=count)
 
 
 if __name__ == "__main__":

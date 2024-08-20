@@ -29,7 +29,7 @@ def set_alphas_with_phi(tree, phi=1.0):
 
 class Corgi(ta.TorchApp):
     """
-    corgi - Classifier for ORganelle Genomes Inter alia
+    corgi - Classifier for ORganelle Genomes (Inter alia)
     """
     @ta.method
     def data(
@@ -68,7 +68,6 @@ class Corgi(ta.TorchApp):
 
         self.classification_tree = seqtree.classification_tree
 
-        
         # self.classification_tree.tips_mode = tips_mode
         # if tips_mode:
         #     self.classification_tree.index_tips_mode()
