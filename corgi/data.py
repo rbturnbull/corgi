@@ -116,6 +116,9 @@ class CorgiDataModule(L.LightningDataModule):
     scale:float=1000
     num_workers:int|None = None
 
+    def __post_init__(self):
+        super().__init__()
+
     def setup(self, stage=None):
         if self.num_workers is None:
             self.num_workers = min(os.cpu_count(), 8)
