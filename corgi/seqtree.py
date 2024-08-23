@@ -14,6 +14,7 @@ from seqbank.transform import bytes_to_str
 import numpy as np
 import hashlib
 import typer
+from plotly import graph_objects as go
 
 
 def str_to_int_hash(s:str)->int:
@@ -142,22 +143,54 @@ class SeqTree(UserDict):
                 )
 
                 SeqIO.write(record, f, format)
+    
+    def add_counts(self):
+        """ Adds a count to each node in the tree. """
+        for node in self.classification_tree.post_order_iter():
+            node.count = 0
+
+        for key in self.keys():
+            node = self.node(key)
+            node.count += 1
 
     def render(self, count:bool=False, **kwargs):
         """ Renders the SeqTree. """
         if count:
-            for key in self.keys():
-                node = self.node(key)
-                if not hasattr(node, "count"):
-                    node.count = 0
-                node.count += 1
-
+            self.add_counts()
             for node in self.classification_tree.post_order_iter():
                 node.render_str = f"{node.name} ({node.count})" if getattr(node, "count", 0) else node.name
 
             kwargs['attr'] = "render_str"
 
         return self.classification_tree.render(**kwargs)
+    
+    def sunburst(self, **kwargs) -> go.Figure:
+        """
+        Renders the SeqTree as a sunburst plot.
+
+        The count of accessions at each node is used as the value.
+
+        Returns a plotly figure.
+        """
+        self.add_counts()
+        labels = []
+        parents = []
+        values = []
+
+        for node in self.classification_tree.pre_order_iter():
+            labels.append(node.name)
+            parents.append(node.parent.name if node.parent else "")
+            values.append(node.count)
+
+        fig = go.Figure(go.Sunburst(
+            labels=labels,
+            parents=parents,
+            values=values,
+            branchvalues="remainder",
+        ))
+        
+        fig.update_layout(margin=dict(t=10, l=10, r=10, b=10), **kwargs)
+        return fig
 
     def accessions_to_file(self, file:Path) -> None:
         """ Writes all the accessions of this SeqTree to a file. """
@@ -238,6 +271,41 @@ def render(
     seqtree = SeqTree.load(seqtree)
     seqtree.render(filepath=output, print=print, count=count)
 
+
+@app.command()
+def count(
+    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
+):
+    seqtree = SeqTree.load(seqtree)
+    print(len(seqtree))
+
+
+@app.command()
+def sunburst(
+    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
+    show:bool = typer.Option(False, help="Whether or not to show the plot."),
+    output:Path = typer.Option(None, help="The path to save the rendered tree."),
+    width:int = typer.Option(1000, help="The width of the plot."),
+    height:int = typer.Option(0, help="The height of the plot. If 0 then it will be calculated based on the width."),
+):
+    seqtree = SeqTree.load(seqtree)
+    height = height or width
+
+    fig = seqtree.sunburst(width=width, height=height)
+    if show:
+        fig.show()
+    
+    if output:
+        output = Path(output)
+        output.parent.mkdir(exist_ok=True, parents=True)
+
+        # https://github.com/plotly/plotly.py/issues/3469
+        import plotly.io as pio   
+        pio.kaleido.scope.mathjax = None
+
+        output_func = fig.write_html if output.suffix.lower() == ".html" else fig.write_image
+        output_func(output)
+        
 
 if __name__ == "__main__":
     app()
