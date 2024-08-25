@@ -1298,7 +1298,7 @@ name = "hierarchicalsoftmax"
 version = "1.1.0"
 description = "A Hierarchical Softmax Framework for PyTorch."
 optional = false
-python-versions = "^3.8"
+python-versions = "^3.10"
 files = []
 develop = false
 
@@ -1307,12 +1307,13 @@ anytree = "^2.8.0"
 rich = ">=10.16.1"
 scikit-learn = "^1.1.1"
 torch = ">=1.10.2"
+torchmetrics = ">=1.4.0.post0"
 
 [package.source]
 type = "git"
 url = "https://github.com/rbturnbull/hierarchicalsoftmax.git"
-reference = "main"
-resolved_reference = "2a6c0338382be231c0403c293ef342ac0ab679aa"
+reference = "torchmetrics"
+resolved_reference = "42c6add93cc6d7eeff113957c9b5f00e72927d11"
 
 [[package]]
 name = "httpcore"
@@ -4856,4 +4857,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "129944579a109ef3c4a1cb44f8ee53fe32522a44b327122ac6608f802ba024d7"
+content-hash = "6e6c9495add4800491ca7685d8053da7a4ec0e61d7b3e7707140b108c9c0c2ad"

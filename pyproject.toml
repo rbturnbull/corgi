@@ -35,7 +35,7 @@ PyMySQL = ">=1.0.2"
 termgraph = ">=0.5.3"
 torchapp = {git = "https://github.com/rbturnbull/torchapp.git", branch = "lightning"}
 torch = ">=2.0.0"
-hierarchicalsoftmax = {git = "https://github.com/rbturnbull/hierarchicalsoftmax.git", branch = "main"}
+hierarchicalsoftmax = {git = "https://github.com/rbturnbull/hierarchicalsoftmax.git", branch = "torchmetrics"}
 attrs = ">=23.1.0"
 polytorch = {git = "https://github.com/rbturnbull/polytorch.git", branch = "hierarchical"}
 seqbank = {git = "https://github.com/rbturnbull/seqbank.git", branch = "main"}
