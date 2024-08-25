@@ -126,6 +126,9 @@ class CorgiDataModule(L.LightningDataModule):
         # Create list of accessions for training and validation depending on validation_partition and test_partition
         training_accessions = []
         validation_accessions = []
+
+        assert self.validation_partition != self.test_partition, f"Validation partition {self.validation_partition} the same as test partition {self.test_partition}"
+        
         for accession, details in self.seqtree.items():
             # Ignore test partition so we do not validate or train on it
             if details.partition == self.test_partition:
@@ -134,6 +137,7 @@ class CorgiDataModule(L.LightningDataModule):
             accessions_list = validation_accessions if details.partition == self.validation_partition else training_accessions
             accessions_list.append(accession)
 
+        assert len(validation_accessions) > 0, f"No validation accessions found. Check the validation partition {self.validation_partition}"
         if self.max_items:
             training_accessions = training_accessions[:self.max_items]
             validation_accessions = validation_accessions[:self.max_items]
