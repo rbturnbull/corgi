@@ -221,16 +221,21 @@ class Corgi(ta.TorchApp):
         #     final_bias=final_bias,
         # )
 
-    @ta.method
-    def metrics(self):
-        return [
-            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=1, data_index=0, name="type_accuracy"),
-            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=2, data_index=0, name="superkingdom_accuracy"),
-            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=3, data_index=0, name="kingdom_accuracy"),
-            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=4, data_index=0, name="phylum_accuracy"),
-            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=5, data_index=0, name="class_accuracy"),
-            HierarchicalGreedyAccuracy(root=self.classification_tree, max_depth=6, data_index=0, name="order_accuracy"),
-        ]
+    @ta.method    
+    def metrics(self) -> list[tuple[str,Metric]]:
+        rank_accuracy = RankAccuracyTorchMetric(
+            root=self.classification_tree, 
+            ranks={
+                1:"type_accuracy", 
+                2:"superkingdom_accuracy",
+                3:"kingdom_accuracy",
+                4:"phylum_accuracy",
+                5:"class_accuracy",
+                6:"order_accuracy",
+            },
+        )
+                
+        return [('rank_accuracy', rank_accuracy)]
 
     @ta.method
     def monitor(self):
