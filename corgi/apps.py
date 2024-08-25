@@ -10,6 +10,7 @@ from rich.box import SIMPLE
 # from Bio.SeqIO import FastaIO
 import numpy as np
 from torchmetrics import Metric
+from hierarchicalsoftmax.metrics import RankAccuracyTorchMetric
 from polytorch import PolyLoss, HierarchicalData, total_size
 from polytorch.metrics import HierarchicalGreedyAccuracy
 from seqbank import SeqBank
