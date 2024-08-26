@@ -3,13 +3,16 @@ import random
 from dataclasses import dataclass
 from zlib import adler32
 import numpy as np
+from pathlib import Path
 from scipy.stats import rv_continuous, skewnorm
 import torch
+from Bio import SeqIO
 from torch import nn
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 import lightning as L
 from seqbank import SeqBank
+from seqbank.transform import seq_to_numpy
 
 from .seqtree import SeqTree
 
@@ -175,3 +178,97 @@ class CorgiDataModule(L.LightningDataModule):
             collate_fn=CollateFixedLength(self.validation_length),
         )
 
+
+class SeqIODataloader:
+    def __init__(self, files, batch_size:int=1, min_length:int=128, max_length:int=5_000, max_seqs:int=None, format:str=""):
+        self.files = list(files)
+        self.format = format
+        self.chunk_details = []
+        self.max_length = max_length
+        self.batch_size = batch_size
+        self.min_length = min_length
+        self.count = 0
+        self.max_seqs = max_seqs
+        seqs = 0
+        for file in self.files:
+            for record in self.parse(file):
+                if len(record.seq) < self.min_length:
+                    continue
+
+                if self.max_seqs and seqs >= self.max_seqs:
+                    break
+
+                chunks = len(record.seq)//self.max_length + 1
+                self.count += chunks
+                seqs += 1
+
+    def get_file_format(self, file):
+        if self.format:
+            return self.format
+        
+        file = Path(file)
+        suffix = file.suffix.lower()
+
+        if suffix in [".fa", ".fna", ".fasta"]:
+            return "fasta"
+
+        if suffix in [".genbank", ".gb", ".gbk"]:
+            return "genbank"
+
+        if suffix in [".tab", ".tsv"]:
+            return "tsv"
+
+        if suffix in [".fastq", ".fq"]:
+            return "fastq"
+
+        raise ValueError(f"Cannot determine file format of {file}.")
+    
+    def __len__(self):
+        return self.count
+
+    def parse(self, file):
+        return SeqIO.parse(file, self.get_file_format(file))
+
+    def iter_records(self):
+        for file in self.files:
+            for record in self.parse(file):
+                yield file, record
+
+    def __iter__(self):
+        batch = []
+        seqs = 0
+
+        for file in self.files:
+            for record in self.parse(file):
+                if len(record.seq) < self.min_length:
+                    continue
+
+                if self.max_seqs and seqs >= self.max_seqs:
+                    break
+
+                seqs += 1
+                t = seq_to_numpy(str(record.seq))
+                chunks = len(t)//self.max_length + 1
+
+                for chunk_index, chunk in enumerate(t.chunk(chunks)):
+                    self.chunk_details.append( (file, record.id, chunk_index) )
+                    batch.append(chunk)
+                    if len(batch) >= self.batch_size:
+                        batch = self.pad(batch)
+                        yield batch
+                        batch = []
+
+        if batch:
+            batch = self.pad(batch)
+            yield batch
+
+    def pad(self, batch):
+        breakpoint()
+        max_len = 0
+        for item in batch:
+            max_len = max(item.shape[0], max_len)
+
+        def pad(tensor):
+            return slice_tensor(tensor, max_len).unsqueeze(dim=0)
+
+        return torch.cat(list(map(pad, batch))),

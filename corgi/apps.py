@@ -18,7 +18,7 @@ from hierarchicalsoftmax.inference import node_probabilities, greedy_predictions
 from hierarchicalsoftmax.nodes import SoftmaxNode
 
 from .models import calc_cnn_dims_start, ConvClassifier
-from .data import CorgiDataModule
+from .data import CorgiDataModule, SeqIODataloader
 from .seqtree import SeqTree, node_to_str
 
 console = Console()
@@ -259,7 +259,7 @@ class Corgi(ta.TorchApp):
         min_length:int = 128,
         **kwargs,
     ):
-        self.dataloader = data.SeqIODataloader(files=file, device=learner.dls.device, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
+        self.dataloader = SeqIODataloader(files=file, device=learner.dls.device, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
         self.classification_tree = learner.dls.classification_tree
         return self.dataloader
 
