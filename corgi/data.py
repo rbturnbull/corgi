@@ -247,7 +247,7 @@ class SeqIODataloader:
                     break
 
                 seqs += 1
-                t = seq_to_numpy(str(record.seq))
+                t = torch.tensor(seq_to_numpy(str(record.seq)))
                 chunks = len(t)//self.max_length + 1
 
                 for chunk_index, chunk in enumerate(t.chunk(chunks)):
@@ -263,7 +263,6 @@ class SeqIODataloader:
             yield batch
 
     def pad(self, batch):
-        breakpoint()
         max_len = 0
         for item in batch:
             max_len = max(item.shape[0], max_len)
