@@ -11,6 +11,7 @@ from Bio import SeqIO
 
 from seqbank.io import get_file_format
 from seqbank.transform import bytes_to_str
+from rich.progress import track
 import numpy as np
 import hashlib
 import typer
@@ -109,6 +110,29 @@ class SeqTree(UserDict):
 
     def accessions(self, partition:Optional[int] = None):
         return self.keys() if partition is None else self.accessions_in_partition(partition)
+    
+    def truncate(self, max_depth:int) -> "SeqTree":
+        """
+        Truncates the tree to a maximum depth.
+        """
+        new_tree = SeqTree(self.classification_tree)
+        for accession in track(self.keys()):
+            node = self.node(accession)
+            ancestors = node.ancestors
+            if len(ancestors) >= max_depth:
+                node = ancestors[max_depth-1]
+            new_tree.add(accession, node, self[accession].partition)
+
+        # Remove any nodes that beyond the max depth
+        for node in new_tree.classification_tree.pre_order_iter():
+            node.readonly = False
+            node.softmax_start_index = None
+            if len(node.ancestors) >= max_depth:
+                node.parent = None
+
+        new_tree.set_indexes()
+
+        return new_tree
             
     def export(self, seqbank:SeqBank, output:Path|str, length:int=0, format:str="", seed:int=0):
         """
@@ -305,7 +329,26 @@ def sunburst(
 
         output_func = fig.write_html if output.suffix.lower() == ".html" else fig.write_image
         output_func(output)
-        
+
+
+@app.command()
+def truncate(
+    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
+    max_depth:int = typer.Argument(...,help="The maximum depth to truncate the tree."),
+    output:Path = typer.Argument(...,help="The path to the output file."),
+):
+    seqtree = SeqTree.load(seqtree)
+    new_tree = seqtree.truncate(max_depth)
+    new_tree.save(output)
+
+
+@app.command()
+def layer_size(
+    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."),         
+):
+    seqtree = SeqTree.load(seqtree)
+    print(seqtree.classification_tree.layer_size)
+
 
 if __name__ == "__main__":
     app()
