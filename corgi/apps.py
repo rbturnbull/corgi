@@ -41,7 +41,7 @@ class Corgi(ta.TorchApp):
         validation_partition:int = ta.Param(default=0, help="The partition to use for validation."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
         validation_length:int = ta.Param(default=1_000, help="The standard length of sequences to use for validation."),
-        phi:float=ta.Param(default=1.0, tune=True, tune_max=1.2, tune_min=0.8, help="A multiplication factor for the loss at each level of the tree."),
+        phi:float=ta.Param(default=1.0, tune=True, tune_min=0.8, tune_max=1.2, help="A multiplication factor for the loss at each level of the tree."),
         test_partition:int = ta.Param(default=0, help="The partition to retain for testing."),
         minimum_length: int = ta.Param(default=150, help="The minimum length to truncate sequences in a training batch."),
         maximum_length: int = ta.Param(default=3_000, help="The maximum length to truncate sequences in a training batch."),

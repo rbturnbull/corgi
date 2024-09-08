@@ -111,9 +111,9 @@ class SeqTree(UserDict):
     def accessions(self, partition:Optional[int] = None):
         return self.keys() if partition is None else self.accessions_in_partition(partition)
     
-    def truncate(self, max_depth:int) -> "SeqTree":
+    def prune(self, max_depth:int) -> "SeqTree":
         """
-        Truncates the tree to a maximum depth.
+        Prunes the tree to a maximum depth.
         """
         new_tree = SeqTree(self.classification_tree)
         for accession in track(self.keys()):
@@ -332,13 +332,16 @@ def sunburst(
 
 
 @app.command()
-def truncate(
+def prune(
     seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
-    max_depth:int = typer.Argument(...,help="The maximum depth to truncate the tree."),
+    max_depth:int = typer.Argument(...,help="The maximum depth to prune the tree."),
     output:Path = typer.Argument(...,help="The path to the output file."),
 ):
+    """
+    Prunes the tree to a maximum depth.
+    """
     seqtree = SeqTree.load(seqtree)
-    new_tree = seqtree.truncate(max_depth)
+    new_tree = seqtree.prune(max_depth)
     new_tree.save(output)
 
 
@@ -346,6 +349,9 @@ def truncate(
 def layer_size(
     seqtree:Path = typer.Argument(...,help="The path to the SeqTree."),         
 ):
+    """
+    Prints the size of the neural network layer to predict the classification tree.
+    """    
     seqtree = SeqTree.load(seqtree)
     print(seqtree.classification_tree.layer_size)
 
