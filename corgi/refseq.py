@@ -7,10 +7,13 @@ from enum import Enum
 from appdirs import user_cache_dir
 from torchapp.download import cached_download
 from rich.progress import track
-from .seqtree import SeqTree
+from seqbank import SeqBank
 import gzip
 
 import typer
+
+
+from .seqtree import SeqTree
 
 app = typer.Typer()
 
@@ -96,6 +99,8 @@ def get_node(taxon, taxonomy, taxon_to_node, root, ranks):
 @app.command()
 def refseq_to_seqtree(
     output:Path, 
+    seqbank,
+    seqbank_output:Path=None,
     render:Path=None, 
     accessions:Path=None,
     partitions:int=6, 
@@ -109,6 +114,12 @@ def refseq_to_seqtree(
     print(f"Using catalog: {catalog}")
     count = line_count(catalog)
     print(f"{count} lines in catalog")
+
+    seqbank = SeqBank(seqbank)
+    seqbank_accessions = seqbank.get_accessions()
+    
+    print(f'Saving seqbank with accessions corresponding to {seqbank_output}')
+    seqbank_output = SeqBank(seqbank_output, write=True)
 
     root = SoftmaxNode("root", rank="root", nseq=0)
     seqtree = SeqTree(root)
@@ -167,6 +178,12 @@ def refseq_to_seqtree(
             # Skip if we have too many sequences for this leaf node
             if max_seqs and node.nseq >= max_seqs:
                 continue
+
+            if accession not in seqbank_accessions:
+                continue
+
+            data = seqbank[accession]            
+            seqbank_output.add(data, accession)
 
             partition = node.nseq % partitions
 
