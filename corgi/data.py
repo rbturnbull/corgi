@@ -99,7 +99,8 @@ class CorgiTrainingDataset(Dataset):
             start_index = rng.randint(0, length - self.maximum)
             data = data[start_index:start_index+self.maximum]
 
-        array = torch.frombuffer(data, dtype=torch.uint8)
+        array = torch.as_tensor(memoryview(data), dtype=torch.uint8)
+
         return torch.Tensor(array), self.seqtree[accession].node_id
 
 
