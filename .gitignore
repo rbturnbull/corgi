@@ -194,3 +194,4 @@ train-repbase.sh
 train.sh
 *.out
 *.slurm
+logs/
