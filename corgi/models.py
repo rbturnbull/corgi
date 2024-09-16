@@ -403,12 +403,13 @@ class ConvClassifier(nn.Module):
         return split_predictions
 
     def replace_output_types(self, output_types, final_bias:bool=None) -> None:
+        device = next(self.parameters()).device
         self.output_types = output_types
         penultimate_dims = self.penultimate.out_features
         if final_bias is None:
             final_bias = self.final.bias
         
-        self.final = nn.Linear(in_features=penultimate_dims, out_features=total_size(self.output_types), bias=final_bias)
+        self.final = nn.Linear(in_features=penultimate_dims, out_features=total_size(self.output_types), bias=final_bias, device=device)
         
 
 
