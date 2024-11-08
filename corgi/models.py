@@ -352,7 +352,7 @@ class ConvClassifier(nn.Module):
         else:
             current_dims = in_channels
 
-        self.average_pool = nn.AdaptiveAvgPool1d(1)
+        # self.average_pool = nn.AdaptiveAvgPool1d(1)
 
         current_dims += int(include_length)
         self.penultimate = nn.Linear(in_features=current_dims, out_features=penultimate_dims, bias=True)
@@ -382,11 +382,12 @@ class ConvClassifier(nn.Module):
             # [0,:,:] and [1,:,:]
             # [0,:,:] -> considers the first index from the first dimension
             x = torch.cat((h_n[0, :, :], h_n[1, :, :]), dim=-1)
-        elif hasattr(x, 'average_pool'):
-            x = self.average_pool(x)
-            x = torch.flatten(x, 1)
+        # elif hasattr(x, 'average_pool'):
+        #     x = self.average_pool(x)
+        #     x = torch.flatten(x, 1)
         else:
             x = torch.mean(x, axis=-1)
+            # x = torch.sum(x, axis=-1)
 
         if getattr(self, 'include_length', False):
             length_tensor = torch.full( (x.shape[0], 1), length/self.length_scaling, device=x.device )

@@ -1,4 +1,5 @@
 import os
+import gzip
 import random
 from dataclasses import dataclass
 from zlib import adler32
@@ -208,17 +209,20 @@ class SeqIODataloader:
             return self.format
         
         file = Path(file)
-        suffix = file.suffix.lower()
+        suffixes = [suffix.lower() for suffix in file.suffixes]
+
+        # Check if the last suffix is '.gz' and adjust accordingly
+        if suffixes[-1] == '.gz' and len(suffixes) > 1:
+            suffix = suffixes[-2]
+        else:
+            suffix = suffixes[-1]
 
         if suffix in [".fa", ".fna", ".fasta"]:
             return "fasta"
-
         if suffix in [".genbank", ".gb", ".gbk"]:
             return "genbank"
-
         if suffix in [".tab", ".tsv"]:
             return "tsv"
-
         if suffix in [".fastq", ".fq"]:
             return "fastq"
 
@@ -227,8 +231,14 @@ class SeqIODataloader:
     def __len__(self):
         return self.count
 
-    def parse(self, file):
-        return SeqIO.parse(file, self.get_file_format(file))
+    def parse(self, file:Path):
+        file_format = self.get_file_format(file)
+        
+        if file.name.endswith('.gz'):
+            with gzip.open(file, "rt") as f:
+                yield from SeqIO.parse(f, file_format)
+        else:
+            yield from SeqIO.parse(file, file_format)
 
     def iter_records(self):
         for file in self.files:

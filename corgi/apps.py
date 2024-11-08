@@ -64,6 +64,7 @@ class Corgi(ta.TorchApp):
 
         print(f"Loading seqtree {seqtree}")
         seqtree = SeqTree.load(seqtree)
+        self.classification_tree = seqtree.classification_tree
 
         print(f"Loading seqbank {seqbank}")
         seqbank = SeqBank(seqbank)
@@ -253,7 +254,7 @@ class Corgi(ta.TorchApp):
     @ta.method
     def prediction_dataloader(
         self,
-        learner,
+        module,
         file: List[Path] = ta.Param(None, help="A fasta file with sequences to be classified."),
         max_seqs: int = None,
         batch_size:int = 1,
@@ -261,8 +262,8 @@ class Corgi(ta.TorchApp):
         min_length:int = 128,
         **kwargs,
     ):
-        self.dataloader = SeqIODataloader(files=file, device=learner.dls.device, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
-        self.classification_tree = learner.dls.classification_tree
+        self.classification_tree = module.hparams['classification_tree']
+        self.dataloader = SeqIODataloader(files=file, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
         return self.dataloader
 
     # def output_results(
@@ -538,3 +539,10 @@ class Corgi(ta.TorchApp):
     def pretrained_location(self) -> str:
         raise NotImplementedError("No default trained model location")
         # return "https://github.com/rbturnbull/corgi/releases/download/v0.3.1-alpha/corgi-0.3.pkl"
+
+    @ta.method
+    def extra_hyperparameters(self) -> dict:
+        """ Extra hyperparameters to save with the module. """
+        return dict(
+            classification_tree=self.classification_tree,
+        )
