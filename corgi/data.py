@@ -17,6 +17,9 @@ from seqbank.transform import seq_to_numpy
 
 from .seqtree import SeqTree
 
+from rich.console import Console
+
+console = Console()
 
 def slice_tensor(tensor, size, start_index=None, pad:bool=True):
     original_length = tensor.shape[0]
@@ -142,7 +145,10 @@ class CorgiDataModule(L.LightningDataModule):
             accessions_list = validation_accessions if details.partition == self.validation_partition else training_accessions
             accessions_list.append(accession)
 
-        assert len(validation_accessions) > 0, f"No validation accessions found. Check the validation partition {self.validation_partition}"
+        if len(validation_accessions) == 0:
+            console.print(f"[bold red]WARNING: No validation accessions found. Check the validation partition {self.validation_partition}. Using all the training examples for validation.")
+            validation_accessions = training_accessions
+        
         if self.max_items:
             training_accessions = training_accessions[:self.max_items]
             validation_accessions = validation_accessions[:self.max_items]
