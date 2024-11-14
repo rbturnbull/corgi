@@ -1,4 +1,5 @@
 import os
+import gzip
 import random
 from dataclasses import dataclass
 from zlib import adler32
@@ -16,6 +17,9 @@ from seqbank.transform import seq_to_numpy
 
 from .seqtree import SeqTree
 
+from rich.console import Console
+
+console = Console()
 
 def slice_tensor(tensor, size, start_index=None, pad:bool=True):
     original_length = tensor.shape[0]
@@ -141,7 +145,10 @@ class CorgiDataModule(L.LightningDataModule):
             accessions_list = validation_accessions if details.partition == self.validation_partition else training_accessions
             accessions_list.append(accession)
 
-        assert len(validation_accessions) > 0, f"No validation accessions found. Check the validation partition {self.validation_partition}"
+        if len(validation_accessions) == 0:
+            console.print(f"[bold red]WARNING: No validation accessions found. Check the validation partition {self.validation_partition}. Using all the training examples for validation.")
+            validation_accessions = training_accessions
+        
         if self.max_items:
             training_accessions = training_accessions[:self.max_items]
             validation_accessions = validation_accessions[:self.max_items]
@@ -208,17 +215,20 @@ class SeqIODataloader:
             return self.format
         
         file = Path(file)
-        suffix = file.suffix.lower()
+        suffixes = [suffix.lower() for suffix in file.suffixes]
+
+        # Check if the last suffix is '.gz' and adjust accordingly
+        if suffixes[-1] == '.gz' and len(suffixes) > 1:
+            suffix = suffixes[-2]
+        else:
+            suffix = suffixes[-1]
 
         if suffix in [".fa", ".fna", ".fasta"]:
             return "fasta"
-
         if suffix in [".genbank", ".gb", ".gbk"]:
             return "genbank"
-
         if suffix in [".tab", ".tsv"]:
             return "tsv"
-
         if suffix in [".fastq", ".fq"]:
             return "fastq"
 
@@ -227,8 +237,14 @@ class SeqIODataloader:
     def __len__(self):
         return self.count
 
-    def parse(self, file):
-        return SeqIO.parse(file, self.get_file_format(file))
+    def parse(self, file:Path):
+        file_format = self.get_file_format(file)
+        
+        if file.name.endswith('.gz'):
+            with gzip.open(file, "rt") as f:
+                yield from SeqIO.parse(f, file_format)
+        else:
+            yield from SeqIO.parse(file, file_format)
 
     def iter_records(self):
         for file in self.files:
