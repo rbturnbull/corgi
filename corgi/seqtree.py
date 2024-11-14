@@ -7,6 +7,7 @@ import pickle
 from Bio.Seq import Seq
 from seqbank import SeqBank
 from Bio.SeqRecord import SeqRecord
+from collections import Counter
 from Bio import SeqIO
 
 from seqbank.io import get_file_format
@@ -177,9 +178,25 @@ class SeqTree(UserDict):
             node = self.node(key)
             node.count += 1
 
-    def render(self, count:bool=False, **kwargs):
+    def add_partition_counts(self):
+        """ Adds a count to each node in the tree. """
+        for node in self.classification_tree.post_order_iter():
+            node.partition_counts = Counter()
+
+        for key, detail in self.items():
+            node = self.node(key)
+            partition = detail.partition
+            node.partition_counts[partition] += 1
+
+    def render(self, count:bool=False, partition_counts:bool=False, **kwargs):
         """ Renders the SeqTree. """
-        if count:
+        if partition_counts:
+            self.add_partition_counts()
+            for node in self.classification_tree.post_order_iter():
+                partition_counts_str = "; ".join([f"{k}->{node.partition_counts[k]}" for k in sorted(node.partition_counts.keys())])
+                node.render_str = f"{node.name} {partition_counts_str}"
+            kwargs['attr'] = "render_str"
+        elif count:
             self.add_counts()
             for node in self.classification_tree.post_order_iter():
                 node.render_str = f"{node.name} ({node.count})" if getattr(node, "count", 0) else node.name
@@ -291,9 +308,10 @@ def render(
     output:Optional[Path] = typer.Option(None, help="The path to save the rendered tree."),
     print:bool = typer.Option(True, help="Whether or not to print the tree to the screen."),
     count:bool = typer.Option(False, help="Whether or not to print the count of accessions at each node."),
+    partition_counts:bool = typer.Option(False, help="Whether or not to print the count of each partition at each node."),
 ):
     seqtree = SeqTree.load(seqtree)
-    seqtree.render(filepath=output, print=print, count=count)
+    seqtree.render(filepath=output, print=print, count=count, partition_counts=partition_counts)
 
 
 @app.command()
