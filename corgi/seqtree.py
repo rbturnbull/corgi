@@ -135,7 +135,7 @@ class SeqTree(UserDict):
 
         return new_tree
             
-    def export(self, seqbank:SeqBank, output:Path|str, length:int=0, format:str="", seed:int=0):
+    def export(self, seqbank:SeqBank, output:Path|str, length:int=0, format:str="", seed:int=0, partition:int|None=None):
         """
         Outputs sequences from a seqbank into a file. 
 
@@ -148,9 +148,13 @@ class SeqTree(UserDict):
         """
         format = format or get_file_format(output)
         with open(output, "w") as f:
-            for accession, detail in self.items():
+            for accession, detail in track(self.items()):
                 data = seqbank[accession]
+
+                if partition is not None and detail.partition != partition:
+                    continue
                 
+                node = self.node(accession)
                 # If the sequence is long enough, take a random slice
                 if length and length > len(data):
                     start_max = len(data) - length
@@ -160,7 +164,7 @@ class SeqTree(UserDict):
                     data = data[start:start+length]
 
                 seq_string = bytes_to_str(data)
-                node_str = node_to_str(detail.node)
+                node_str = node_to_str(node)
                 record = SeqRecord(
                     Seq(seq_string),
                     id=f"{accession}#{node_str}",
@@ -299,7 +303,7 @@ def export(
 ):
     seqtree = SeqTree.load(seqtree)
     seqbank = SeqBank(seqbank)
-    seqtree.export(seqbank, output, accessions=seqtree.accessions(partition), format=format, length=length, seed=seed)
+    seqtree.export(seqbank, output, format=format, length=length, seed=seed, partition=partition)
 
 
 @app.command()
