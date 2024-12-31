@@ -189,7 +189,6 @@ class CorgiDataModule(L.LightningDataModule):
 
 class SeqIODataloader:
     def __init__(self, files, batch_size:int=1, min_length:int=128, max_length:int=5_000, max_seqs:int=None, format:str=""):
-        self.files = list(files)
         self.format = format
         self.chunk_details = []
         self.max_length = max_length
@@ -198,6 +197,27 @@ class SeqIODataloader:
         self.count = 0
         self.max_seqs = max_seqs
         seqs = 0
+
+        base_extensions = {".fa", ".fasta", ".fna"}
+
+        # Function to check if a file matches allowed extensions (including .gz)
+        def matches_extensions(file: Path):
+            return (
+                file.suffix in base_extensions or
+                (file.suffix == ".gz" and any(file.stem.endswith(ext) for ext in base_extensions))
+            )
+
+        # Expand the list
+        self.files = []
+        for path in files:
+            if path.is_dir():
+                # If it's a directory, find all files with the specified extensions
+                self.files.extend([file for file in path.rglob("*") if matches_extensions(file)])
+            else:
+                # If it's not a directory, add the file to the list
+                if matches_extensions(path):
+                    self.files.append(path)
+
         for file in self.files:
             for record in self.parse(file):
                 if len(record.seq) < self.min_length:
