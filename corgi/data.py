@@ -200,6 +200,7 @@ class CorgiDataModule(L.LightningDataModule):
     loc:float=600
     scale:float=1000
     num_workers:int|None = None
+    train_all:bool=False
 
     def __post_init__(self):
         super().__init__()
@@ -221,6 +222,9 @@ class CorgiDataModule(L.LightningDataModule):
 
             accessions_list = validation_accessions if details.partition == self.validation_partition else training_accessions
             accessions_list.append(accession)
+
+        if self.train_all:
+            training_accessions += validation_accessions
 
         if len(validation_accessions) == 0:
             console.print(f"[bold red]WARNING: No validation accessions found. Check the validation partition {self.validation_partition}. Using all the training examples for validation.")

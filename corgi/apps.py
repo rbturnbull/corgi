@@ -50,6 +50,7 @@ class Corgi(ta.TorchApp):
         scale:float = ta.Param(default=1000, help="A parameter to scale the distribution of sequence lengths."),
         # tips_mode:bool = False,
         max_items:int = ta.Param(default=0, help="The maximum number of items to use for training. If zero then all items are used."),
+        train_all:bool = ta.Param(default=False, help="Whether or not to use the validation partition for training."),
     ) -> CorgiDataModule:
         """
         Creates a Pytorch Lightning object which Corgi uses in training and prediction.
@@ -92,6 +93,7 @@ class Corgi(ta.TorchApp):
             maximum_length=maximum_length,
             validation_length=validation_length,
             test_partition=test_partition,
+            train_all=train_all,
             skewness=skewness,
             loc=loc,
             scale=scale,
