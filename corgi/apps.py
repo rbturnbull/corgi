@@ -257,15 +257,22 @@ class Corgi(ta.TorchApp):
     def prediction_dataloader(
         self,
         module,
-        file: List[Path] = ta.Param(None, help="A fasta file with sequences to be classified."),
+        input: list[Path] = ta.Param(None, help="A fasta file with sequences to be classified."),
+        file: list[Path] = ta.Param(None, help="A fasta file with sequences to be classified (DEPRECATED. Use `input`)."),
         max_seqs: int = None,
         batch_size:int = 1,
         max_length:int = 5_000,
         min_length:int = 128,
         **kwargs,
     ):
+        files = []
+        if input:
+            files.extend(input)
+        if file:
+            files.extend(file)
+
         self.classification_tree = module.hparams['classification_tree']
-        self.dataloader = SeqIODataloader(files=file, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
+        self.dataloader = SeqIODataloader(files=files, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
         return self.dataloader
 
     # def output_results(
