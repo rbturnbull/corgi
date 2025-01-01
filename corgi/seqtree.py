@@ -254,7 +254,11 @@ class SeqTree(UserDict):
         for accession in missing:
             del self[accession]
         return missing
-    
+
+    def pickle_tree(self, output:Path):
+        with open(output, 'wb') as pickle_file:
+            pickle.dump(self.classification_tree, pickle_file)
+
 
 
 app = typer.Typer()
@@ -376,6 +380,15 @@ def layer_size(
     """    
     seqtree = SeqTree.load(seqtree)
     print(seqtree.classification_tree.layer_size)
+
+
+@app.command()
+def pickle_tree(
+    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."),    
+    output:Path = typer.Argument(...,help="The path to the output pickle file."),     
+):
+    seqtree = SeqTree.load(seqtree)
+    seqtree.pickle_tree(output)
 
 
 if __name__ == "__main__":
