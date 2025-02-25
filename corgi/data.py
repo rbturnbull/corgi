@@ -292,6 +292,7 @@ class SeqIODataloader:
         # Expand the list
         self.files = []
         for path in files:
+            path = Path(path)
             if path.is_dir():
                 # If it's a directory, find all files with the specified extensions
                 self.files.extend([file for file in path.rglob("*") if matches_extensions(file)])
