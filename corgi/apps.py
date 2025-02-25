@@ -267,8 +267,12 @@ class Corgi(ta.TorchApp):
     ):
         files = []
         if input:
+            if isinstance(input, (str, Path)):
+                input = [input]
             files.extend(input)
         if file:
+            if isinstance(file, (str, Path)):
+                file = [file]
             files.extend(file)
 
         self.classification_tree = module.hparams['classification_tree']

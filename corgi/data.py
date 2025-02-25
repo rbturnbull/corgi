@@ -291,6 +291,11 @@ class SeqIODataloader:
 
         # Expand the list
         self.files = []
+
+        # If 'files' is a string or Path, convert it to a list
+        if isinstance(files, (str,Path)):
+            files = [Path(files)]
+
         for path in files:
             path = Path(path)
             if path.is_dir():
