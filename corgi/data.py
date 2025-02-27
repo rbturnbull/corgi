@@ -377,7 +377,7 @@ class SeqIODataloader:
                 intervals = generate_overlapping_intervals(len(t), self.max_length, self.overlap)
 
                 for chunk_index, interval in enumerate(intervals):
-                    self.chunk_details.append( (file, record.id, chunk_index) )
+                    self.chunk_details.append( (file, record.id, record.description, chunk_index) )
                     batch.append(t[interval[0]:interval[1]])
                     if len(batch) >= self.batch_size:
                         batch = self.pad(batch)

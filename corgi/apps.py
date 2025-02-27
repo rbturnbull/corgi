@@ -393,7 +393,7 @@ class Corgi(ta.TorchApp):
         
         classification_probabilities = node_probabilities(results[0], root=self.classification_tree)
         category_names = [self.node_to_str(node) for node in self.classification_tree.node_list if not node.is_root]
-        chunk_details = pd.DataFrame(self.dataloader.chunk_details, columns=["file", "original_id", "chunk"])
+        chunk_details = pd.DataFrame(self.dataloader.chunk_details, columns=["file", "original_id", "description", "chunk"])
         predictions_df = pd.DataFrame(classification_probabilities.numpy(), columns=category_names)
 
         results_df = pd.concat(
@@ -403,7 +403,7 @@ class Corgi(ta.TorchApp):
 
         # Average over chunks
         results_df["chunk_index"] = results_df.index
-        results_df = results_df.groupby(["file", "original_id"]).mean().reset_index()
+        results_df = results_df.groupby(["file", "original_id", "description"]).mean().reset_index()
 
         # sort to get original order
         results_df = results_df.sort_values(by="chunk_index").drop(columns=["chunk_index"])
@@ -439,7 +439,7 @@ class Corgi(ta.TorchApp):
         results_df['original_classification'] = results_df['original_id'].apply(get_original_classification)
 
         # Reorder columns
-        results_df = results_df[["file", "accession", "greedy_prediction", "probability", "original_id", "original_classification" ] + category_names]
+        results_df = results_df[["file", "accession", "greedy_prediction", "probability", "original_id", "original_classification", "description" ] + category_names]
 
         # Output images
         if image_dir:
