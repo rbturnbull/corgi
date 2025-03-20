@@ -5,7 +5,10 @@ import torch
 from torch import tensor
 import torch.nn as nn
 
-from fastcore.transform import Transform
+try:
+    from fastcore.transform import Transform
+except ImportError:
+    from fasttransform import Transform
 import numpy as np
 from Bio.SeqRecord import SeqRecord
 from scipy.stats import nbinom

@@ -12,7 +12,10 @@ from rich.progress import track
 from Bio import SeqIO
 
 from fastcore.foundation import L
-from fastcore.dispatch import typedispatch
+try:
+    from fastcore.dispatch import typedispatch
+except ImportError:
+    from plum import dispatch as typedispatch
 from fastcore.meta import delegates
 
 from fastai.data.core import TfmdDL, DataLoaders, get_empty_df

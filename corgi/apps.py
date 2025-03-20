@@ -26,7 +26,6 @@ class Corgi(ta.TorchApp):
     """
     corgi - Classifier for ORganelle Genomes Inter alia
     """
-
     def __init__(self):
         super().__init__()
         self.categories = refseq.REFSEQ_CATEGORIES  # This will be overridden by the dataloader
@@ -34,6 +33,33 @@ class Corgi(ta.TorchApp):
         add_kwargs(to_func=self.category_counts, from_funcs=self.dataloaders)
         self.category_counts_cli = self.copy_method(self.category_counts)
         change_typer_to_defaults(self.category_counts)
+
+    def version(self, verbose: bool = False):
+        """
+        Prints the version of the package that defines this app.
+
+        Used in the command-line interface.
+
+        Args:
+            verbose (bool, optional): Whether or not to print to stdout. Defaults to False.
+
+        Raises:
+            Exception: If it cannot find the package.
+
+        """
+        if verbose:
+            from importlib import metadata
+            import typer
+            
+            package = "bio-corgi"
+
+            if package:
+                version = metadata.version(package)
+                print(version)
+            else:
+                raise Exception("Cannot find package.")
+
+            raise typer.Exit()
 
     def dataloaders(
         self,
