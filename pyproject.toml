@@ -23,7 +23,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"
 biopython = ">=1.79"
-fastai = ">=2.4.1"
+fastai = ">=2.4.1,<2.8"
 dask = ">=2021.7.1"
 progressbar2 = ">=3.53.1"
 h5py = ">=3.1.0"
@@ -39,6 +39,7 @@ cryptography = ">=36.0.1"
 PyMySQL = ">=1.0.2"
 termgraph = ">=0.5.3"
 torchapp = ">=0.3.1"
+scipy = ">=1.9.1,<1.10.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=6.2.5"
