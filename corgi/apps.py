@@ -259,6 +259,7 @@ class Corgi(ta.TorchApp):
         module,
         input: list[Path] = ta.Param(None, help="A fasta file with sequences to be classified."),
         file: list[Path] = ta.Param(None, help="A fasta file with sequences to be classified (DEPRECATED. Use `input`)."),
+        seqtree: Path = ta.Param(None, help="The seqtree with the classification tree to use. DEPRECATED."),
         max_seqs: int = None,
         batch_size:int = 1,
         max_length:int = 5_000,
@@ -275,7 +276,11 @@ class Corgi(ta.TorchApp):
                 file = [file]
             files.extend(file)
 
-        self.classification_tree = module.hparams['classification_tree']
+        if seqtree and Path(seqtree).exists():
+            seqtree = SeqTree.load(seqtree)
+            self.classification_tree = seqtree.classification_tree
+        else:
+            self.classification_tree = module.hparams['classification_tree']
         self.dataloader = SeqIODataloader(files=files, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
         return self.dataloader
 

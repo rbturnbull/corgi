@@ -195,3 +195,4 @@ train.sh
 *.out
 *.slurm
 logs/
+lightning_logs/

@@ -267,7 +267,7 @@ class ConvClassifier(nn.Module):
         output_types=None,
         cnn_dims_start=64,
         kernel_size_maxpool=2,
-        return_penultimate:bool=False,
+        return_embeddings:bool=False,
         num_embeddings=5,  # i.e. the size of the vocab which is N, A, C, G, T
         kernel_size=3,
         factor=2,
@@ -288,7 +288,7 @@ class ConvClassifier(nn.Module):
         self.cnn_layers = cnn_layers
         self.output_types = output_types
         self.kernel_size_maxpool = kernel_size_maxpool
-        self.return_penultimate = return_penultimate
+        self.return_embeddings = return_embeddings
 
         self.num_embeddings = num_embeddings
         self.kernel_size = kernel_size
@@ -398,7 +398,7 @@ class ConvClassifier(nn.Module):
 
         split_predictions = split_tensor(predictions, self.output_types, feature_axis=1)
 
-        if self.return_penultimate:
+        if getattr(self, "return_embeddings", False):
             return split_predictions, penultimate_result
     
         return split_predictions
