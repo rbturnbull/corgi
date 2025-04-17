@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+import typer
 from torch import nn
 import pandas as pd
 import torch
@@ -275,6 +275,9 @@ class Corgi(ta.TorchApp):
             if isinstance(file, (str, Path)):
                 file = [file]
             files.extend(file)
+
+        if not files:
+            raise typer.BadParameter("No files given to classify.")
 
         if seqtree and Path(seqtree).exists():
             seqtree = SeqTree.load(seqtree)
