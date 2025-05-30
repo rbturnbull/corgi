@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bio-corgi"
-version = "0.4.2"
+version = "0.4.3"
 description = "Classifier for ORganelle Genomes Inter alia"
 authors = ["Robert Turnbull <robert.turnbull@unimelb.edu.au>"]
 license = "Apache Software License 2.0"
@@ -38,7 +38,7 @@ optuna = ">=2.10.0"
 cryptography = ">=36.0.1"
 PyMySQL = ">=1.0.2"
 termgraph = ">=0.5.3"
-torchapp = ">=0.3.1"
+torchapp = ">=0.3.1,<0.4.0"
 scipy = ">=1.9.1,<1.10.0"
 
 [tool.poetry.group.dev.dependencies]
