@@ -18,9 +18,9 @@ jobs:
           python-version: 3.11
           cache: 'poetry'
       - run: |
-        poetry install
-        # install a version of pytorch that does not require a GPU / CUDA
-        poetry run pip install torch==2.0.1 --extra-index-url https://download.pytorch.org/whl/cpu --force
+          poetry install
+          # install a version of pytorch that does not require a GPU / CUDA
+          poetry run pip install torch==2.0.1 --extra-index-url https://download.pytorch.org/whl/cpu --force
       - name: Build library
         run: poetry build
       - name: Publish library
