@@ -196,3 +196,4 @@ train.sh
 *.slurm
 logs/
 lightning_logs/
+seqtree-to-treedict.py

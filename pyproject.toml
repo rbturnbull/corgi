@@ -8,7 +8,7 @@ readme = "README.rst"
 repository = "https://github.com/rbturnbull/corgi"
 documentation = "https://rbturnbull.github.io/corgi/"
 homepage = "https://github.com/rbturnbull/corgi"
-keywords = ["metagenomic classifier", "tiara", "DNA", "bioinformatics", "fastai", "pytorch", "deep learning", "command-line interface"]
+keywords = ["metagenomic classifier", "tiara", "DNA", "bioinformatics", "lightning", "pytorch", "deep learning", "command-line interface"]
 classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Intended Audience :: Science/Research",
@@ -33,12 +33,12 @@ httpx = ">=0.20.0"
 cryptography = ">=36.0.1"
 PyMySQL = ">=1.0.2"
 termgraph = ">=0.5.3"
-torchapp = {git = "https://github.com/rbturnbull/torchapp.git", branch = "lightning"}
+torchapp = ">=0.5.1"
 torch = ">=2.0.0"
-hierarchicalsoftmax = {git = "https://github.com/rbturnbull/hierarchicalsoftmax.git", branch = "torchmetrics"}
+hierarchicalsoftmax = ">=1.4.1"
 attrs = ">=23.1.0"
-polytorch = {git = "https://github.com/rbturnbull/polytorch.git", branch = "hierarchical"}
-seqbank = {git = "https://github.com/rbturnbull/seqbank.git", branch = "main"}
+polytorch = ">=0.1.3"
+seqbank = ">=0.1.3"
 multitax = ">=1.3.1"
 
 
