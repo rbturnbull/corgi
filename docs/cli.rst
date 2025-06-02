@@ -2,11 +2,12 @@
 Command Line Interface Reference
 ================================
 
-.. click:: corgi.apps:Corgi.inference_only_click
-   :prog: corgi
-   :nested: full
+More information coming soon.
+.. .. click:: corgi.apps:Corgi.main_app
+..    :prog: corgi
+..    :nested: full
 
 
-.. click:: corgi.apps:Corgi.click
-   :prog: corgi-train
-   :nested: full
+.. .. click:: corgi.apps:Corgi.tools_app
+..    :prog: corgi-train
+..    :nested: full
