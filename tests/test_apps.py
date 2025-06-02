@@ -1,4 +1,5 @@
-from torchapp.testing import TorchAppTestCase
+from torchapp.testing import TorchAppTestCase, CliRunner
+import re
 from corgi.apps import Corgi
 from pathlib import Path
 from corgi.seqtree import SeqTree
@@ -18,3 +19,10 @@ def mock_init(self):
 class TestCorgi(TorchAppTestCase):
     app_class = Corgi
 
+    def test_version_main(self):
+        app = self.get_app()
+        runner = CliRunner()
+        result = runner.invoke(app.main_app, ["--version"])
+        assert result.exit_code == 0, f"Expected exit code 0, got {result.exit_code}: {result.stdout}"
+        pep440_regex = r"^\d+(\.\d+)*([a-zA-Z]+\d+)?([+-][\w\.]+)?$"
+        assert re.match(pep440_regex, result.stdout)

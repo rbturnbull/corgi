@@ -319,7 +319,7 @@ class Corgi(ta.TorchApp):
         results,
         output_csv: Path = ta.Param(default=None, help="A path to output the results as a CSV."),
         output_tips_csv: Path = ta.Param(default=None, help="A path to output the results as a CSV which only stores the probabilities at the tips."),
-        output_fasta: Path = ta.Param(default=None, help="A path to output the results in FASTA format."),
+        # output_fasta: Path = ta.Param(default=None, help="A path to output the results in FASTA format."),
         image_dir: Path = ta.Param(default=None, help="A directory to output the results as images."),
         image_format:str = "svg",
         image_threshold:float = 0.005,
@@ -327,7 +327,7 @@ class Corgi(ta.TorchApp):
         **kwargs,
     ):
         
-        assert self.classification_tree # This should be saved from the learner
+        assert self.classification_tree # This should be saved on the checkpoint
         
         classification_probabilities = node_probabilities(results[0], root=self.classification_tree)
         category_names = [self.node_to_str(node) for node in self.classification_tree.node_list if not node.is_root]
@@ -404,8 +404,7 @@ class Corgi(ta.TorchApp):
         if not (image_dir or output_fasta or output_csv or output_tips_csv):
             print("No output files requested.")
             
-        if output_fasta:
-            raise NotImplementedError
+        # if output_fasta:
         #     console.print(f"Writing results for {len(results_df)} repeats to: {output_fasta}")
         #     with open(output_fasta, "w") as fasta_out:
         #         for file in self.dataloader.files:

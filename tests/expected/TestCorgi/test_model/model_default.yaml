@@ -28,7 +28,6 @@ output: |-
       (22): Dropout(p=0.2, inplace=False)
       (23): MaxPool1d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
     )
-    (average_pool): AdaptiveAvgPool1d(output_size=1)
-    (penultimate): Linear(in_features=320, out_features=1024, bias=True)
+    (penultimate): Linear(in_features=321, out_features=1024, bias=True)
     (final): Linear(in_features=1024, out_features=4, bias=True)
   )

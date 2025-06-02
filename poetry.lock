@@ -5201,14 +5201,14 @@ optree = ["optree (>=0.13.0)"]
 
 [[package]]
 name = "torchapp"
-version = "0.5.3"
+version = "0.5.4"
 description = "A wrapper for PyTorch projects to create easy command-line interfaces and manage hyper-parameter tuning."
 optional = false
 python-versions = "<3.13,>=3.10"
 groups = ["main"]
 files = [
-    {file = "torchapp-0.5.3-py3-none-any.whl", hash = "sha256:082c395e8641ae092c35f4c090e1db2593a89edeac1857caea8d1f31ddc02a68"},
-    {file = "torchapp-0.5.3.tar.gz", hash = "sha256:21d476f7cabd520d28d0ccb474c1e8a0f7958895f8d2d779dcf517b976ac684f"},
+    {file = "torchapp-0.5.4-py3-none-any.whl", hash = "sha256:0a7babef2945ebbdbd9adc184062b347d44cd054ba7422a49e0eb1c33551fc8c"},
+    {file = "torchapp-0.5.4.tar.gz", hash = "sha256:552d869097b96e6260db471ee857b1579b9b6b5ac39ad7c6dd957b1ca372fb55"},
 ]
 
 [package.dependencies]
