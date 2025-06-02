@@ -19,7 +19,7 @@
 .. |git3moji badge| image:: https://img.shields.io/badge/git3moji-%E2%9A%A1%EF%B8%8F%F0%9F%90%9B%F0%9F%93%BA%F0%9F%91%AE%F0%9F%94%A4-fffad8.svg
     :target: https://robinpokorny.github.io/git3moji/
 
-.. |torchapp badge| image:: https://img.shields.io/badge/MLOpps-torchapp-B1230A.svg
+.. |torchapp badge| image:: https://img.shields.io/badge/torch-app-B1230A.svg
     :target: https://rbturnbull.github.io/torchapp/
         
 .. end-badges
@@ -49,7 +49,6 @@ To install the latest version from the repository, you can use this command:
 
     Soon corgi will be able to be installed using conda.
 
-
 Usage
 ============
 
@@ -57,9 +56,9 @@ To make predictions, run the ``corgi`` command line tool:
 
 .. code-block:: bash
 
-    corgi --file <input seq file>
+    corgi --input <input seq file> --output-csv <output csv file>
 
-This will create a directory with the predictions in a CSV file and in fasta format.
+This will output all the predictions in a CSV file.
 
 For more information about the other options, see the help with:
 
@@ -71,8 +70,7 @@ For help on training a model with corgi, run:
 
 .. code-block:: bash
 
-    corgi-train --help
-
+    corgi-tools --help
 
 .. end-quickstart
 
@@ -80,6 +78,18 @@ For help on training a model with corgi, run:
 Credits
 ==================================
 
-* Robert Turnbull <robert.turnbull@unimelb.edu.au>
+* `Robert Turnbull <https://robturnbull.com>`_
+* Vinícius Salazar
+* Edoardo Tescari
+* Heroen Verbruggen
+
+With contributions from:
+* Yuhao Tong
+* Kamalpreet Singh
+* Rafsan Al Mamun
+* Diego Aranda Villarreal
+
+Citation details to come.
+
 * Created using torchapp (https://github.com/rbturnbull/torchapp)
 
