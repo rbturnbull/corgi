@@ -84,6 +84,7 @@ Credits
 * Heroen Verbruggen
 
 With contributions from:
+
 * Yuhao Tong
 * Kamalpreet Singh
 * Rafsan Al Mamun
