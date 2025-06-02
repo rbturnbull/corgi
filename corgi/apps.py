@@ -22,6 +22,37 @@ from .seqtree import SeqTree, node_to_str
 
 console = Console()
 
+def output_results_bar_chart(results_df: pd.DataFrame, top_k: int = 10):
+    value_counts = results_df['greedy_prediction'].value_counts()
+    total_categories = len(value_counts)
+    if top_k:
+        value_counts = value_counts.iloc[:top_k]
+    table = Table(box=SIMPLE)
+    table.add_column("Prediction", justify="left", style="bold")
+    table.add_column("Proportion", justify="left", style="green")
+    table.add_column("Count", justify="right")
+    bar_size = 80  # Width of the bar in characters
+    for prediction, count in value_counts.items():
+        proportion = count / len(results_df)
+        bar = "█" * int(proportion * bar_size)
+        table.add_row(prediction, f"{bar} {proportion:.1%}", f"{count}")
+    if total_categories > top_k:
+        table.add_row(
+            "Other Categories",
+            f"{'█' * bar_size} {sum(value_counts.iloc[top_k:]) / len(results_df):.1%}",
+            f"{sum(value_counts.iloc[top_k:])}"
+        )
+    # Add line
+    table.add_row('────────────────────', '─' * bar_size, '─' * 10, style="red")
+    table.add_row(
+        "Total",
+        "",
+        f"{len(results_df)}"
+    )
+
+    console.print(table)
+
+
 
 def set_alphas_with_phi(tree, phi=1.0):
     for node in tree.pre_order_iter():
@@ -368,18 +399,7 @@ class Corgi(ta.TorchApp):
             )
 
         # Output Bar Chart
-        value_counts = results_df['greedy_prediction'].value_counts()
-        value_counts = value_counts.iloc[:10]
-        table = Table(box=SIMPLE)
-        table.add_column("Prediction", justify="left", style="bold")
-        table.add_column("Proportion", justify="left", style="green")
-        table.add_column("Count", justify="right")
-        bar_size = 80  # Width of the bar in characters
-        for prediction, count in value_counts.items():
-            proportion = count / len(results_df)
-            bar = "█" * int(proportion * bar_size)
-            table.add_row(prediction, f"{bar} {proportion:.2%}", f"{count}")
-        console.print(table)
+        output_results_bar_chart(results_df, top_k=10)
 
         if not (image_dir or output_fasta or output_csv or output_tips_csv):
             print("No output files requested.")
