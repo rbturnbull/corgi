@@ -197,3 +197,4 @@ train.sh
 logs/
 lightning_logs/
 seqtree-to-treedict.py
+change-checkpoint-model.py

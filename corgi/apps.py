@@ -12,7 +12,6 @@ import numpy as np
 from torchmetrics import Metric
 from hierarchicalsoftmax.metrics import RankAccuracyTorchMetric
 from polytorch import PolyLoss, HierarchicalData, total_size
-from polytorch.metrics import HierarchicalGreedyAccuracy
 from seqbank import SeqBank
 from hierarchicalsoftmax.inference import node_probabilities, greedy_predictions, render_probabilities
 from hierarchicalsoftmax.nodes import SoftmaxNode
@@ -72,10 +71,6 @@ class Corgi(ta.TorchApp):
 
         self.classification_tree = seqtree.classification_tree
 
-        # self.classification_tree.tips_mode = tips_mode
-        # if tips_mode:
-        #     self.classification_tree.index_tips_mode()
-        
         set_alphas_with_phi(self.classification_tree, phi=phi)
 
         self.output_types = [
@@ -216,18 +211,6 @@ class Corgi(ta.TorchApp):
             transformer_heads=transformer_heads,
         )
 
-        # return models.ConvRecurrantClassifier(
-        #     num_classes=num_classes,
-        #     embedding_dim=embedding_dim,
-        #     filters=filters,
-        #     cnn_layers=cnn_layers,
-        #     lstm_dims=lstm_dims,
-        #     final_layer_dims=final_layer_dims,
-        #     dropout=dropout,
-        #     kernel_size_maxpool=kernel_size_maxpool,
-        #     final_bias=final_bias,
-        # )
-
     @ta.method    
     def metrics(self) -> list[tuple[str,Metric]]:
         rank_accuracy = RankAccuracyTorchMetric(
@@ -252,6 +235,12 @@ class Corgi(ta.TorchApp):
     def loss_function(self):
         assert self.output_types
         return PolyLoss(data_types=self.output_types, feature_axis=1)
+
+    def package_name(self) -> str:
+        """
+        Returns the name of the package.
+        """
+        return "bio-corgi"
 
     @ta.method
     def prediction_dataloader(
@@ -286,96 +275,6 @@ class Corgi(ta.TorchApp):
             self.classification_tree = module.hparams['classification_tree']
         self.dataloader = SeqIODataloader(files=files, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
         return self.dataloader
-
-    # def output_results(
-    #     self,
-    #     results,
-    #     output_dir:Path = ta.Param(default=None, help="A path to output the results as a CSV."),
-    #     csv: Path = ta.Param(default=None, help="A path to output the results as a CSV. If not given then a default name is chosen inside the output directory."),
-    #     save_filtered:bool = ta.Param(default=True, help="Whether or not to save the filtered sequences."),
-    #     threshold: float = ta.Param(
-    #         default=None, 
-    #         help="The threshold to use for filtering. "
-    #             "If not given, then only the most likely category used for filtering.",
-    #     ),
-    #     **kwargs,
-    # ):
-    #     if not output_dir:
-    #         time_string = time.strftime("%Y_%m_%d-%I_%M_%S_%p")
-    #         output_dir = f"corgi-output-{time_string}"
-
-    #     output_dir = Path(output_dir)
-
-    #     chunk_details = pd.DataFrame(self.seqio_dataloader.chunk_details, columns=["file", "accession", "chunk"])
-    #     predictions_df = pd.DataFrame(results[0].numpy(), columns=self.categories)
-    #     results_df = pd.concat(
-    #         [chunk_details.drop(columns=['chunk']), predictions_df],
-    #         axis=1,
-    #     )
-
-    #     # Average over chunks
-    #     results_df = results_df.groupby(["file", "accession"]).mean().reset_index()
-
-    #     columns = set(predictions_df.columns)
-
-    #     results_df['prediction'] = results_df[self.categories].idxmax(axis=1)
-    #     results_df['eukaryotic'] = predictions_df[list(columns & set(refseq.EUKARYOTIC))].sum(axis=1)
-    #     results_df['prokaryotic'] = predictions_df[list(columns & set(refseq.PROKARYOTIC))].sum(axis=1)
-    #     results_df['organellar'] = predictions_df[list(columns & set(refseq.ORGANELLAR))].sum(axis=1)
-
-    #     if not csv:
-    #         output_dir.mkdir(parents=True, exist_ok=True)
-    #         csv = output_dir / f"corgi-output.csv"
-
-    #     console.print(f"Writing results for {len(results_df)} sequences to: {csv}")
-    #     results_df.to_csv(csv, index=False)
-
-    #     # Write all the sequences to fasta files
-    #     if save_filtered:
-    #         record_to_string = FastaIO.as_fasta
-
-    #         output_dir.mkdir(parents=True, exist_ok=True)
-            
-    #         file_handles = {}
-
-    #         for file, record in self.seqio_dataloader.iter_records():
-    #             row = results_df[ (results_df.accession == record.id) & (results_df.file == file) ]
-    #             if len(row) == 0:
-    #                 categories = ["unclassified"]
-    #             else:
-    #                 # Get the categories to write to
-    #                 if not threshold:
-    #                     # if no threshold then just use the most likely category
-    #                     categories = [row['prediction'].item()]
-    #                 else:
-    #                     # otherwise use all categories above or equal to the threshold
-    #                     category_predictions = row.iloc[0][self.categories]
-    #                     categories = [category_predictions[category_predictions >= threshold].index.item()]
-
-    #             for category in categories:
-    #                 if category not in file_handles:
-    #                     file_path = output_dir / f"{category}.fasta"
-    #                     file_handles[category] = open(file_path, "w")
-
-    #                 file_handle = file_handles[category]
-    #                 file_handle.write(record_to_string(record))
-
-    #         for file_handle in file_handles.values():
-    #             file_handle.close()
-
-    #     # Output bar chart
-    #     from termgraph.module import Data, BarChart, Args
-
-    #     value_counts = results_df['prediction'].value_counts()
-    #     data = Data([[count] for count in value_counts], value_counts.index)
-    #     chart = BarChart(
-    #         data,
-    #         Args(
-    #             space_between=False,
-    #         ),
-    #     )
-
-    #     chart.draw()
 
     def node_to_str(self, node:SoftmaxNode) -> str:
         """ 
@@ -468,9 +367,23 @@ class Corgi(ta.TorchApp):
                 threshold=image_threshold,
             )
 
+        # Output Bar Chart
+        value_counts = results_df['greedy_prediction'].value_counts()
+        value_counts = value_counts.iloc[:10]
+        table = Table(box=SIMPLE)
+        table.add_column("Prediction", justify="left", style="bold")
+        table.add_column("Proportion", justify="left", style="green")
+        table.add_column("Count", justify="right")
+        bar_size = 80  # Width of the bar in characters
+        for prediction, count in value_counts.items():
+            proportion = count / len(results_df)
+            bar = "█" * int(proportion * bar_size)
+            table.add_row(prediction, f"{bar} {proportion:.2%}", f"{count}")
+        console.print(table)
+
         if not (image_dir or output_fasta or output_csv or output_tips_csv):
             print("No output files requested.")
-
+            
         if output_fasta:
             raise NotImplementedError
         #     console.print(f"Writing results for {len(results_df)} repeats to: {output_fasta}")
@@ -528,42 +441,21 @@ class Corgi(ta.TorchApp):
 
         return results_df
 
-    # def category_counts_dataloader(self, dataloader, description):
-    #     from collections import Counter
-
-    #     counter = Counter()
-    #     for batch in dataloader:
-    #         counter.update(batch[1].cpu().numpy())
-    #     total = sum(counter.values())
-
-    #     table = Table(title=f"{description}: Categories in epoch", box=SIMPLE)
-
-    #     table.add_column("Category", justify="right", style="cyan", no_wrap=True)
-    #     table.add_column("Count", justify="center")
-    #     table.add_column("Percentage")
-
-    #     for category_id, category in enumerate(self.categories):
-    #         count = counter[category_id]
-    #         table.add_row(category, str(count), f"{count/total*100:.1f}%")
-
-    #     table.add_row("Total", str(total), "")
-
-    #     console.print(table)
-
-    # def category_counts(self, **kwargs):
-    #     dataloaders = call_func(self.dataloaders, **kwargs)
-    #     self.category_counts_dataloader(dataloaders.train, "Training")
-    #     self.category_counts_dataloader(dataloaders.valid, "Validation")
-
-
-    @ta.method
-    def pretrained_location(self) -> str:
-        raise NotImplementedError("No default trained model location")
-        # return "https://github.com/rbturnbull/corgi/releases/download/v0.3.1-alpha/corgi-0.3.pkl"
-
     @ta.method
     def extra_hyperparameters(self) -> dict:
         """ Extra hyperparameters to save with the module. """
         return dict(
             classification_tree=self.classification_tree,
         )
+
+    def checkpoint(
+        self, 
+        checkpoint:Path=ta.Param(default=None, help="A path to a checkpoint to load. If not given then a default checkpoint is used."),
+        large: bool = ta.Param(default=False, help="Whether or not to use a large checkpoint (overridden by `checkpoint` parameter)."),
+    ) -> str:
+        if checkpoint:
+            return checkpoint
+        if large:
+            raise NotImplementedError("Large checkpoint not yet available.")
+        
+        return "https://github.com/rbturnbull/corgi/releases/download/v0.5.0a1/corgi-0.5.0a1-base.ckpt"
