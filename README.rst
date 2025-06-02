@@ -1,4 +1,4 @@
-.. image:: https://raw.githubusercontent.com/rbturnbull/corgi/main/docs/images/corgi-banner.svg
+.. image:: https://raw.githubusercontent.com/rbturnbull/corgi/main/docs/images/corgi-banner.jpg
 
 .. start-badges
 
