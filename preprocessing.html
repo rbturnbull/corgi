@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quickstart &mdash; corgi 0.2.0 documentation</title>
+  <title>Preprocessing &mdash; corgi 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -22,8 +22,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="SeqTree" href="seqtree.html" />
-    <link rel="prev" title="Welcome to corgi’s documentation!" href="index.html" /> 
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="SeqTree" href="seqtree.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,13 +47,9 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="seqtree.html">SeqTree</a></li>
-<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Preprocessing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
@@ -73,9 +69,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Quickstart</li>
+      <li class="breadcrumb-item active">Preprocessing</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/quickstart.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/preprocessing.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -83,51 +79,37 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="quickstart">
-<h1>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h1>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>The software can be installed using <code class="docutils literal notranslate"><span class="pre">pip</span></code></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>bio-corgi
+  <section id="preprocessing">
+<h1>Preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading"></a></h1>
+<p>Use this tutorial to learn how to generate the files needed to train Corgi from scratch.
+You can use this to replicate the results found in the paper (still to be released).</p>
+<p>Corgi takes two input files, a SeqTree and a SeqBank.
+The SeqBank holds the sequence data for each accession in the dataset.
+The SeqTree has the information about the cross-validation partition for each accession and which node in the taxonomic tree that the accession corresponds to.</p>
+<p>To create the initial SeqTree object, run this command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>refseq-to-seqtree<span class="w"> </span>corgi-max200-initial.st<span class="w"> </span>--max-seqs<span class="w"> </span><span class="m">200</span><span class="w"> </span>--accessions<span class="w"> </span>corgi-max200-initial.txt<span class="w"> </span>--partitions<span class="w"> </span><span class="m">6</span>
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Do not try just <cite>pip install corgi</cite> because that is a different package.</p>
-</div>
-<p>To install the latest version from the repository, you can use this command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/rbturnbull/corgi.git
+<p>This will download the latest version of the RefSeq catalog and create a SeqTree file <code class="docutils literal notranslate"><span class="pre">corgi-max200.st</span></code> which include at most 200 accessions for each order.</p>
+<p>Corgi was trained with the 225 release of RefSeq. If you want to explicitly give it a RefSeq catalog, then you can specify the path to it with the <code class="docutils literal notranslate"><span class="pre">--catalog</span></code> option.</p>
+<p>The list of accessions was saved to the file <code class="docutils literal notranslate"><span class="pre">corgi-max200-initial.txt</span></code>. This list can be used to create a SeqBank file:</p>
+<p>Each genome will be assigned to one of six partitions. We will use partition 0 as the test set and partitions 1–5 as the cross-validation partitions.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>seqbank<span class="w"> </span>refseq<span class="w"> </span>corgi-max200.sb<span class="w"> </span>--filter<span class="w"> </span>corgi-max200-initial.txt
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Soon corgi will be able to be installed using conda.</p>
-</div>
-</section>
-<section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
-<p>To make predictions, run the <code class="docutils literal notranslate"><span class="pre">corgi</span></code> command line tool:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>corgi<span class="w"> </span>--input<span class="w"> </span>&lt;input<span class="w"> </span>seq<span class="w"> </span>file&gt;<span class="w"> </span>--output-csv<span class="w"> </span>&lt;output<span class="w"> </span>csv<span class="w"> </span>file&gt;
+<p>This command will download each raw RefSeq file and save the data for each accession in <code class="docutils literal notranslate"><span class="pre">corgi-max200-initial.txt</span></code>.</p>
+<p>There may be accessions found in the catalog that were not found in the seqbank file. A new SeqTree file can be created with these removed:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>intersection-seqbank<span class="w"> </span>corgi-max200-initial.st<span class="w"> </span>corgi-max200.sb<span class="w"> </span>corgi-max200.st
 </pre></div>
 </div>
-<p>This will output all the predictions in a CSV file.</p>
-<p>For more information about the other options, see the help with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>corgi<span class="w"> </span>--help
-</pre></div>
-</div>
-<p>For help on training a model with corgi, run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>corgi-tools<span class="w"> </span>--help
-</pre></div>
-</div>
-</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to corgi’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="seqtree.html" class="btn btn-neutral float-right" title="SeqTree" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="seqtree.html" class="btn btn-neutral float-left" title="SeqTree" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

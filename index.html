@@ -15,7 +15,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=938c9ccc"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
@@ -47,6 +47,8 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seqtree.html">SeqTree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
@@ -78,8 +80,8 @@
              
   <section id="welcome-to-corgi-s-documentation">
 <h1>Welcome to corgi’s documentation!<a class="headerlink" href="#welcome-to-corgi-s-documentation" title="Link to this heading"></a></h1>
-<img alt="https://raw.githubusercontent.com/rbturnbull/corgi/main/docs/images/corgi-banner.svg" src="https://raw.githubusercontent.com/rbturnbull/corgi/main/docs/images/corgi-banner.svg" />
-<p><a class="reference external" href="https://github.com/rbturnbull/corgi/actions"><img alt="testing badge" src="https://github.com/rbturnbull/corgi/actions/workflows/testing.yml/badge.svg" /></a> <a class="reference external" href="https://rbturnbull.github.io/corgi/coverage/"><img alt="coverage badge" src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/rbturnbull/ee1b52dd314d6441e0aabc0e1e50dc2c/raw/coverage-badge.json" /></a> <a class="reference external" href="https://rbturnbull.github.io/corgi"><img alt="docs badge" src="https://github.com/rbturnbull/corgi/actions/workflows/docs.yml/badge.svg" /></a> <a class="reference external" href="https://github.com/psf/black"><img alt="black badge" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a> <a class="reference external" href="https://robinpokorny.github.io/git3moji/"><img alt="git3moji badge" src="https://img.shields.io/badge/git3moji-%E2%9A%A1%EF%B8%8F%F0%9F%90%9B%F0%9F%93%BA%F0%9F%91%AE%F0%9F%94%A4-fffad8.svg" /></a> <a class="reference external" href="https://rbturnbull.github.io/torchapp/"><img alt="torchapp badge" src="https://img.shields.io/badge/MLOpps-torchapp-B1230A.svg" /></a></p>
+<img alt="https://raw.githubusercontent.com/rbturnbull/corgi/main/docs/images/corgi-banner.jpg" src="https://raw.githubusercontent.com/rbturnbull/corgi/main/docs/images/corgi-banner.jpg" />
+<p><a class="reference external" href="https://github.com/rbturnbull/corgi/actions"><img alt="testing badge" src="https://github.com/rbturnbull/corgi/actions/workflows/testing.yml/badge.svg" /></a> <a class="reference external" href="https://rbturnbull.github.io/corgi/coverage/"><img alt="coverage badge" src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/rbturnbull/ee1b52dd314d6441e0aabc0e1e50dc2c/raw/coverage-badge.json" /></a> <a class="reference external" href="https://rbturnbull.github.io/corgi"><img alt="docs badge" src="https://github.com/rbturnbull/corgi/actions/workflows/docs.yml/badge.svg" /></a> <a class="reference external" href="https://github.com/psf/black"><img alt="black badge" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a> <a class="reference external" href="https://robinpokorny.github.io/git3moji/"><img alt="git3moji badge" src="https://img.shields.io/badge/git3moji-%E2%9A%A1%EF%B8%8F%F0%9F%90%9B%F0%9F%93%BA%F0%9F%91%AE%F0%9F%94%A4-fffad8.svg" /></a> <a class="reference external" href="https://rbturnbull.github.io/torchapp/"><img alt="torchapp badge" src="https://img.shields.io/badge/torch-app-B1230A.svg" /></a></p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -88,15 +90,16 @@
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#usage">Usage</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="seqtree.html">SeqTree</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="seqtree.html#seqtree">seqtree</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#corgi.apps.Corgi"><code class="docutils literal notranslate"><span class="pre">Corgi</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#corgi">corgi</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#corgi-train">corgi-train</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
 </ul>
 </div>

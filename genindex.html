@@ -14,7 +14,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=938c9ccc"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
@@ -45,6 +45,8 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seqtree.html">SeqTree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
@@ -78,15 +80,15 @@
 
 <div class="genindex-jumpbox">
  <a href="#Symbols"><strong>Symbols</strong></a>
- | <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
- | <a href="#G"><strong>G</strong></a>
- | <a href="#I"><strong>I</strong></a>
- | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#V"><strong>V</strong></a>
  
@@ -95,873 +97,141 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    --base-dir
+    --count
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-base-dir">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-base-dir">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-base-dir">corgi-train-show-batch command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-base-dir">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-base-dir">corgi-train-tune command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-base-dir">corgi-train-validate command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-count">seqtree-render command line option</a>
 </li>
       </ul></li>
       <li>
-    --batch-size
+    --format
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-batch-size">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-batch-size">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-batch-size">corgi-train-infer command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-batch-size">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-batch-size">corgi-train-show-batch command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-batch-size">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-batch-size">corgi-train-tune command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-batch-size">corgi-train-validate command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-format">seqtree-export command line option</a>
 </li>
       </ul></li>
       <li>
-    --cnn-dims-start
+    --height
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-cnn-dims-start">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-cnn-dims-start">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-cnn-dims-start">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-cnn-dims-start">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --cnn-layers
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-cnn-layers">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-cnn-layers">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-cnn-layers">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-cnn-layers">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --cnn-only
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-cnn-only">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-cnn-only">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-cnn-only">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-cnn-only">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --csv
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-csv">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-csv">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-csv">corgi-train-infer command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-csv">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-csv">corgi-train-show-batch command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-csv">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-csv">corgi-train-tune command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-csv">corgi-train-validate command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --dataloader-type
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-dataloader-type">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-dataloader-type">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-dataloader-type">corgi-train-show-batch command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-dataloader-type">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-dataloader-type">corgi-train-tune command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-dataloader-type">corgi-train-validate command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --deform-lambda
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-deform-lambda">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-deform-lambda">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-deform-lambda">corgi-train-show-batch command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-deform-lambda">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-deform-lambda">corgi-train-tune command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-deform-lambda">corgi-train-validate command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --distributed
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-train-distributed">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-distributed">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --dropout
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-dropout">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-dropout">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-dropout">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-dropout">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --embedding-dim
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-embedding-dim">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-embedding-dim">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-embedding-dim">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-embedding-dim">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --end-lr
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-end-lr">corgi-train-lr-finder command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --engine
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-engine">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --epochs
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-train-epochs">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-epochs">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --factor
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-factor">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-factor">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-factor">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-factor">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --file
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-file">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-file">corgi-train-infer command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --filters
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-filters">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-filters">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-filters">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-filters">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --final-bias
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-final-bias">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-final-bias">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-final-bias">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-final-bias">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --final-layer-dims
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-final-layer-dims">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-final-layer-dims">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-final-layer-dims">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-final-layer-dims">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --fp16
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-fp16">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-fp16">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-fp16">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-fp16">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --freeze-epochs
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-train-freeze-epochs">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-freeze-epochs">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --gpu
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-gpu">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-gpu">corgi-train-infer command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-gpu">corgi-train-validate command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --id
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-id">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --include-length
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-include-length">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-include-length">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-include-length">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-include-length">corgi-train-tune command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-height">seqtree-sunburst command line option</a>
 </li>
       </ul></li>
       <li>
     --install-completion
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-install-completion">corgi-train command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-install-completion">seqtree command line option</a>
 </li>
       </ul></li>
       <li>
-    --iterations
+    --length
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-iterations">corgi-train-lr-finder command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-length">seqtree-export command line option</a>
 </li>
       </ul></li>
       <li>
-    --kernel-size
+    --no-count
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-kernel-size">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-kernel-size">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-kernel-size">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-kernel-size">corgi-train-tune command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-count">seqtree-render command line option</a>
 </li>
       </ul></li>
       <li>
-    --kernel-size-maxpool
+    --no-partition-counts
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-kernel-size-maxpool">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-kernel-size-maxpool">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-kernel-size-maxpool">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-kernel-size-maxpool">corgi-train-tune command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-partition-counts">seqtree-render command line option</a>
 </li>
       </ul></li>
       <li>
-    --learning-rate
+    --no-print
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-train-learning-rate">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-learning-rate">corgi-train-tune command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-print">seqtree-render command line option</a>
 </li>
       </ul></li>
       <li>
-    --lstm-dims
+    --no-show
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-lstm-dims">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-lstm-dims">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-lstm-dims">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-lstm-dims">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --macc
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-macc">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-macc">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-macc">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-macc">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --max-length
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-max-length">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-max-length">corgi-train-infer command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --max-seqs
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-max-seqs">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-max-seqs">corgi-train-infer command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --method
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-method">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --min-iter
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-min-iter">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --min-length
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-min-length">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-min-length">corgi-train-infer command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-show">seqtree-sunburst command line option</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    --mlflow
+    --output
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-mlflow">corgi-train-export command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-output">seqtree-render command line option</a>
 </li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-mlflow">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-mlflow">corgi-train-tune command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-output">seqtree-sunburst command line option</a>
 </li>
       </ul></li>
       <li>
-    --name
+    --partition
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-name">corgi-train-tune command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-accessions-partition">seqtree-accessions command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-partition">seqtree-export command line option</a>
 </li>
       </ul></li>
       <li>
-    --no-cnn-only
+    --partition-counts
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-cnn-only">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-cnn-only">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-cnn-only">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-cnn-only">corgi-train-tune command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-partition-counts">seqtree-render command line option</a>
 </li>
       </ul></li>
       <li>
-    --no-distributed
+    --print
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-train-distributed">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-distributed">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-final-bias
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-final-bias">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-final-bias">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-final-bias">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-final-bias">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-fp16
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-fp16">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-fp16">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-fp16">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-fp16">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-gpu
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-gpu">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-gpu">corgi-train-infer command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-gpu">corgi-train-validate command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-include-length
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-include-length">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-include-length">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-include-length">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-include-length">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-mlflow
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-mlflow">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-mlflow">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-mlflow">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-reload
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-reload">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-reload">corgi-train-infer command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-reload">corgi-train-validate command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-save-filtered
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-save-filtered">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-save-filtered">corgi-train-infer command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-wandb
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --notes
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-notes">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-notes">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-notes">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --output-dir
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-output-dir">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-output-dir">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-output-dir">corgi-train-infer command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-output-dir">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-output-dir">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-output-dir">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --output-path
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-output-path">corgi-train-show-batch command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --penultimate-dims
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-penultimate-dims">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-penultimate-dims">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-penultimate-dims">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-penultimate-dims">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --plot-filename
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-plot-filename">corgi-train-lr-finder command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --pretrained
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-pretrained">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-pretrained">corgi-train-infer command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-pretrained">corgi-train-validate command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --project-name
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-project-name">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-project-name">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-project-name">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --reload
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-reload">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-reload">corgi-train-infer command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-reload">corgi-train-validate command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --run-id
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-run-id">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-run-id">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-run-id">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --run-name
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-run-name">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-run-name">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-run-name">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --runs
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-runs">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --save-filtered
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-save-filtered">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-save-filtered">corgi-train-infer command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-print">seqtree-render command line option</a>
 </li>
       </ul></li>
       <li>
     --seed
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-seed">corgi-train-tune command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-seed">seqtree-export command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --show
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-show">seqtree-sunburst command line option</a>
 </li>
       </ul></li>
       <li>
     --show-completion
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-show-completion">corgi-train command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-show-completion">seqtree command line option</a>
 </li>
       </ul></li>
       <li>
-    --start-lr
+    --width
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-start-lr">corgi-train-lr-finder command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --tag
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-tag">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-tag">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-tag">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --threshold
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-threshold">corgi command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-threshold">corgi-train-infer command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --transformer-heads
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-transformer-heads">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-transformer-heads">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-transformer-heads">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-transformer-heads">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --transformer-layers
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-transformer-layers">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-transformer-layers">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-transformer-layers">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-transformer-layers">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --validation-seq-length
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-validation-seq-length">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-validation-seq-length">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-validation-seq-length">corgi-train-show-batch command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-validation-seq-length">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-validation-seq-length">corgi-train-tune command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-validation-seq-length">corgi-train-validate command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --version
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-v">corgi-train command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --wandb
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --wandb-dir
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb-dir">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb-dir">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb-dir">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --wandb-entity
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb-entity">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb-entity">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb-entity">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --wandb-group
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb-group">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb-group">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb-group">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --wandb-job-type
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb-job-type">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb-job-type">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb-job-type">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --wandb-mode
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb-mode">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb-mode">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb-mode">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --weight-decay
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-weight-decay">corgi-train-export command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-weight-decay">corgi-train-lr-finder command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-weight-decay">corgi-train-train command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-weight-decay">corgi-train-tune command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -v
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-v">corgi-train command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-width">seqtree-sunburst command line option</a>
 </li>
       </ul></li>
   </ul></td>
 </tr></table>
 
-<h2 id="A">A</h2>
+<h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.activation">activation() (corgi.apps.Corgi method)</a>
+      <li><a href="api.html#corgi.apps.Corgi.bibliography">bibliography (corgi.apps.Corgi attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.assert_initialized">assert_initialized() (corgi.apps.Corgi method)</a>
+      <li><a href="api.html#corgi.apps.Corgi.bibtex">bibtex (corgi.apps.Corgi attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -971,533 +241,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#corgi.apps.Corgi.cache_dir">cache_dir() (corgi.apps.Corgi method)</a>
 </li>
-      <li><a href="api.html#corgi.apps.Corgi.callbacks">callbacks() (corgi.apps.Corgi method)</a>
+      <li><a href="api.html#corgi.apps.Corgi.checkpoint">checkpoint() (corgi.apps.Corgi method)</a>
 </li>
-      <li><a href="api.html#corgi.apps.Corgi.cli">cli() (corgi.apps.Corgi method)</a>
-</li>
-      <li><a href="api.html#corgi.apps.Corgi.click">click() (corgi.apps.Corgi class method)</a>
-</li>
-      <li><a href="api.html#corgi.apps.Corgi">Corgi (class in corgi.apps)</a>
-</li>
-      <li>
-    corgi command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-batch-size">--batch-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-csv">--csv</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-file">--file</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-gpu">--gpu</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-max-length">--max-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-max-seqs">--max-seqs</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-min-length">--min-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-gpu">--no-gpu</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-reload">--no-reload</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-save-filtered">--no-save-filtered</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-output-dir">--output-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-pretrained">--pretrained</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-reload">--reload</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-save-filtered">--save-filtered</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-threshold">--threshold</a>
-</li>
-      </ul></li>
-      <li>
-    corgi-train command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-install-completion">--install-completion</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-completion">--show-completion</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-v">--version</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-v">-v</a>
-</li>
-      </ul></li>
-      <li>
-    corgi-train-export command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-base-dir">--base-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-batch-size">--batch-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-cnn-dims-start">--cnn-dims-start</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-cnn-layers">--cnn-layers</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-cnn-only">--cnn-only</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-csv">--csv</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-dataloader-type">--dataloader-type</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-deform-lambda">--deform-lambda</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-dropout">--dropout</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-embedding-dim">--embedding-dim</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-factor">--factor</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-filters">--filters</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-final-bias">--final-bias</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-final-layer-dims">--final-layer-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-fp16">--fp16</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-include-length">--include-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-kernel-size">--kernel-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-kernel-size-maxpool">--kernel-size-maxpool</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-lstm-dims">--lstm-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-macc">--macc</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-mlflow">--mlflow</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-cnn-only">--no-cnn-only</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-final-bias">--no-final-bias</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-fp16">--no-fp16</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-include-length">--no-include-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-mlflow">--no-mlflow</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb">--no-wandb</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-notes">--notes</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-output-dir">--output-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-penultimate-dims">--penultimate-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-project-name">--project-name</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-run-id">--run-id</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-run-name">--run-name</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-tag">--tag</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-transformer-heads">--transformer-heads</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-transformer-layers">--transformer-layers</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-validation-seq-length">--validation-seq-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb">--wandb</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb-dir">--wandb-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb-entity">--wandb-entity</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb-group">--wandb-group</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb-job-type">--wandb-job-type</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-wandb-mode">--wandb-mode</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-weight-decay">--weight-decay</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-export-arg-MODEL_PATH">MODEL_PATH</a>
-</li>
-      </ul></li>
-      <li>
-    corgi-train-infer command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-batch-size">--batch-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-csv">--csv</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-file">--file</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-gpu">--gpu</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-max-length">--max-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-max-seqs">--max-seqs</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-min-length">--min-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-gpu">--no-gpu</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-reload">--no-reload</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-save-filtered">--no-save-filtered</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-output-dir">--output-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-pretrained">--pretrained</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-reload">--reload</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-save-filtered">--save-filtered</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-infer-threshold">--threshold</a>
-</li>
-      </ul></li>
-      <li>
-    corgi-train-lr-finder command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-base-dir">--base-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-batch-size">--batch-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-cnn-dims-start">--cnn-dims-start</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-cnn-layers">--cnn-layers</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-cnn-only">--cnn-only</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-csv">--csv</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-dataloader-type">--dataloader-type</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-deform-lambda">--deform-lambda</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-dropout">--dropout</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-embedding-dim">--embedding-dim</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-end-lr">--end-lr</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-factor">--factor</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-filters">--filters</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-final-bias">--final-bias</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-final-layer-dims">--final-layer-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-fp16">--fp16</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-include-length">--include-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-iterations">--iterations</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-kernel-size">--kernel-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-kernel-size-maxpool">--kernel-size-maxpool</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-lstm-dims">--lstm-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-macc">--macc</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-cnn-only">--no-cnn-only</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-final-bias">--no-final-bias</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-fp16">--no-fp16</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-include-length">--no-include-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-output-dir">--output-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-penultimate-dims">--penultimate-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-plot-filename">--plot-filename</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-start-lr">--start-lr</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-transformer-heads">--transformer-heads</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-transformer-layers">--transformer-layers</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-validation-seq-length">--validation-seq-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-lr-finder-weight-decay">--weight-decay</a>
-</li>
-      </ul></li>
-      <li>
-    corgi-train-show-batch command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-base-dir">--base-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-batch-size">--batch-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-csv">--csv</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-dataloader-type">--dataloader-type</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-deform-lambda">--deform-lambda</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-output-path">--output-path</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-show-batch-validation-seq-length">--validation-seq-length</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    corgi-train-train command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-train-base-dir">--base-dir</a>
+      <li><a href="api.html#corgi.apps.Corgi">Corgi (class in corgi.apps)</a>
 </li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-batch-size">--batch-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-cnn-dims-start">--cnn-dims-start</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-cnn-layers">--cnn-layers</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-cnn-only">--cnn-only</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-csv">--csv</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-dataloader-type">--dataloader-type</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-deform-lambda">--deform-lambda</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-distributed">--distributed</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-dropout">--dropout</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-embedding-dim">--embedding-dim</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-epochs">--epochs</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-factor">--factor</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-filters">--filters</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-final-bias">--final-bias</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-final-layer-dims">--final-layer-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-fp16">--fp16</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-freeze-epochs">--freeze-epochs</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-include-length">--include-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-kernel-size">--kernel-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-kernel-size-maxpool">--kernel-size-maxpool</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-learning-rate">--learning-rate</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-lstm-dims">--lstm-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-macc">--macc</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-mlflow">--mlflow</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-cnn-only">--no-cnn-only</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-distributed">--no-distributed</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-final-bias">--no-final-bias</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-fp16">--no-fp16</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-include-length">--no-include-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-mlflow">--no-mlflow</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb">--no-wandb</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-notes">--notes</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-output-dir">--output-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-penultimate-dims">--penultimate-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-project-name">--project-name</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-run-id">--run-id</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-run-name">--run-name</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-tag">--tag</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-transformer-heads">--transformer-heads</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-transformer-layers">--transformer-layers</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-validation-seq-length">--validation-seq-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb">--wandb</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb-dir">--wandb-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb-entity">--wandb-entity</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb-group">--wandb-group</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb-job-type">--wandb-job-type</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-wandb-mode">--wandb-mode</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-train-weight-decay">--weight-decay</a>
-</li>
-      </ul></li>
-      <li>
-    corgi-train-tune command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-base-dir">--base-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-batch-size">--batch-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-cnn-dims-start">--cnn-dims-start</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-cnn-layers">--cnn-layers</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-cnn-only">--cnn-only</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-csv">--csv</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-dataloader-type">--dataloader-type</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-deform-lambda">--deform-lambda</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-distributed">--distributed</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-dropout">--dropout</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-embedding-dim">--embedding-dim</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-engine">--engine</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-epochs">--epochs</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-factor">--factor</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-filters">--filters</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-final-bias">--final-bias</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-final-layer-dims">--final-layer-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-fp16">--fp16</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-freeze-epochs">--freeze-epochs</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-id">--id</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-include-length">--include-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-kernel-size">--kernel-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-kernel-size-maxpool">--kernel-size-maxpool</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-learning-rate">--learning-rate</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-lstm-dims">--lstm-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-macc">--macc</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-method">--method</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-min-iter">--min-iter</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-mlflow">--mlflow</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-name">--name</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-cnn-only">--no-cnn-only</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-distributed">--no-distributed</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-final-bias">--no-final-bias</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-fp16">--no-fp16</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-include-length">--no-include-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-mlflow">--no-mlflow</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb">--no-wandb</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-notes">--notes</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-output-dir">--output-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-penultimate-dims">--penultimate-dims</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-project-name">--project-name</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-run-id">--run-id</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-run-name">--run-name</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-runs">--runs</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-seed">--seed</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-tag">--tag</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-transformer-heads">--transformer-heads</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-transformer-layers">--transformer-layers</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-validation-seq-length">--validation-seq-length</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb">--wandb</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb-dir">--wandb-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb-entity">--wandb-entity</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb-group">--wandb-group</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb-job-type">--wandb-job-type</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-wandb-mode">--wandb-mode</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-tune-weight-decay">--weight-decay</a>
-</li>
-      </ul></li>
-      <li>
-    corgi-train-validate command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-base-dir">--base-dir</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-batch-size">--batch-size</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-csv">--csv</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-dataloader-type">--dataloader-type</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-deform-lambda">--deform-lambda</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-gpu">--gpu</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-gpu">--no-gpu</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-reload">--no-reload</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-pretrained">--pretrained</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-reload">--reload</a>
-</li>
-        <li><a href="cli.html#cmdoption-corgi-train-validate-validation-seq-length">--validation-seq-length</a>
-</li>
-      </ul></li>
       <li>
     corgi.apps
 
@@ -1511,7 +260,7 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.dataloaders">dataloaders() (corgi.apps.Corgi method)</a>
+      <li><a href="api.html#corgi.apps.Corgi.data">data (corgi.apps.Corgi attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1519,39 +268,7 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.export">export() (corgi.apps.Corgi method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="G">G</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.goal">goal() (corgi.apps.Corgi method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="I">I</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.inference_only_click">inference_only_click() (corgi.apps.Corgi class method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.inference_only_main">inference_only_main() (corgi.apps.Corgi class method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="L">L</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.learner">learner() (corgi.apps.Corgi method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.loss_func">loss_func() (corgi.apps.Corgi method)</a>
+      <li><a href="api.html#corgi.apps.Corgi.extra_hyperparameters">extra_hyperparameters (corgi.apps.Corgi attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1559,21 +276,17 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.main">main() (corgi.apps.Corgi class method)</a>
-</li>
-      <li><a href="api.html#corgi.apps.Corgi.metrics">metrics() (corgi.apps.Corgi method)</a>
-</li>
-      <li><a href="api.html#corgi.apps.Corgi.model">model() (corgi.apps.Corgi method)</a>
-</li>
       <li>
-    MODEL_PATH
+    MAX_DEPTH
 
       <ul>
-        <li><a href="cli.html#cmdoption-corgi-train-export-arg-MODEL_PATH">corgi-train-export command line option</a>
+        <li><a href="seqtree.html#cmdoption-seqtree-prune-arg-MAX_DEPTH">seqtree-prune command line option</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#corgi.apps.Corgi.model">model (corgi.apps.Corgi attribute)</a>
+</li>
       <li>
     module
 
@@ -1581,21 +294,218 @@
         <li><a href="api.html#module-corgi.apps">corgi.apps</a>
 </li>
       </ul></li>
-      <li><a href="api.html#corgi.apps.Corgi.monitor">monitor() (corgi.apps.Corgi method)</a>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#corgi.apps.Corgi.node_to_str">node_to_str() (corgi.apps.Corgi method)</a>
 </li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#corgi.apps.Corgi.one_batch">one_batch (corgi.apps.Corgi attribute)</a>
+</li>
+      <li><a href="api.html#corgi.apps.Corgi.one_batch_loss">one_batch_loss (corgi.apps.Corgi attribute)</a>
+</li>
+      <li><a href="api.html#corgi.apps.Corgi.one_batch_output_size">one_batch_output_size (corgi.apps.Corgi attribute)</a>
+</li>
+      <li><a href="api.html#corgi.apps.Corgi.one_batch_size">one_batch_size (corgi.apps.Corgi attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    OUTPUT
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-arg-OUTPUT">seqtree-export command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-intersection-seqbank-arg-OUTPUT">seqtree-intersection-seqbank command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-pickle-tree-arg-OUTPUT">seqtree-pickle-tree command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-prune-arg-OUTPUT">seqtree-prune command line option</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.pretrained_local_path">pretrained_local_path() (corgi.apps.Corgi method)</a>
+      <li><a href="api.html#corgi.apps.Corgi.package_name">package_name() (corgi.apps.Corgi method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.pretrained_location">pretrained_location() (corgi.apps.Corgi method)</a>
+      <li><a href="api.html#corgi.apps.Corgi.predict">predict (corgi.apps.Corgi attribute)</a>
 </li>
-      <li><a href="api.html#corgi.apps.Corgi.project_name">project_name() (corgi.apps.Corgi method)</a>
+      <li><a href="api.html#corgi.apps.Corgi.process_location">process_location() (corgi.apps.Corgi method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    SEQBANK
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-arg-SEQBANK">seqtree-export command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-intersection-seqbank-arg-SEQBANK">seqtree-intersection-seqbank command line option</a>
+</li>
+      </ul></li>
+      <li>
+    SEQTREE
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-accessions-arg-SEQTREE">seqtree-accessions command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-count-arg-SEQTREE">seqtree-count command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-arg-SEQTREE">seqtree-export command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-intersection-seqbank-arg-SEQTREE">seqtree-intersection-seqbank command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-layer-size-arg-SEQTREE">seqtree-layer-size command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-pickle-tree-arg-SEQTREE">seqtree-pickle-tree command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-prune-arg-SEQTREE">seqtree-prune command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-arg-SEQTREE">seqtree-render command line option</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-arg-SEQTREE">seqtree-sunburst command line option</a>
+</li>
+      </ul></li>
+      <li>
+    seqtree command line option
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-install-completion">--install-completion</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-show-completion">--show-completion</a>
+</li>
+      </ul></li>
+      <li>
+    seqtree-accessions command line option
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-accessions-partition">--partition</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-accessions-arg-SEQTREE">SEQTREE</a>
+</li>
+      </ul></li>
+      <li>
+    seqtree-count command line option
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-count-arg-SEQTREE">SEQTREE</a>
+</li>
+      </ul></li>
+      <li>
+    seqtree-export command line option
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-format">--format</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-length">--length</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-partition">--partition</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-seed">--seed</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-arg-OUTPUT">OUTPUT</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-arg-SEQBANK">SEQBANK</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-export-arg-SEQTREE">SEQTREE</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    seqtree-intersection-seqbank command line option
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-intersection-seqbank-arg-OUTPUT">OUTPUT</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-intersection-seqbank-arg-SEQBANK">SEQBANK</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-intersection-seqbank-arg-SEQTREE">SEQTREE</a>
+</li>
+      </ul></li>
+      <li>
+    seqtree-layer-size command line option
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-layer-size-arg-SEQTREE">SEQTREE</a>
+</li>
+      </ul></li>
+      <li>
+    seqtree-pickle-tree command line option
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-pickle-tree-arg-OUTPUT">OUTPUT</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-pickle-tree-arg-SEQTREE">SEQTREE</a>
+</li>
+      </ul></li>
+      <li>
+    seqtree-prune command line option
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-prune-arg-MAX_DEPTH">MAX_DEPTH</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-prune-arg-OUTPUT">OUTPUT</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-prune-arg-SEQTREE">SEQTREE</a>
+</li>
+      </ul></li>
+      <li>
+    seqtree-render command line option
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-count">--count</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-count">--no-count</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-partition-counts">--no-partition-counts</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-print">--no-print</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-output">--output</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-partition-counts">--partition-counts</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-print">--print</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-render-arg-SEQTREE">SEQTREE</a>
+</li>
+      </ul></li>
+      <li>
+    seqtree-sunburst command line option
+
+      <ul>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-height">--height</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-show">--no-show</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-output">--output</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-show">--show</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-width">--width</a>
+</li>
+        <li><a href="seqtree.html#cmdoption-seqtree-sunburst-arg-SEQTREE">SEQTREE</a>
+</li>
+      </ul></li>
+      <li><a href="api.html#corgi.apps.Corgi.setup_and_data">setup_and_data (corgi.apps.Corgi attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1603,7 +513,11 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.train">train() (corgi.apps.Corgi method)</a>
+      <li><a href="api.html#corgi.apps.Corgi.train">train (corgi.apps.Corgi attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#corgi.apps.Corgi.tune">tune (corgi.apps.Corgi attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1611,7 +525,11 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#corgi.apps.Corgi.version">version() (corgi.apps.Corgi method)</a>
+      <li><a href="api.html#corgi.apps.Corgi.validate">validate (corgi.apps.Corgi attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#corgi.apps.Corgi.version">version (corgi.apps.Corgi attribute)</a>
 </li>
   </ul></td>
 </tr></table>

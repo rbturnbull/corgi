@@ -15,7 +15,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=938c9ccc"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
@@ -23,7 +23,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Command Line Interface Reference" href="cli.html" />
-    <link rel="prev" title="Quickstart" href="quickstart.html" /> 
+    <link rel="prev" title="Preprocessing" href="preprocessing.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -48,30 +48,30 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seqtree.html">SeqTree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#corgi.apps.Corgi"><code class="docutils literal notranslate"><span class="pre">Corgi</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.activation"><code class="docutils literal notranslate"><span class="pre">Corgi.activation()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.assert_initialized"><code class="docutils literal notranslate"><span class="pre">Corgi.assert_initialized()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.bibliography"><code class="docutils literal notranslate"><span class="pre">Corgi.bibliography</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.bibtex"><code class="docutils literal notranslate"><span class="pre">Corgi.bibtex</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.cache_dir"><code class="docutils literal notranslate"><span class="pre">Corgi.cache_dir()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.callbacks"><code class="docutils literal notranslate"><span class="pre">Corgi.callbacks()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.cli"><code class="docutils literal notranslate"><span class="pre">Corgi.cli()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.click"><code class="docutils literal notranslate"><span class="pre">Corgi.click()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.dataloaders"><code class="docutils literal notranslate"><span class="pre">Corgi.dataloaders()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.export"><code class="docutils literal notranslate"><span class="pre">Corgi.export()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.goal"><code class="docutils literal notranslate"><span class="pre">Corgi.goal()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.inference_only_click"><code class="docutils literal notranslate"><span class="pre">Corgi.inference_only_click()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.inference_only_main"><code class="docutils literal notranslate"><span class="pre">Corgi.inference_only_main()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.learner"><code class="docutils literal notranslate"><span class="pre">Corgi.learner()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.loss_func"><code class="docutils literal notranslate"><span class="pre">Corgi.loss_func()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.main"><code class="docutils literal notranslate"><span class="pre">Corgi.main()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.metrics"><code class="docutils literal notranslate"><span class="pre">Corgi.metrics()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.model"><code class="docutils literal notranslate"><span class="pre">Corgi.model()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.monitor"><code class="docutils literal notranslate"><span class="pre">Corgi.monitor()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.pretrained_local_path"><code class="docutils literal notranslate"><span class="pre">Corgi.pretrained_local_path()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.pretrained_location"><code class="docutils literal notranslate"><span class="pre">Corgi.pretrained_location()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.project_name"><code class="docutils literal notranslate"><span class="pre">Corgi.project_name()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.train"><code class="docutils literal notranslate"><span class="pre">Corgi.train()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.version"><code class="docutils literal notranslate"><span class="pre">Corgi.version()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.checkpoint"><code class="docutils literal notranslate"><span class="pre">Corgi.checkpoint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.data"><code class="docutils literal notranslate"><span class="pre">Corgi.data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.extra_hyperparameters"><code class="docutils literal notranslate"><span class="pre">Corgi.extra_hyperparameters</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.model"><code class="docutils literal notranslate"><span class="pre">Corgi.model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.node_to_str"><code class="docutils literal notranslate"><span class="pre">Corgi.node_to_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.one_batch"><code class="docutils literal notranslate"><span class="pre">Corgi.one_batch</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.one_batch_loss"><code class="docutils literal notranslate"><span class="pre">Corgi.one_batch_loss</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.one_batch_output_size"><code class="docutils literal notranslate"><span class="pre">Corgi.one_batch_output_size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.one_batch_size"><code class="docutils literal notranslate"><span class="pre">Corgi.one_batch_size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.package_name"><code class="docutils literal notranslate"><span class="pre">Corgi.package_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.predict"><code class="docutils literal notranslate"><span class="pre">Corgi.predict</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.process_location"><code class="docutils literal notranslate"><span class="pre">Corgi.process_location()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.setup_and_data"><code class="docutils literal notranslate"><span class="pre">Corgi.setup_and_data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.train"><code class="docutils literal notranslate"><span class="pre">Corgi.train</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.tune"><code class="docutils literal notranslate"><span class="pre">Corgi.tune</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.validate"><code class="docutils literal notranslate"><span class="pre">Corgi.validate</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.version"><code class="docutils literal notranslate"><span class="pre">Corgi.version</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -108,25 +108,17 @@
 <span id="api-reference"></span><h1>API Reference<a class="headerlink" href="#module-corgi.apps" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="corgi.apps.Corgi">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">corgi.apps.</span></span><span class="sig-name descname"><span class="pre">Corgi</span></span><a class="headerlink" href="#corgi.apps.Corgi" title="Link to this definition"></a></dt>
-<dd><p>corgi - Classifier for ORganelle Genomes Inter alia</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.activation">
-<span class="sig-name descname"><span class="pre">activation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.activation" title="Link to this definition"></a></dt>
-<dd><p>The activation for the last layer. If None, then fastai will use the default activiation of the loss if it exists.</p>
-</dd></dl>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">corgi.apps.</span></span><span class="sig-name descname"><span class="pre">Corgi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi" title="Link to this definition"></a></dt>
+<dd><p>corgi - Classifier for ORganelle Genomes (Inter alia)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.bibliography">
+<span class="sig-name descname"><span class="pre">bibliography</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.bibliography&gt;,</span> <span class="pre">methods_to_call=[],</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=True,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.bibliography" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.assert_initialized">
-<span class="sig-name descname"><span class="pre">assert_initialized</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.assert_initialized" title="Link to this definition"></a></dt>
-<dd><p>Asserts that this app has been initialized.</p>
-<p>All sub-classes of TorchApp need to call super().__init__() if overriding the __init__() function.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>TorchAppInitializationError</strong> – If the app has not been properly initialized.</p>
-</dd>
-</dl>
-</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.bibtex">
+<span class="sig-name descname"><span class="pre">bibtex</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.bibtex&gt;,</span> <span class="pre">methods_to_call=[],</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=True,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.bibtex" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.cache_dir">
@@ -135,212 +127,94 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.callbacks">
-<span class="sig-name descname"><span class="pre">callbacks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag:</span> <span class="pre">~typing.List[str]</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wandb:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wandb_mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wandb_dir:</span> <span class="pre">~pathlib.Path</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wandb_entity:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wandb_group:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wandb_job_type:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlflow:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.callbacks" title="Link to this definition"></a></dt>
-<dd><p>The list of callbacks to use with this app in the fastai training loop.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>project_name</strong> (<em>str</em>) – The name for this project for logging purposes. If no name is given then the name of the app is used.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The list of callbacks.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="corgi.apps.Corgi.checkpoint">
+<span class="sig-name descname"><span class="pre">checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint:</span> <span class="pre">~pathlib.Path</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">large:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.checkpoint" title="Link to this definition"></a></dt>
+<dd><p>Returns a path to a checkpoint to use for prediction.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.cli">
-<span class="sig-name descname"><span class="pre">cli</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inference_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.cli" title="Link to this definition"></a></dt>
-<dd><p>Returns a ‘Click’ object which defines the command-line interface of the app.</p>
-</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">Corgi.data&gt;,</span> <span class="pre">methods_to_call=[],</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.click">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">click</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inference_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.click" title="Link to this definition"></a></dt>
-<dd><p>Creates an instance of this class and returns the click object for the command-line interface.</p>
-</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.extra_hyperparameters">
+<span class="sig-name descname"><span class="pre">extra_hyperparameters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">Corgi.extra_hyperparameters&gt;,</span> <span class="pre">methods_to_call=[],</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.extra_hyperparameters" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.dataloaders">
-<span class="sig-name descname"><span class="pre">dataloaders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv:</span> <span class="pre">~pathlib.Path</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_dir:</span> <span class="pre">~pathlib.Path</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader_type:</span> <span class="pre">~corgi.dataloaders.DataloaderType</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_seq_length:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deform_lambda:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataLoaders</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.dataloaders" title="Link to this definition"></a></dt>
-<dd><p>Creates a FastAI DataLoaders object which Corgi uses in training and prediction.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>inputs</strong> (<em>Path</em>) – The input file.</p></li>
-<li><p><strong>batch_size</strong> (<em>int</em>) – The number of elements to use in a batch for training and prediction. Defaults to 32.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.export">
-<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.export" title="Link to this definition"></a></dt>
-<dd><p>Generates a learner, saves model weights from a file and exports the learner so that it can be used for inference.</p>
-<p>This is useful if a run has not reached completion but the model weights have still been saved.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.goal">
-<span class="sig-name descname"><span class="pre">goal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.goal" title="Link to this definition"></a></dt>
-<dd><p>Sets the optimality direction when evaluating the metric from <cite>monitor</cite>.</p>
-<p>By default it produces the same behaviour as fastai callbacks (fastai.callback.tracker)
-ie. it is set to “minimize” if the monitor metric has the string ‘loss’ or ‘err’ otherwise it is “maximize”.</p>
-<p>If the monitor is empty then this function returns None.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.inference_only_click">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inference_only_click</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.inference_only_click" title="Link to this definition"></a></dt>
-<dd><p>Creates an instance of this class and returns the click object for the command-line interface.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.inference_only_main">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inference_only_main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.inference_only_main" title="Link to this definition"></a></dt>
-<dd><p>Creates an instance of this class and runs the command-line interface for only the inference command.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.learner">
-<span class="sig-name descname"><span class="pre">learner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp16:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Learner</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.learner" title="Link to this definition"></a></dt>
-<dd><p>Creates a fastai learner object.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.loss_func">
-<span class="sig-name descname"><span class="pre">loss_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.loss_func" title="Link to this definition"></a></dt>
-<dd><p>The loss function. If None, then fastai will use the default loss function if it exists for this model.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.main">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inference_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.main" title="Link to this definition"></a></dt>
-<dd><p>Creates an instance of this class and runs the command-line interface.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.metrics">
-<span class="sig-name descname"><span class="pre">metrics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.metrics" title="Link to this definition"></a></dt>
-<dd><p>The list of metrics to use with this app.</p>
-<p>By default this list is empty. This method should be subclassed to add metrics in child classes of TorchApp.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The list of metrics.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>List</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.model">
-<span class="sig-name descname"><span class="pre">model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding_dim:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cnn_layers:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size_maxpool:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lstm_dims:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_layer_dims:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_bias:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cnn_only:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cnn_dims_start:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penultimate_dims:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_length:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_heads:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_layers:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">macc:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Module</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.model" title="Link to this definition"></a></dt>
-<dd><p>Creates a deep learning model for the Corgi to use.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The created model.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>nn.Module</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">Corgi.model&gt;,</span> <span class="pre">methods_to_call=('module_class',),</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.monitor">
-<span class="sig-name descname"><span class="pre">monitor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.monitor" title="Link to this definition"></a></dt>
-<dd><p>The metric to optimize for when performing hyperparameter tuning.</p>
-<p>By default it returns ‘valid_loss’.</p>
+<dt class="sig sig-object py" id="corgi.apps.Corgi.node_to_str">
+<span class="sig-name descname"><span class="pre">node_to_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SoftmaxNode</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.node_to_str" title="Link to this definition"></a></dt>
+<dd><p>Converts the node to a string</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.pretrained_local_path">
-<span class="sig-name descname"><span class="pre">pretrained_local_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reload:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.pretrained_local_path" title="Link to this definition"></a></dt>
-<dd><p>The local path of the pretrained model.</p>
-<p>If it is a URL, then it is downloaded.
-If it is a relative path, then this method returns the absolute path to it.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pretrained</strong> (<em>str</em><em>, </em><em>optional</em>) – The location (URL or filepath) of a pretrained model. If it is a relative path, then it is relative to the current working directory. Defaults to using the result of the <cite>pretrained_location</cite> method.</p></li>
-<li><p><strong>reload</strong> (<em>bool</em><em>, </em><em>optional</em>) – Should the pretrained model be downloaded again if it is online and already present locally. Defaults to False.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>FileNotFoundError</strong> – If the file cannot be located in the local environment.</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The absolute path to the model on the local filesystem.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Path</p>
-</dd>
-</dl>
-</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.one_batch">
+<span class="sig-name descname"><span class="pre">one_batch</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.one_batch&gt;,</span> <span class="pre">methods_to_call=('setup_and_data',),</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.one_batch" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.one_batch_loss">
+<span class="sig-name descname"><span class="pre">one_batch_loss</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.one_batch_loss&gt;,</span> <span class="pre">methods_to_call=('one_batch',</span> <span class="pre">'lightning_module'),</span> <span class="pre">main=False,</span> <span class="pre">tool=True,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.one_batch_loss" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.one_batch_output_size">
+<span class="sig-name descname"><span class="pre">one_batch_output_size</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.one_batch_output_size&gt;,</span> <span class="pre">methods_to_call=('setup_and_data',</span> <span class="pre">'lightning_module'),</span> <span class="pre">main=False,</span> <span class="pre">tool=True,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.one_batch_output_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.one_batch_size">
+<span class="sig-name descname"><span class="pre">one_batch_size</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.one_batch_size&gt;,</span> <span class="pre">methods_to_call=('one_batch',),</span> <span class="pre">main=False,</span> <span class="pre">tool=True,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.one_batch_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.pretrained_location">
-<span class="sig-name descname"><span class="pre">pretrained_location</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.pretrained_location" title="Link to this definition"></a></dt>
-<dd><p>The location of a pretrained model.</p>
-<p>It can be a URL, in which case it will need to be downloaded.
-Or it can be part of the package bundle in which case,
-it needs to be a relative path from directory which contains the code which defines the app.</p>
-<p>This function by default returns an empty string.
-Inherited classes need to override this method to use pretrained models.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The location of the pretrained model.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[str, Path]</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="corgi.apps.Corgi.package_name">
+<span class="sig-name descname"><span class="pre">package_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.package_name" title="Link to this definition"></a></dt>
+<dd><p>Returns the name of the package.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="corgi.apps.Corgi.project_name">
-<span class="sig-name descname"><span class="pre">project_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.project_name" title="Link to this definition"></a></dt>
-<dd><p>The name to use for a project for logging purposes.</p>
-<p>The default is to use the class name.</p>
-</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.predict&gt;,</span> <span class="pre">methods_to_call=('load_checkpoint',</span> <span class="pre">'prediction_trainer',</span> <span class="pre">'prediction_dataloader',</span> <span class="pre">'output_results'),</span> <span class="pre">main=True,</span> <span class="pre">tool=True,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.predict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.process_location">
+<span class="sig-name descname"><span class="pre">process_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.process_location" title="Link to this definition"></a></dt>
+<dd><p>Process a location string into a Path</p>
+<p>Can be a URL or a local path.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.setup_and_data">
+<span class="sig-name descname"><span class="pre">setup_and_data</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.setup_and_data&gt;,</span> <span class="pre">methods_to_call=('setup',</span> <span class="pre">'data',</span> <span class="pre">'validation_dataloader'),</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.setup_and_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.train">
-<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distributed:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Learner</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.train" title="Link to this definition"></a></dt>
-<dd><p>Trains a model for this app.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>distributed</strong> (<em>bool</em><em>, </em><em>optional</em>) – If the learner is distributed. Defaults to Param(default=False, help=”If the learner is distributed.”).</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The fastai Learner object created for training.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Learner</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">train</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.train&gt;,</span> <span class="pre">methods_to_call=('setup_and_data',</span> <span class="pre">'validation_dataloader',</span> <span class="pre">'lightning_module',</span> <span class="pre">'trainer'),</span> <span class="pre">main=False,</span> <span class="pre">tool=True,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.train" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
-<dl class="py method">
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.tune">
+<span class="sig-name descname"><span class="pre">tune</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.tune&gt;,</span> <span class="pre">methods_to_call=('train',</span> <span class="pre">'project_name'),</span> <span class="pre">main=False,</span> <span class="pre">tool=True,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.tune" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.validate&gt;,</span> <span class="pre">methods_to_call=('setup_and_data',</span> <span class="pre">'load_checkpoint',</span> <span class="pre">'trainer'),</span> <span class="pre">main=False,</span> <span class="pre">tool=True,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.validate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.version">
-<span class="sig-name descname"><span class="pre">version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.version" title="Link to this definition"></a></dt>
-<dd><p>Prints the version of the package that defines this app.</p>
-<p>Used in the command-line interface.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to print to stdout. Defaults to False.</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>Exception</strong> – If it cannot find the package.</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.version&gt;,</span> <span class="pre">methods_to_call=(),</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=True,</span> <span class="pre">shortcut='-v',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -350,7 +224,7 @@ Inherited classes need to override this method to use pretrained models.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quickstart" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="preprocessing.html" class="btn btn-neutral float-left" title="Preprocessing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cli.html" class="btn btn-neutral float-right" title="Command Line Interface Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

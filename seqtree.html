@@ -1,0 +1,443 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SeqTree &mdash; corgi 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Preprocessing" href="preprocessing.html" />
+    <link rel="prev" title="Quickstart" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            corgi
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SeqTree</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#seqtree">seqtree</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#seqtree-accessions">accessions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqtree-count">count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqtree-export">export</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqtree-intersection-seqbank">intersection-seqbank</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqtree-layer-size">layer-size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqtree-pickle-tree">pickle-tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqtree-prune">prune</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqtree-render">render</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqtree-sunburst">sunburst</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">corgi</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SeqTree</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/seqtree.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="seqtree">
+<h1>SeqTree<a class="headerlink" href="#seqtree" title="Link to this heading"></a></h1>
+<p>One of the input files that Corgi uses for training is a SeqTree.
+This works like a dictionary in Python where the keys are the accessions in the dataset and the value is a SeqDetail which has the index of the cross-validation partition to use for the accession as well as the taxonomic tree that the accession corresponds to.</p>
+<p>SeqTree objects can be worked on using <code class="docutils literal notranslate"><span class="pre">seqbank</span></code> on the command line.</p>
+<p>To see the options available, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>seqbank<span class="w"> </span>--help
+</pre></div>
+</div>
+<section id="seqtree">
+<h2>seqtree<a class="headerlink" href="#seqtree" title="Link to this heading"></a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-install-completion">
+<span class="sig-name descname"><span class="pre">--install-completion</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-install-completion" title="Link to this definition"></a></dt>
+<dd><p>Install completion for the current shell.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-show-completion">
+<span class="sig-name descname"><span class="pre">--show-completion</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-show-completion" title="Link to this definition"></a></dt>
+<dd><p>Show completion for the current shell, to copy it or customize the installation.</p>
+</dd></dl>
+
+<section id="seqtree-accessions">
+<h3>accessions<a class="headerlink" href="#seqtree-accessions" title="Link to this heading"></a></h3>
+<p>Prints a list of accessions in a SeqTree.</p>
+<p>If a partition is given, then only the accessions for that partition are given.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>accessions<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-accessions-partition">
+<span class="sig-name descname"><span class="pre">--partition</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;partition&gt;</span></span><a class="headerlink" href="#cmdoption-seqtree-accessions-partition" title="Link to this definition"></a></dt>
+<dd><p>The index of the partition to list.</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-accessions-arg-SEQTREE">
+<span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-accessions-arg-SEQTREE" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f00430e1e90&gt;</p>
+</dd></dl>
+
+</section>
+<section id="seqtree-count">
+<h3>count<a class="headerlink" href="#seqtree-count" title="Link to this heading"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>count<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-count-arg-SEQTREE">
+<span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-count-arg-SEQTREE" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f0043099e50&gt;</p>
+</dd></dl>
+
+</section>
+<section id="seqtree-export">
+<h3>export<a class="headerlink" href="#seqtree-export" title="Link to this heading"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE<span class="w"> </span>SEQBANK<span class="w"> </span>OUTPUT
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-export-length">
+<span class="sig-name descname"><span class="pre">--length</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;length&gt;</span></span><a class="headerlink" href="#cmdoption-seqtree-export-length" title="Link to this definition"></a></dt>
+<dd><p>If used then a subsequence this maximum length is selected.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-export-seed">
+<span class="sig-name descname"><span class="pre">--seed</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;seed&gt;</span></span><a class="headerlink" href="#cmdoption-seqtree-export-seed" title="Link to this definition"></a></dt>
+<dd><p>The random seed to use when slicing the length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default<span class="colon">:</span></dt>
+<dd class="field-odd"><p>42</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-export-partition">
+<span class="sig-name descname"><span class="pre">--partition</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;partition&gt;</span></span><a class="headerlink" href="#cmdoption-seqtree-export-partition" title="Link to this definition"></a></dt>
+<dd><p>The index of the partition to include in the export. If not given then all accesions will be exported.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-export-format">
+<span class="sig-name descname"><span class="pre">--format</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;format&gt;</span></span><a class="headerlink" href="#cmdoption-seqtree-export-format" title="Link to this definition"></a></dt>
+<dd><p>The format of the exported file. If not given, then it will be inferred from the file extension of the output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-export-arg-SEQTREE">
+<span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-export-arg-SEQTREE" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f0043098750&gt;</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-export-arg-SEQBANK">
+<span class="sig-name descname"><span class="pre">SEQBANK</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-export-arg-SEQBANK" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqBank. &lt;typer.models.TyperPath object at 0x7f0043098610&gt;</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-export-arg-OUTPUT">
+<span class="sig-name descname"><span class="pre">OUTPUT</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-export-arg-OUTPUT" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the output file. &lt;typer.models.TyperPath object at 0x7f0043098e10&gt;</p>
+</dd></dl>
+
+</section>
+<section id="seqtree-intersection-seqbank">
+<h3>intersection-seqbank<a class="headerlink" href="#seqtree-intersection-seqbank" title="Link to this heading"></a></h3>
+<p>Takes a SeqTree and removes any accession that is not found in a SeqBank.</p>
+<p>Saves the output SeqTree to <cite>output</cite>.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>intersection-seqbank<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE<span class="w"> </span>SEQBANK<span class="w"> </span>OUTPUT
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-intersection-seqbank-arg-SEQTREE">
+<span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-intersection-seqbank-arg-SEQTREE" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f004518e390&gt;</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-intersection-seqbank-arg-SEQBANK">
+<span class="sig-name descname"><span class="pre">SEQBANK</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-intersection-seqbank-arg-SEQBANK" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqBank. &lt;typer.models.TyperPath object at 0x7f0043000190&gt;</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-intersection-seqbank-arg-OUTPUT">
+<span class="sig-name descname"><span class="pre">OUTPUT</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-intersection-seqbank-arg-OUTPUT" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqBank. &lt;typer.models.TyperPath object at 0x7f0043cf2a90&gt;</p>
+</dd></dl>
+
+</section>
+<section id="seqtree-layer-size">
+<h3>layer-size<a class="headerlink" href="#seqtree-layer-size" title="Link to this heading"></a></h3>
+<p>Prints the size of the neural network layer to predict the classification tree.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>layer-size<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-layer-size-arg-SEQTREE">
+<span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-layer-size-arg-SEQTREE" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f004309ae50&gt;</p>
+</dd></dl>
+
+</section>
+<section id="seqtree-pickle-tree">
+<h3>pickle-tree<a class="headerlink" href="#seqtree-pickle-tree" title="Link to this heading"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>pickle-tree<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE<span class="w"> </span>OUTPUT
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-pickle-tree-arg-SEQTREE">
+<span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-pickle-tree-arg-SEQTREE" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f004309b150&gt;</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-pickle-tree-arg-OUTPUT">
+<span class="sig-name descname"><span class="pre">OUTPUT</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-pickle-tree-arg-OUTPUT" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the output pickle file. &lt;typer.models.TyperPath object at 0x7f004309b3d0&gt;</p>
+</dd></dl>
+
+</section>
+<section id="seqtree-prune">
+<h3>prune<a class="headerlink" href="#seqtree-prune" title="Link to this heading"></a></h3>
+<p>Prunes the tree to a maximum depth.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>prune<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE<span class="w"> </span>MAX_DEPTH<span class="w"> </span>OUTPUT
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-prune-arg-SEQTREE">
+<span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-prune-arg-SEQTREE" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f004309aa10&gt;</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-prune-arg-MAX_DEPTH">
+<span class="sig-name descname"><span class="pre">MAX_DEPTH</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-prune-arg-MAX_DEPTH" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The maximum depth to prune the tree. INT</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-prune-arg-OUTPUT">
+<span class="sig-name descname"><span class="pre">OUTPUT</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-prune-arg-OUTPUT" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the output file. &lt;typer.models.TyperPath object at 0x7f004309a990&gt;</p>
+</dd></dl>
+
+</section>
+<section id="seqtree-render">
+<h3>render<a class="headerlink" href="#seqtree-render" title="Link to this heading"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>render<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-render-output">
+<span class="sig-name descname"><span class="pre">--output</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;output&gt;</span></span><a class="headerlink" href="#cmdoption-seqtree-render-output" title="Link to this definition"></a></dt>
+<dd><p>The path to save the rendered tree.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-render-print">
+<span id="cmdoption-seqtree-render-no-print"></span><span class="sig-name descname"><span class="pre">--print</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-print</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-render-print" title="Link to this definition"></a></dt>
+<dd><p>Whether or not to print the tree to the screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-render-count">
+<span id="cmdoption-seqtree-render-no-count"></span><span class="sig-name descname"><span class="pre">--count</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-count</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-render-count" title="Link to this definition"></a></dt>
+<dd><p>Whether or not to print the count of accessions at each node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default<span class="colon">:</span></dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-render-partition-counts">
+<span id="cmdoption-seqtree-render-no-partition-counts"></span><span class="sig-name descname"><span class="pre">--partition-counts</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-partition-counts</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-render-partition-counts" title="Link to this definition"></a></dt>
+<dd><p>Whether or not to print the count of each partition at each node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default<span class="colon">:</span></dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-render-arg-SEQTREE">
+<span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-render-arg-SEQTREE" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f0043099490&gt;</p>
+</dd></dl>
+
+</section>
+<section id="seqtree-sunburst">
+<h3>sunburst<a class="headerlink" href="#seqtree-sunburst" title="Link to this heading"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>sunburst<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-sunburst-show">
+<span id="cmdoption-seqtree-sunburst-no-show"></span><span class="sig-name descname"><span class="pre">--show</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-show</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-sunburst-show" title="Link to this definition"></a></dt>
+<dd><p>Whether or not to show the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default<span class="colon">:</span></dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-sunburst-output">
+<span class="sig-name descname"><span class="pre">--output</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;output&gt;</span></span><a class="headerlink" href="#cmdoption-seqtree-sunburst-output" title="Link to this definition"></a></dt>
+<dd><p>The path to save the rendered tree.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-sunburst-width">
+<span class="sig-name descname"><span class="pre">--width</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;width&gt;</span></span><a class="headerlink" href="#cmdoption-seqtree-sunburst-width" title="Link to this definition"></a></dt>
+<dd><p>The width of the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1000</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-sunburst-height">
+<span class="sig-name descname"><span class="pre">--height</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;height&gt;</span></span><a class="headerlink" href="#cmdoption-seqtree-sunburst-height" title="Link to this definition"></a></dt>
+<dd><p>The height of the plot. If 0 then it will be calculated based on the width.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default<span class="colon">:</span></dt>
+<dd class="field-odd"><p>0</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-sunburst-arg-SEQTREE">
+<span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-sunburst-arg-SEQTREE" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f0043099f90&gt;</p>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quickstart" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="preprocessing.html" class="btn btn-neutral float-right" title="Preprocessing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Robert Turnbull.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
