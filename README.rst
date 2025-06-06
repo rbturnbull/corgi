@@ -37,7 +37,7 @@ The software can be installed using ``pip``
 
 .. warning ::
 
-    Do not try just `pip install corgi` because that is a different package.
+    Do not try just ``pip install corgi`` because that is a different package.
 
 To install the latest version from the repository, you can use this command:
 
