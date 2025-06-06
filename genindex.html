@@ -84,6 +84,7 @@
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
+ | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
@@ -241,10 +242,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#corgi.apps.Corgi.cache_dir">cache_dir() (corgi.apps.Corgi method)</a>
 </li>
+      <li><a href="api.html#corgi.apps.Corgi.callbacks">callbacks (corgi.apps.Corgi attribute)</a>
+</li>
       <li><a href="api.html#corgi.apps.Corgi.checkpoint">checkpoint() (corgi.apps.Corgi method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#corgi.apps.Corgi.checkpoint_callback">checkpoint_callback (corgi.apps.Corgi attribute)</a>
+</li>
       <li><a href="api.html#corgi.apps.Corgi">Corgi (class in corgi.apps)</a>
 </li>
       <li>
@@ -268,7 +273,23 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#corgi.apps.Corgi.extra_callbacks">extra_callbacks (corgi.apps.Corgi attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#corgi.apps.Corgi.extra_hyperparameters">extra_hyperparameters (corgi.apps.Corgi attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#corgi.apps.Corgi.lightning_module">lightning_module (corgi.apps.Corgi attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#corgi.apps.Corgi.load_checkpoint">load_checkpoint (corgi.apps.Corgi attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -339,11 +360,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#corgi.apps.Corgi.package_name">package_name() (corgi.apps.Corgi method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#corgi.apps.Corgi.predict">predict (corgi.apps.Corgi attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#corgi.apps.Corgi.prediction_trainer">prediction_trainer (corgi.apps.Corgi attribute)</a>
+</li>
       <li><a href="api.html#corgi.apps.Corgi.process_location">process_location() (corgi.apps.Corgi method)</a>
+</li>
+      <li><a href="api.html#corgi.apps.Corgi.profiler">profiler (corgi.apps.Corgi attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -515,9 +540,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#corgi.apps.Corgi.train">train (corgi.apps.Corgi attribute)</a>
 </li>
+      <li><a href="api.html#corgi.apps.Corgi.trainer">trainer (corgi.apps.Corgi attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#corgi.apps.Corgi.tune">tune (corgi.apps.Corgi attribute)</a>
+</li>
+      <li><a href="api.html#corgi.apps.Corgi.tuning_params">tuning_params() (corgi.apps.Corgi method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -543,7 +572,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Robert Turnbull.</p>
+    <p>&#169; Copyright 2022–2025, Robert Turnbull.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

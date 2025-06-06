@@ -55,9 +55,14 @@
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.bibliography"><code class="docutils literal notranslate"><span class="pre">Corgi.bibliography</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.bibtex"><code class="docutils literal notranslate"><span class="pre">Corgi.bibtex</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.cache_dir"><code class="docutils literal notranslate"><span class="pre">Corgi.cache_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.callbacks"><code class="docutils literal notranslate"><span class="pre">Corgi.callbacks</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.checkpoint"><code class="docutils literal notranslate"><span class="pre">Corgi.checkpoint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.checkpoint_callback"><code class="docutils literal notranslate"><span class="pre">Corgi.checkpoint_callback</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.data"><code class="docutils literal notranslate"><span class="pre">Corgi.data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.extra_callbacks"><code class="docutils literal notranslate"><span class="pre">Corgi.extra_callbacks</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.extra_hyperparameters"><code class="docutils literal notranslate"><span class="pre">Corgi.extra_hyperparameters</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.lightning_module"><code class="docutils literal notranslate"><span class="pre">Corgi.lightning_module</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.load_checkpoint"><code class="docutils literal notranslate"><span class="pre">Corgi.load_checkpoint</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.model"><code class="docutils literal notranslate"><span class="pre">Corgi.model</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.node_to_str"><code class="docutils literal notranslate"><span class="pre">Corgi.node_to_str()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.one_batch"><code class="docutils literal notranslate"><span class="pre">Corgi.one_batch</span></code></a></li>
@@ -66,10 +71,14 @@
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.one_batch_size"><code class="docutils literal notranslate"><span class="pre">Corgi.one_batch_size</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.package_name"><code class="docutils literal notranslate"><span class="pre">Corgi.package_name()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.predict"><code class="docutils literal notranslate"><span class="pre">Corgi.predict</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.prediction_trainer"><code class="docutils literal notranslate"><span class="pre">Corgi.prediction_trainer</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.process_location"><code class="docutils literal notranslate"><span class="pre">Corgi.process_location()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.profiler"><code class="docutils literal notranslate"><span class="pre">Corgi.profiler</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.setup_and_data"><code class="docutils literal notranslate"><span class="pre">Corgi.setup_and_data</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.train"><code class="docutils literal notranslate"><span class="pre">Corgi.train</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.trainer"><code class="docutils literal notranslate"><span class="pre">Corgi.trainer</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.tune"><code class="docutils literal notranslate"><span class="pre">Corgi.tune</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.tuning_params"><code class="docutils literal notranslate"><span class="pre">Corgi.tuning_params()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.validate"><code class="docutils literal notranslate"><span class="pre">Corgi.validate</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#corgi.apps.Corgi.version"><code class="docutils literal notranslate"><span class="pre">Corgi.version</span></code></a></li>
 </ul>
@@ -123,14 +132,26 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.cache_dir">
 <span class="sig-name descname"><span class="pre">cache_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.cache_dir" title="Link to this definition"></a></dt>
-<dd><p>Returns a path to a directory where data files for this app can be cached.</p>
+<dd><p>Returns a directory under the user’s cache folder for storing downloads,
+e.g. <cite>~/.cache/torchapps/&lt;AppName&gt;/</cite>.</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.callbacks">
+<span class="sig-name descname"><span class="pre">callbacks</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.callbacks&gt;,</span> <span class="pre">methods_to_call=('extra_callbacks',),</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.callbacks" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.checkpoint">
 <span class="sig-name descname"><span class="pre">checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint:</span> <span class="pre">~pathlib.Path</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">large:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">&lt;torchapp.params.Param</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.checkpoint" title="Link to this definition"></a></dt>
-<dd><p>Returns a path to a checkpoint to use for prediction.</p>
+<dd><p>Returns a path (local or remote) to a checkpoint.
+By default, you must override or pass <cite>–checkpoint</cite>.</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.checkpoint_callback">
+<span class="sig-name descname"><span class="pre">checkpoint_callback</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.checkpoint_callback&gt;,</span> <span class="pre">methods_to_call=('monitor',),</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.checkpoint_callback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.data">
@@ -138,8 +159,23 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.extra_callbacks">
+<span class="sig-name descname"><span class="pre">extra_callbacks</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.extra_callbacks&gt;,</span> <span class="pre">methods_to_call=[],</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.extra_callbacks" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.extra_hyperparameters">
 <span class="sig-name descname"><span class="pre">extra_hyperparameters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">Corgi.extra_hyperparameters&gt;,</span> <span class="pre">methods_to_call=[],</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.extra_hyperparameters" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.lightning_module">
+<span class="sig-name descname"><span class="pre">lightning_module</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.lightning_module&gt;,</span> <span class="pre">methods_to_call=('model',</span> <span class="pre">'loss_function',</span> <span class="pre">'extra_hyperparameters',</span> <span class="pre">'input_count',</span> <span class="pre">'metrics',</span> <span class="pre">'module_class'),</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.lightning_module" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.load_checkpoint">
+<span class="sig-name descname"><span class="pre">load_checkpoint</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.load_checkpoint&gt;,</span> <span class="pre">methods_to_call=('checkpoint',),</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.load_checkpoint" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -184,12 +220,22 @@
 <span class="sig-name descname"><span class="pre">predict</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.predict&gt;,</span> <span class="pre">methods_to_call=('load_checkpoint',</span> <span class="pre">'prediction_trainer',</span> <span class="pre">'prediction_dataloader',</span> <span class="pre">'output_results'),</span> <span class="pre">main=True,</span> <span class="pre">tool=True,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.predict" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.prediction_trainer">
+<span class="sig-name descname"><span class="pre">prediction_trainer</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.prediction_trainer&gt;,</span> <span class="pre">methods_to_call=[],</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.prediction_trainer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.process_location">
 <span class="sig-name descname"><span class="pre">process_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#corgi.apps.Corgi.process_location" title="Link to this definition"></a></dt>
-<dd><p>Process a location string into a Path</p>
-<p>Can be a URL or a local path.</p>
+<dd><p>Turn a URL or filesystem path into a Path that points to a local file.
+If it’s a URL, download (and cache) via cached_download().</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.profiler">
+<span class="sig-name descname"><span class="pre">profiler</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.profiler&gt;,</span> <span class="pre">methods_to_call=[],</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.profiler" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.setup_and_data">
@@ -202,9 +248,22 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.trainer">
+<span class="sig-name descname"><span class="pre">trainer</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.trainer&gt;,</span> <span class="pre">methods_to_call=('callbacks',</span> <span class="pre">'profiler',</span> <span class="pre">'project_name'),</span> <span class="pre">main=False,</span> <span class="pre">tool=False,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.trainer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.tune">
 <span class="sig-name descname"><span class="pre">tune</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Method(func=&lt;function</span> <span class="pre">TorchApp.tune&gt;,</span> <span class="pre">methods_to_call=('train',</span> <span class="pre">'project_name'),</span> <span class="pre">main=False,</span> <span class="pre">tool=True,</span> <span class="pre">flag=False,</span> <span class="pre">shortcut='',</span> <span class="pre">signature_ready=False)</span></em><a class="headerlink" href="#corgi.apps.Corgi.tune" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="corgi.apps.Corgi.tuning_params">
+<span class="sig-name descname"><span class="pre">tuning_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#corgi.apps.Corgi.tuning_params" title="Link to this definition"></a></dt>
+<dd><p>Inspect the signature of self.tune(…) and return a dict of only
+those Param() arguments where <cite>Param.tune == True</cite>.
+(So that an external tuner can see which hyperparameters are tunable.)</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="corgi.apps.Corgi.validate">
@@ -231,7 +290,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Robert Turnbull.</p>
+    <p>&#169; Copyright 2022–2025, Robert Turnbull.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
