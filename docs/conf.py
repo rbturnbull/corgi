@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = "corgi"
-copyright = "2022, Robert Turnbull"
+copyright = "2022–2025, Robert Turnbull"
 author = "Robert Turnbull"
 
 # The full version, including alpha/beta/rc tags

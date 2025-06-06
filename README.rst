@@ -2,7 +2,11 @@
 
 .. start-badges
 
-|testing badge| |coverage badge| |docs badge| |black badge| |git3moji badge| |torchapp badge|
+|pypi badge| |testing badge| |coverage badge| |docs badge| |black badge| |git3moji badge| |torchapp badge|
+
+.. |pypi badge| image:: https://img.shields.io/pypi/v/bio-corgi?color=blue
+   :alt: PyPI - Version
+   :target: https://pypi.org/project/bio-corgi/
 
 .. |testing badge| image:: https://github.com/rbturnbull/corgi/actions/workflows/testing.yml/badge.svg
     :target: https://github.com/rbturnbull/corgi/actions
