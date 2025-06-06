@@ -1,22 +1,16 @@
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
+from collections import Counter
 from pathlib import Path
 from attrs import define, field
-from hierarchicalsoftmax import SoftmaxNode
 from collections import UserDict
 import pickle
-from Bio.Seq import Seq
-from seqbank import SeqBank
-from Bio.SeqRecord import SeqRecord
-from collections import Counter
-from Bio import SeqIO
-
-from seqbank.io import get_file_format
-from seqbank.transform import bytes_to_str
-from rich.progress import track
-import numpy as np
 import hashlib
 import typer
-from plotly import graph_objects as go
+from rich.progress import track
+
+
+if TYPE_CHECKING:
+    from hierarchicalsoftmax import SoftmaxNode
 
 
 def str_to_int_hash(s:str)->int:
@@ -30,7 +24,7 @@ def str_to_int_hash(s:str)->int:
     return seed_number
 
 
-def node_to_str(node:SoftmaxNode) -> str:
+def node_to_str(node:"SoftmaxNode") -> str:
     """ 
     Converts the node to a string
     """
@@ -45,7 +39,7 @@ def node_to_str(node:SoftmaxNode) -> str:
 @define
 class SeqDetail:
     partition:int
-    node:SoftmaxNode = field(default=None, eq=False)
+    node:"SoftmaxNode" = field(default=None, eq=False)
     node_id:int = None
 
     def __getstate__(self):
@@ -62,10 +56,12 @@ class AlreadyExists(Exception):
 
 class SeqTree(UserDict):
     def __init__(self, classification_tree=None):
+        from hierarchicalsoftmax import SoftmaxNode
+
         super().__init__()
         self.classification_tree = classification_tree or SoftmaxNode("root")
 
-    def add(self, accession:str, node:SoftmaxNode, partition:int):
+    def add(self, accession:str, node:"SoftmaxNode", partition:int):
         assert node.root == self.classification_tree
         if accession in self:
             old_node = self.node(accession)
@@ -109,7 +105,7 @@ class SeqTree(UserDict):
             if detail.partition == partition:
                 yield accession
 
-    def accessions(self, partition:Optional[int] = None):
+    def accessions(self, partition:int|None = None):
         return self.keys() if partition is None else self.accessions_in_partition(partition)
     
     def prune(self, max_depth:int) -> "SeqTree":
@@ -135,7 +131,7 @@ class SeqTree(UserDict):
 
         return new_tree
             
-    def export(self, seqbank:SeqBank, output:Path|str, length:int=0, format:str="", seed:int=0, partition:int|None=None):
+    def export(self, seqbank:"SeqBank", output:Path|str, length:int=0, format:str="", seed:int=0, partition:int|None=None):
         """
         Outputs sequences from a seqbank into a file. 
 
@@ -146,6 +142,13 @@ class SeqTree(UserDict):
 
         Random seed can be set with `seed`.
         """
+        import numpy as np
+        from Bio.Seq import Seq
+        from Bio import SeqIO        
+        from Bio.SeqRecord import SeqRecord
+        from seqbank.transform import bytes_to_str
+        from seqbank.io import get_file_format
+
         format = format or get_file_format(output)
         with open(output, "w") as f:
             for accession, detail in track(self.items()):
@@ -209,7 +212,7 @@ class SeqTree(UserDict):
 
         return self.classification_tree.render(**kwargs)
     
-    def sunburst(self, **kwargs) -> go.Figure:
+    def sunburst(self, **kwargs) -> "go.Figure":
         """
         Renders the SeqTree as a sunburst plot.
 
@@ -217,6 +220,8 @@ class SeqTree(UserDict):
 
         Returns a plotly figure.
         """
+        from plotly import graph_objects as go
+
         self.add_counts()
         labels = []
         parents = []
@@ -243,7 +248,7 @@ class SeqTree(UserDict):
             for accession in self.keys():
                 print(accession, file=f)
 
-    def intersection_seqbank(self, seqbank:SeqBank) -> List[str]:
+    def intersection_seqbank(self, seqbank:"SeqBank") -> List[str]:
         """ 
         Removes any accession that is not found in a SeqBank. 
         
@@ -274,6 +279,8 @@ def intersection_seqbank(
 
     Saves the output SeqTree to `output`.
     """
+    from seqbank import SeqBank
+
     seqtree = SeqTree.load(seqtree)
     seqbank = SeqBank(seqbank)
     seqtree.intersection_seqbank(seqbank)
@@ -305,6 +312,8 @@ def export(
     partition:Optional[int] = typer.Option(None,help="The index of the partition to include in the export. If not given then all accesions will be exported."), 
     format:str = typer.Option("",help="The format of the exported file. If not given, then it will be inferred from the file extension of the output."), 
 ):
+    from seqbank import SeqBank
+
     seqtree = SeqTree.load(seqtree)
     seqbank = SeqBank(seqbank)
     seqtree.export(seqbank, output, format=format, length=length, seed=seed, partition=partition)

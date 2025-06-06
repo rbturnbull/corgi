@@ -1,53 +1,51 @@
+from typing import TYPE_CHECKING
 from pathlib import Path
 import typer
-from torch import nn
-import pandas as pd
-import torch
 import torchapp as ta
 from rich.console import Console
-from rich.table import Table
-from rich.box import SIMPLE
-# from Bio.SeqIO import FastaIO
-import numpy as np
-from torchmetrics import Metric
-from hierarchicalsoftmax.metrics import RankAccuracyTorchMetric
-from polytorch import PolyLoss, HierarchicalData, total_size
-from seqbank import SeqBank
-from hierarchicalsoftmax.inference import node_probabilities, greedy_predictions, render_probabilities
-from hierarchicalsoftmax.nodes import SoftmaxNode
 
-from .models import calc_cnn_dims_start, ConvClassifier
-from .data import CorgiDataModule, SeqIODataloader
-from .seqtree import SeqTree, node_to_str
+
+if TYPE_CHECKING:
+    from torch import nn
+    import pandas as pd
+    from hierarchicalsoftmax.nodes import SoftmaxNode
+    from torchmetrics import Metric
+    from .data import CorgiDataModule
 
 console = Console()
 
-def output_results_bar_chart(results_df: pd.DataFrame, top_k: int = 10):
-    value_counts = results_df['greedy_prediction'].value_counts()
+def output_results_bar_chart(predictions: "pd.Series", top_k: int = 10, bar_size: int = 80):
+    from rich.table import Table
+    from rich.box import SIMPLE
+
+    value_counts = predictions.value_counts()
     total_categories = len(value_counts)
     if top_k:
+        original_value_counts = value_counts
         value_counts = value_counts.iloc[:top_k]
     table = Table(box=SIMPLE)
     table.add_column("Prediction", justify="left", style="bold")
-    table.add_column("Proportion", justify="left", style="green")
+    table.add_column("Proportion", justify="left", style="blue")
     table.add_column("Count", justify="right")
-    bar_size = 80  # Width of the bar in characters
     for prediction, count in value_counts.items():
-        proportion = count / len(results_df)
+        proportion = count / len(predictions)
         bar = "█" * int(proportion * bar_size)
         table.add_row(prediction, f"{bar} {proportion:.1%}", f"{count}")
     if total_categories > top_k:
+        count = sum(original_value_counts.iloc[top_k:])
+        proportion = count / len(predictions)
+        bar = "█" * int(proportion * bar_size)
         table.add_row(
             "Other Categories",
-            f"{'█' * bar_size} {sum(value_counts.iloc[top_k:]) / len(results_df):.1%}",
-            f"{sum(value_counts.iloc[top_k:])}"
+            f"{bar} {proportion:.1%}",
+            f"{count}"
         )
     # Add line
     table.add_row('────────────────────', '─' * bar_size, '─' * 10, style="red")
     table.add_row(
         "Total",
         "",
-        f"{len(results_df)}"
+        f"{len(predictions)}"
     )
 
     console.print(table)
@@ -55,6 +53,8 @@ def output_results_bar_chart(results_df: pd.DataFrame, top_k: int = 10):
 
 
 def set_alphas_with_phi(tree, phi=1.0):
+    import numpy as np
+
     for node in tree.pre_order_iter():
         node.alpha = np.power(phi, len(node.ancestors))
 
@@ -66,8 +66,8 @@ class Corgi(ta.TorchApp):
     @ta.method
     def data(
         self,
-        seqtree: Path = ta.Param(default=None, help="The seqtree which has the sequences to use."),
-        seqbank: Path = ta.Param(help="The seqbank file with the sequences."),
+        seqtree: Path = ta.Param(..., help="The seqtree which has the sequences to use."),
+        seqbank: Path = ta.Param(..., help="The seqbank file with the sequences."),
         validation_partition:int = ta.Param(default=0, help="The partition to use for validation."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
         validation_length:int = ta.Param(default=1_000, help="The standard length of sequences to use for validation."),
@@ -81,14 +81,18 @@ class Corgi(ta.TorchApp):
         # tips_mode:bool = False,
         max_items:int = ta.Param(default=0, help="The maximum number of items to use for training. If zero then all items are used."),
         train_all:bool = ta.Param(default=False, help="Whether or not to use the validation partition for training."),
-    ) -> CorgiDataModule:
+    ) -> "CorgiDataModule":
         """
         Creates a Pytorch Lightning object which Corgi uses in training and prediction.
         """
-        if seqtree is None:
-            raise ValueError("No seqtree given")
-        if seqbank is None:
-            raise ValueError("No seqbank given")
+        from seqbank import SeqBank
+        from polytorch import HierarchicalData
+        from .data import CorgiDataModule
+        from .seqtree import SeqTree
+        
+
+        assert seqtree is not None, "No seqtree given"
+        assert seqbank is not None, "No seqbank given"
         
         seqtree = Path(seqtree)
         seqbank = Path(seqbank)
@@ -193,13 +197,16 @@ class Corgi(ta.TorchApp):
             help="The approximate number of multiply or accumulate operations in the model. Used to set cnn_dims_start if not provided explicitly.",
         ),
         **kwargs,
-    ) -> nn.Module:
+    ) -> 'nn.Module':
         """
         Creates a deep learning model for the Corgi to use.
 
         Returns:
             nn.Module: The created model.
         """
+        from polytorch import total_size
+        from .models import calc_cnn_dims_start, ConvClassifier
+
         assert self.classification_tree
 
         num_classes = total_size(self.output_types)
@@ -243,7 +250,9 @@ class Corgi(ta.TorchApp):
         )
 
     @ta.method    
-    def metrics(self) -> list[tuple[str,Metric]]:
+    def metrics(self) -> list[tuple[str,'Metric']]:
+        from hierarchicalsoftmax.metrics import RankAccuracyTorchMetric
+
         rank_accuracy = RankAccuracyTorchMetric(
             root=self.classification_tree, 
             ranks={
@@ -264,6 +273,8 @@ class Corgi(ta.TorchApp):
 
     @ta.method
     def loss_function(self):
+        from polytorch import PolyLoss
+
         assert self.output_types
         return PolyLoss(data_types=self.output_types, feature_axis=1)
 
@@ -286,6 +297,9 @@ class Corgi(ta.TorchApp):
         min_length:int = 128,
         **kwargs,
     ):
+        from .data import SeqIODataloader
+        from .seqtree import SeqTree
+
         files = []
         if input:
             if isinstance(input, (str, Path)):
@@ -307,10 +321,11 @@ class Corgi(ta.TorchApp):
         self.dataloader = SeqIODataloader(files=files, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
         return self.dataloader
 
-    def node_to_str(self, node:SoftmaxNode) -> str:
+    def node_to_str(self, node:'SoftmaxNode') -> str:
         """ 
         Converts the node to a string
         """
+        from .seqtree import node_to_str
         return node_to_str(node)
 
     @ta.method
@@ -326,6 +341,9 @@ class Corgi(ta.TorchApp):
         prediction_threshold:float = ta.Param(default=0.5, help="The threshold value for making hierarchical predictions."),
         **kwargs,
     ):
+        import torch
+        import pandas as pd
+        from hierarchicalsoftmax.inference import node_probabilities, greedy_predictions, render_probabilities
         
         assert self.classification_tree # This should be saved on the checkpoint
         
@@ -356,28 +374,23 @@ class Corgi(ta.TorchApp):
             threshold=prediction_threshold,
         )
 
-        results_df['greedy_prediction'] = [
+        results_df['prediction'] = [
             self.node_to_str(node)
             for node in predictions
         ]
 
         results_df['accession'] = results_df['original_id'].apply(lambda x: x.split("#")[0])
-        def get_original_classification(original_id:str):
-            if "#" in original_id:
-                return original_id.split("#")[1]
-            return "null"
         
         def get_prediction_probability(row):
-            prediction = row["greedy_prediction"]
+            prediction = row["prediction"]
             if prediction in row:
                 return row[prediction]
             return 1.0
         
         results_df['probability'] = results_df.apply(get_prediction_probability, axis=1)
-        results_df['original_classification'] = results_df['original_id'].apply(get_original_classification)
 
         # Reorder columns
-        results_df = results_df[["file", "accession", "greedy_prediction", "probability", "original_id", "original_classification", "description" ] + category_names]
+        results_df = results_df[["file", "accession", "prediction", "probability", "original_id", "description" ] + category_names]
 
         # Output images
         if image_dir:
@@ -399,9 +412,9 @@ class Corgi(ta.TorchApp):
             )
 
         # Output Bar Chart
-        output_results_bar_chart(results_df, top_k=10)
+        output_results_bar_chart(results_df["prediction"], top_k=10)
 
-        if not (image_dir or output_fasta or output_csv or output_tips_csv):
+        if not (image_dir or output_csv or output_tips_csv):
             print("No output files requested.")
             
         # if output_fasta:
@@ -416,8 +429,7 @@ class Corgi(ta.TorchApp):
         #                     continue
 
         #                 accession = row['accession'].item()
-        #                 original_classification = row["original_classification"].item()
-        #                 prediction = row["greedy_prediction"].item()
+        #                 prediction = row["prediction"].item()
                         
         #                 new_id = f"{accession}#{prediction}"
         #                 record.id = new_id
@@ -434,7 +446,7 @@ class Corgi(ta.TorchApp):
         #                     new_probability = row[prediction].values[0]
         #                 else:
         #                     new_probability = 1.0 # i.e.root
-        #                 record.description = f"{record.description} original classification = {original_classification}, classification probability = {new_probability:.2f} )"
+        #                 record.description = f"{record.description} classification probability = {new_probability:.2f} )"
 
         #                 SeqIO.write(record, fasta_out, "fasta")
 
