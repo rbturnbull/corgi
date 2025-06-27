@@ -1,6 +1,10 @@
 from pathlib import Path
 from torchapp.modules import GeneralLightningModule
 import numpy as np
+import os
+from rich.console import Console
+
+console = Console()
 
 class CorgiLightningModule(GeneralLightningModule):
     def __init__(self, *args, **kwargs):
@@ -25,13 +29,15 @@ class CorgiLightningModule(GeneralLightningModule):
             self.current_position = 0
 
             # Write the memmap index
-            memmap_index_path = self.embeddings_path.with_suffix('.index')
-            with open(memmap_index_path, 'w') as f:
-                for file, record_id, _, chunk_index in self.dataloader.chunk_details:
+            embeddings_index = self.embeddings_path.with_suffix('.index')
+            console.print(f"Exporting embeddings to '{self.embeddings_path}'")
+            console.print(f"Exporting memmap index to '{embeddings_index}'")
+            with open(embeddings_index, 'w') as f:
+                for file, record_id, _, _ in self.dataloader.chunk_details:
                     # Replace pipe with underscore for file names
-                    file = str(file).replace("|", "_")  
-                    record_id = str(record_id).replace("|", "_")
-                    f.write(f"{file}|{record_id}|{chunk_index}\n")
+                    file = str(file).replace("\t", "_")  
+                    record_id = str(record_id).replace("\t", "_")
+                    f.write(f"{file}\t{record_id}\n")
     
     def predict_step(self, batch):
         assert isinstance(batch, tuple)
@@ -60,3 +66,24 @@ class CorgiLightningModule(GeneralLightningModule):
         # Return result of the model
         return result
     
+
+def read_memmap(path, count, dtype:str="float16") -> np.memmap:
+    file_size = os.path.getsize(path)
+    dtype_size = np.dtype(dtype).itemsize
+    num_elements = file_size // dtype_size
+    embedding_size = num_elements // count
+    shape = (count, embedding_size)
+    return np.memmap(path, dtype=dtype, mode='r', shape=shape)
+
+
+def read_embeddings(embeddings_path:Path|str, embeddings_index:Path=None, ) -> tuple[np.ndarray, list[str]]:
+    """
+    Read embeddings from a memmap file.
+    """
+    embeddings_path = Path(embeddings_path)
+    index_path = embeddings_index or embeddings_path.with_suffix('.index')
+    index_path = Path(index_path)
+    assert index_path.exists(), f"Index file '{index_path}' does not exist."
+    index = [line.split("\t") for line in Path(index_path).read_text().strip().splitlines()]
+    memmap = read_memmap(embeddings_path, len(index))
+    return memmap, index
