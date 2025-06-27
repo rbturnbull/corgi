@@ -76,7 +76,7 @@ def read_memmap(path, count, dtype:str="float16") -> np.memmap:
     return np.memmap(path, dtype=dtype, mode='r', shape=shape)
 
 
-def read_embeddings(embeddings_path:Path|str, embeddings_index:Path=None, ) -> tuple[np.ndarray, list[str]]:
+def read_embeddings(embeddings_path:Path|str, embeddings_index:Path=None, merge:bool=False) -> tuple[np.ndarray, list[str]]:
     """
     Read embeddings from a memmap file.
     """
@@ -84,6 +84,22 @@ def read_embeddings(embeddings_path:Path|str, embeddings_index:Path=None, ) -> t
     index_path = embeddings_index or embeddings_path.with_suffix('.index')
     index_path = Path(index_path)
     assert index_path.exists(), f"Index file '{index_path}' does not exist."
-    index = [line.split("\t") for line in Path(index_path).read_text().strip().splitlines()]
-    memmap = read_memmap(embeddings_path, len(index))
-    return memmap, index
+    index_with_tabs = Path(index_path).read_text().strip().splitlines()
+    
+    embeddings = read_memmap(embeddings_path, len(index_with_tabs))
+
+    if merge:
+        import pandas as pd
+        df = pd.DataFrame(embeddings)
+        df["index_with_tabs"] = index_with_tabs
+
+        # Group by 'index_with_tabs' and average the embeddings
+        grouped = df.groupby("index_with_tabs", sort=False).mean(numeric_only=True)
+
+        # Extract the averaged embeddings and the corresponding unique ids
+        embeddings = grouped.values
+        index_with_tabs = grouped.index.to_list()
+
+    index = [line.split("\t") for line in index_with_tabs]
+
+    return embeddings, index
