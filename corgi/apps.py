@@ -130,6 +130,11 @@ class Corgi(ta.TorchApp):
         )
 
         return data
+    
+    @ta.method
+    def module_class(self, **kwargs) -> 'CorgiLightningModule':
+        from .modules import CorgiLightningModule
+        return CorgiLightningModule
 
     @ta.method("module_class")
     def model(
@@ -291,6 +296,7 @@ class Corgi(ta.TorchApp):
         input: list[Path] = ta.Param(None, help="A fasta file with sequences to be classified."),
         file: list[Path] = ta.Param(None, help="A fasta file with sequences to be classified (DEPRECATED. Use `input`)."),
         seqtree: Path = ta.Param(None, help="The seqtree with the classification tree to use. DEPRECATED."),
+        embeddings: Path = ta.Param(None, help="A path to save the embeddings from the model output."),
         max_seqs: int = None,
         batch_size:int = 1,
         max_length:int = 5_000,
@@ -319,6 +325,12 @@ class Corgi(ta.TorchApp):
         else:
             self.classification_tree = module.hparams['classification_tree']
         self.dataloader = SeqIODataloader(files=files, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
+
+        if embeddings:
+            module.set_embedding_path(
+                embeddings_path=embeddings,
+                dataloader=self.dataloader,
+            )
         return self.dataloader
 
     def node_to_str(self, node:'SoftmaxNode') -> str:
@@ -493,18 +505,19 @@ class Corgi(ta.TorchApp):
         
         return "https://figshare.unimelb.edu.au/ndownloader/files/55166714"
 
-    @ta.method("super")
-    def prediction_trainer(
-        self,
-        embeddings:Path = ta.Param(None, help="The path to save the embeddings from the model output."),
-        **kwargs,
-    ):
-        if embeddings is None:
-            return super().prediction_trainer(**kwargs)
+    # @ta.method("super")
+    # def prediction_trainer(
+    #     self,
+    #     module,
+    #     embeddings:Path = ta.Param(None, help="The path to save the embeddings from the model output."),
+    #     **kwargs,
+    # ):
+    #     if embeddings is None:
+    #         return super().prediction_trainer(module, **kwargs)
 
-        from .models import CorgiEmbeddingLightningModule  
+    #     from .modules import CorgiEmbeddingLightningModule  
 
-        return CorgiEmbeddingLightningModule(
-            memmap_array_path=embeddings,
-            dataloader=self.dataloader,
-        )
+    #     return CorgiEmbeddingLightningModule(
+    #         memmap_array_path=embeddings,
+    #         corgi=self,
+    #     )
