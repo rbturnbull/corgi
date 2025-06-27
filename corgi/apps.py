@@ -479,6 +479,7 @@ class Corgi(ta.TorchApp):
             classification_tree=self.classification_tree,
         )
 
+    @ta.method
     def checkpoint(
         self, 
         checkpoint:Path=ta.Param(default=None, help="A path to a checkpoint to load. If not given then a default checkpoint is used."),
@@ -491,3 +492,19 @@ class Corgi(ta.TorchApp):
             raise NotImplementedError("Large checkpoint not yet available.")
         
         return "https://figshare.unimelb.edu.au/ndownloader/files/55166714"
+
+    @ta.method("super")
+    def prediction_trainer(
+        self,
+        embeddings:Path = ta.Param(None, help="The path to save the embeddings from the model output."),
+        **kwargs,
+    ):
+        if embeddings is None:
+            return super().prediction_trainer(**kwargs)
+
+        from .models import CorgiEmbeddingLightningModule  
+
+        return CorgiEmbeddingLightningModule(
+            memmap_array_path=embeddings,
+            dataloader=self.dataloader,
+        )
