@@ -76,7 +76,7 @@ def read_memmap(path, count, dtype:str="float16") -> np.memmap:
     return np.memmap(path, dtype=dtype, mode='r', shape=shape)
 
 
-def read_embeddings(embeddings_path:Path|str, embeddings_index:Path=None, merge:bool=False) -> tuple[np.ndarray, list[str]]:
+def read_embeddings(embeddings_path:Path|str, embeddings_index:Path=None, merge:bool=True) -> tuple[np.ndarray, list[str]]:
     """
     Read embeddings from a memmap file.
     """
