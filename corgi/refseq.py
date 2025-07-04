@@ -32,6 +32,19 @@ class DNAType(Enum):
     def __str__(self):
         return str(self.value)
 
+    @classmethod
+    def from_description(cls, description: str):
+        """ Convert a description to a DNAType. """
+        description = description.lower()
+        if "mitochondrion" in description:
+            return cls.MITOCHONDRION
+        elif "plastid" in description:
+            return cls.PLASTID
+        elif "plasmid" in description:
+            return cls.PLASMID
+        else:
+            return cls.NUCLEAR
+
 
 def my_open(file):
     file = Path(file)
