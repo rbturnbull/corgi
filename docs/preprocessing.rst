@@ -5,7 +5,7 @@ Preprocessing
 Use this tutorial to learn how to generate the files needed to train Corgi from scratch. 
 You can use this to replicate the results found in the paper (still to be released).
 
-Corgi takes two input files, a SeqTree and a SeqBank. 
+Corgi takes two input files – a SeqTree and a SeqBank. 
 The SeqBank holds the sequence data for each accession in the dataset. 
 The SeqTree has the information about the cross-validation partition for each accession and which node in the taxonomic tree that the accession corresponds to.
 
