@@ -131,7 +131,7 @@ class Corgi(ta.TorchApp):
 
         return data
 
-    @ta.method("module_class")
+    @ta.method("module_class", "checkpoint")
     def model(
         self,
         pretrained:Path = ta.Param(None, help="A pretrained model to finetune."),
@@ -196,6 +196,7 @@ class Corgi(ta.TorchApp):
             default=10_000_000,
             help="The approximate number of multiply or accumulate operations in the model. Used to set cnn_dims_start if not provided explicitly.",
         ),
+        reload: bool = ta.Param(default=False, help="Whether or not to reload the pretrained model before using it."),
         **kwargs,
     ) -> 'nn.Module':
         """
@@ -212,8 +213,16 @@ class Corgi(ta.TorchApp):
         num_classes = total_size(self.output_types)
 
         if pretrained:
+            if str(pretrained) == "default":
+                pretrained = self.checkpoint(**kwargs)
+
+            pretrained = self.process_location(pretrained, reload=reload)
+
+            if not pretrained or not pretrained.is_file():
+                raise FileNotFoundError(f"Cannot find pretrained model at '{pretrained}'")
+
             module_class = self.module_class(**kwargs)
-            module = module_class.load_from_checkpoint(pretrained)
+            module = module_class.load_from_checkpoint(str(pretrained))
             model = module.model
             model.replace_output_types(self.output_types, final_bias=final_bias)
             return model
