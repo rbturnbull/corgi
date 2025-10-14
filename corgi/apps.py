@@ -72,7 +72,7 @@ class Corgi(ta.TorchApp):
         batch_size: int = ta.Param(default=32, help="The batch size."),
         validation_length:int = ta.Param(default=1_000, help="The standard length of sequences to use for validation."),
         phi:float=ta.Param(default=1.0, tune=True, tune_min=0.8, tune_max=1.2, help="A multiplication factor for the loss at each level of the tree."),
-        test_partition:int = ta.Param(default=0, help="The partition to retain for testing."),
+        test_partition:int = ta.Param(default=-1, help="The partition to retain for testing (by default, -1 so that it is not used)."),
         minimum_length: int = ta.Param(default=150, help="The minimum length to truncate sequences in a training batch."),
         maximum_length: int = ta.Param(default=3_000, help="The maximum length to truncate sequences in a training batch."),
         skewness:float = ta.Param(default=5, help="The skewness of the distribution of sequence lengths in a batch."),
@@ -131,7 +131,7 @@ class Corgi(ta.TorchApp):
 
         return data
 
-    @ta.method("module_class")
+    @ta.method("module_class", "checkpoint")
     def model(
         self,
         pretrained:Path = ta.Param(None, help="A pretrained model to finetune."),
@@ -196,6 +196,7 @@ class Corgi(ta.TorchApp):
             default=10_000_000,
             help="The approximate number of multiply or accumulate operations in the model. Used to set cnn_dims_start if not provided explicitly.",
         ),
+        reload: bool = ta.Param(default=False, help="Whether or not to reload the pretrained model before using it."),
         **kwargs,
     ) -> 'nn.Module':
         """
@@ -212,8 +213,16 @@ class Corgi(ta.TorchApp):
         num_classes = total_size(self.output_types)
 
         if pretrained:
+            if str(pretrained) == "default":
+                pretrained = self.checkpoint(**kwargs)
+
+            pretrained = self.process_location(pretrained, reload=reload)
+
+            if not pretrained or not pretrained.is_file():
+                raise FileNotFoundError(f"Cannot find pretrained model at '{pretrained}'")
+
             module_class = self.module_class(**kwargs)
-            module = module_class.load_from_checkpoint(pretrained)
+            module = module_class.load_from_checkpoint(str(pretrained))
             model = module.model
             model.replace_output_types(self.output_types, final_bias=final_bias)
             return model
@@ -284,12 +293,49 @@ class Corgi(ta.TorchApp):
         """
         return "bio-corgi"
 
+    def find_input_paths(self, files:list[str], base_extensions:set[str]|None=None) -> list[Path]:
+        base_extensions = base_extensions or {
+            ".fa", ".fasta", ".fna", ".fas", ".frn", ".ref", # FASTA
+            ".genbank", ".gb", ".gbk",  # Genbank
+            ".tab", ".tsv", # Tabular
+            ".fastq", ".fq", # Fastq
+        }
+
+        # Function to check if a file matches allowed extensions (including .gz)
+        def matches_extensions(file: Path):
+            return (
+                file.suffix in base_extensions or
+                (file.suffix == ".gz" and any(file.stem.endswith(ext) for ext in base_extensions))
+            )
+
+        # Expand the list
+        fasta_paths = []
+
+        # If 'files' is a string or Path, convert it to a list
+        if isinstance(files, (str,Path)):
+            fasta_paths = [files]
+
+        for path in files:
+            path = self.process_location(path)
+            if path.is_dir():
+                # If it's a directory, find all files with the specified extensions
+                fasta_paths.extend([file for file in path.rglob("*") if matches_extensions(file)])
+            else:
+                # If it's not a directory, add the file to the list
+                if matches_extensions(path):
+                    fasta_paths.append(path)
+
+        return fasta_paths
+    
+    def find_fasta_paths(self, files:list[str]) -> list[Path]:
+        return self.find_input_paths(files, base_extensions={".fa", ".fasta", ".fna", ".fas", ".frn", ".ref"})
+
     @ta.method
     def prediction_dataloader(
         self,
         module,
-        input: list[Path] = ta.Param(None, help="A fasta file with sequences to be classified."),
-        file: list[Path] = ta.Param(None, help="A fasta file with sequences to be classified (DEPRECATED. Use `input`)."),
+        input: list[str] = ta.Param(None, help="A FASTA file with sequences to be classified."),
+        file: list[Path] = ta.Param(None, help="A FASTA file with sequences to be classified (DEPRECATED. Use `input`)."),
         seqtree: Path = ta.Param(None, help="The seqtree with the classification tree to use. DEPRECATED."),
         max_seqs: int = None,
         batch_size:int = 1,
@@ -302,13 +348,10 @@ class Corgi(ta.TorchApp):
 
         files = []
         if input:
-            if isinstance(input, (str, Path)):
-                input = [input]
-            files.extend(input)
+            files += self.find_input_paths(input)
+
         if file:
-            if isinstance(file, (str, Path)):
-                file = [file]
-            files.extend(file)
+            files += self.find_input_paths(file)
 
         if not files:
             raise typer.BadParameter("No files given to classify.")

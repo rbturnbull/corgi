@@ -62,6 +62,9 @@ To make predictions, run the ``corgi`` command line tool:
 
     corgi --input <input seq file> --output-csv <output csv file>
 
+The input can be a FASTA file, a GenBank file, or a FASTQ file. This can be GZipped or uncompressed. 
+It can also be a URL.
+
 This will output all the predictions in a CSV file.
 
 For more information about the other options, see the help with:
