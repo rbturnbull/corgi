@@ -280,7 +280,7 @@ class SeqIODataloader:
         self.overlap = overlap
         seqs = 0
 
-        base_extensions = {".fa", ".fasta", ".fna"}
+        base_extensions = {".fa", ".fasta", ".fna", ".fas"}
 
         # Function to check if a file matches allowed extensions (including .gz)
         def matches_extensions(file: Path):
@@ -331,7 +331,7 @@ class SeqIODataloader:
         else:
             suffix = suffixes[-1]
 
-        if suffix in [".fa", ".fna", ".fasta"]:
+        if suffix in [".fa", ".fna", ".fasta", ".fas", ".frn", ".ref"]:
             return "fasta"
         if suffix in [".genbank", ".gb", ".gbk"]:
             return "genbank"
