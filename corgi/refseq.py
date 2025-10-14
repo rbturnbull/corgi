@@ -111,7 +111,7 @@ def get_node(taxon, taxonomy, taxon_to_node, root, ranks):
 @app.command()
 def refseq_to_seqtree(
     output:Path, 
-    seqbank,
+    seqbank:Path,
     seqbank_output:Path=None,
     render:Path=None, 
     accessions:Path=None,
@@ -178,6 +178,10 @@ def refseq_to_seqtree(
                 line = line.decode()
             components = line.split("\t")
             accession = components[2]
+
+            if accession not in seqbank_accessions:
+                continue
+
             prefix = accession[:2]
 
             # Exclude non-DNA sequences
@@ -208,9 +212,6 @@ def refseq_to_seqtree(
 
             # Skip if we have too many sequences for this leaf node
             if max_seqs and node.nseq >= max_seqs:
-                continue
-
-            if accession not in seqbank_accessions:
                 continue
 
             data = seqbank[accession]            
