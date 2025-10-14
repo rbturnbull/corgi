@@ -72,7 +72,7 @@ class Corgi(ta.TorchApp):
         batch_size: int = ta.Param(default=32, help="The batch size."),
         validation_length:int = ta.Param(default=1_000, help="The standard length of sequences to use for validation."),
         phi:float=ta.Param(default=1.0, tune=True, tune_min=0.8, tune_max=1.2, help="A multiplication factor for the loss at each level of the tree."),
-        test_partition:int = ta.Param(default=0, help="The partition to retain for testing."),
+        test_partition:int = ta.Param(default=-1, help="The partition to retain for testing (by default, -1 so that it is not used)."),
         minimum_length: int = ta.Param(default=150, help="The minimum length to truncate sequences in a training batch."),
         maximum_length: int = ta.Param(default=3_000, help="The maximum length to truncate sequences in a training batch."),
         skewness:float = ta.Param(default=5, help="The skewness of the distribution of sequence lengths in a batch."),
@@ -293,7 +293,7 @@ class Corgi(ta.TorchApp):
         """
         return "bio-corgi"
 
-    def find_input_paths(self, files:list[str], base_extensions:set[str]|None) -> list[Path]:
+    def find_input_paths(self, files:list[str], base_extensions:set[str]|None=None) -> list[Path]:
         base_extensions = base_extensions or {
             ".fa", ".fasta", ".fna", ".fas", ".frn", ".ref", # FASTA
             ".genbank", ".gb", ".gbk",  # Genbank
