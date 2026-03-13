@@ -530,7 +530,10 @@ class Corgi(ta.TorchApp):
         if checkpoint:
             return checkpoint
         if large:
-            return "https://figshare.unimelb.edu.au/ndownloader/files/55166705"
+            # return "https://figshare.unimelb.edu.au/ndownloader/files/55166705"
+            return "https://ndownloader.figshare.com/files/55166705"
             raise NotImplementedError("Large checkpoint not yet available.")
         
-        return "https://figshare.unimelb.edu.au/ndownloader/files/55166714"
+        # return "https://figshare.unimelb.edu.au/ndownloader/files/55166714"
+        return "https://ndownloader.figshare.com/files/55166714"
+    
