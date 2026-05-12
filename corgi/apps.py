@@ -14,6 +14,19 @@ if TYPE_CHECKING:
 
 console = Console()
 
+
+def limit_torch_threads(num_threads: int | None) -> None:
+    if num_threads is None:
+        return
+
+    if num_threads < 1:
+        raise typer.BadParameter("num_threads must be at least 1.")
+
+    import torch
+
+    torch.set_num_threads(num_threads)
+
+
 def output_results_bar_chart(predictions: "pd.Series", top_k: int = 10, bar_size: int = 80):
     from rich.table import Table
     from rich.box import SIMPLE
@@ -341,10 +354,16 @@ class Corgi(ta.TorchApp):
         batch_size:int = 1,
         max_length:int = 5_000,
         min_length:int = 128,
+        num_threads: int = ta.Param(
+            default=None,
+            help="The maximum number of PyTorch CPU threads to use during prediction. If not set, PyTorch uses its default.",
+        ),
         **kwargs,
     ):
         from .data import SeqIODataloader
         from .seqtree import SeqTree
+
+        limit_torch_threads(num_threads)
 
         files = []
         if input:
