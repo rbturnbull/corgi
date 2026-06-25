@@ -326,7 +326,7 @@ class Corgi(ta.TorchApp):
 
         # If 'files' is a string or Path, convert it to a list
         if isinstance(files, (str,Path)):
-            fasta_paths = [files]
+            files = [files]
 
         for path in files:
             path = self.process_location(path)
