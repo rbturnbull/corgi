@@ -422,7 +422,14 @@ class Corgi(ta.TorchApp):
         assert self.classification_tree # This should be saved on the checkpoint
         
         classification_probabilities = node_probabilities(results[0], root=self.classification_tree)
-        category_names = [self.node_to_str(node) for node in self.classification_tree.node_list if not node.is_root]
+
+        if hasattr(self.classification_tree, "node_list_softmax"):
+            category_names = [self.node_to_str(node) for node in self.classification_tree.node_list_softmax]
+        else:
+            # Backwards compatibility for older seqtree files which don't have the node_list_softmax attribute, 
+            # in which case we just use all non-root nodes as categories. 
+            category_names = [self.node_to_str(node) for node in self.classification_tree.node_list if not node.is_root]
+
         chunk_details = pd.DataFrame(self.dataloader.chunk_details, columns=["file", "original_id", "description", "chunk"])
         predictions_df = pd.DataFrame(classification_probabilities.numpy(), columns=category_names)
 
