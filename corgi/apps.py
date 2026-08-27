@@ -143,6 +143,11 @@ class Corgi(ta.TorchApp):
         )
 
         return data
+    
+    @ta.method
+    def module_class(self, **kwargs) -> 'CorgiLightningModule':
+        from .modules import CorgiLightningModule
+        return CorgiLightningModule
 
     @ta.method("module_class", "checkpoint")
     def model(
@@ -350,6 +355,7 @@ class Corgi(ta.TorchApp):
         input: list[str] = ta.Param(None, help="A FASTA file with sequences to be classified."),
         file: list[Path] = ta.Param(None, help="A FASTA file with sequences to be classified (DEPRECATED. Use `input`)."),
         seqtree: Path = ta.Param(None, help="The seqtree with the classification tree to use. DEPRECATED."),
+        embeddings: Path = ta.Param(None, help="A path to save the embeddings from the model output."),
         max_seqs: int = None,
         batch_size:int = 1,
         max_length:int = 5_000,
@@ -381,6 +387,12 @@ class Corgi(ta.TorchApp):
         else:
             self.classification_tree = module.hparams['classification_tree']
         self.dataloader = SeqIODataloader(files=files, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
+
+        if embeddings:
+            module.set_embedding_path(
+                embeddings_path=embeddings,
+                dataloader=self.dataloader,
+            )
         return self.dataloader
 
     def node_to_str(self, node:'SoftmaxNode') -> str:
@@ -410,7 +422,14 @@ class Corgi(ta.TorchApp):
         assert self.classification_tree # This should be saved on the checkpoint
         
         classification_probabilities = node_probabilities(results[0], root=self.classification_tree)
-        category_names = [self.node_to_str(node) for node in self.classification_tree.node_list if not node.is_root]
+
+        if hasattr(self.classification_tree, "node_list_softmax"):
+            category_names = [self.node_to_str(node) for node in self.classification_tree.node_list_softmax]
+        else:
+            # Backwards compatibility for older seqtree files which don't have the node_list_softmax attribute, 
+            # in which case we just use all non-root nodes as categories. 
+            category_names = [self.node_to_str(node) for node in self.classification_tree.node_list if not node.is_root]
+
         chunk_details = pd.DataFrame(self.dataloader.chunk_details, columns=["file", "original_id", "description", "chunk"])
         predictions_df = pd.DataFrame(classification_probabilities.numpy(), columns=category_names)
 
@@ -541,6 +560,7 @@ class Corgi(ta.TorchApp):
             classification_tree=self.classification_tree,
         )
 
+    @ta.method
     def checkpoint(
         self, 
         checkpoint:Path=ta.Param(default=None, help="A path to a checkpoint to load. If not given then a default checkpoint is used."),

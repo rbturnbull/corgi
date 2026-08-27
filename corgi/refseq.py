@@ -2,7 +2,6 @@ from multitax import NcbiTx
 from hierarchicalsoftmax import SoftmaxNode
 from pathlib import Path
 import requests
-from typing import List
 from enum import Enum
 from appdirs import user_cache_dir
 from torchapp.download import cached_download
@@ -31,6 +30,19 @@ class DNAType(Enum):
 
     def __str__(self):
         return str(self.value)
+
+    @classmethod
+    def from_description(cls, description: str):
+        """ Convert a description to a DNAType. """
+        description = description.lower()
+        if "mitochondrion" in description:
+            return cls.MITOCHONDRION
+        elif "plastid" in description:
+            return cls.PLASTID
+        elif "plasmid" in description:
+            return cls.PLASMID
+        else:
+            return cls.NUCLEAR
 
 
 def my_open(file):
@@ -99,7 +111,7 @@ def get_node(taxon, taxonomy, taxon_to_node, root, ranks):
 @app.command()
 def refseq_to_seqtree(
     output:Path, 
-    seqbank,
+    seqbank:Path,
     seqbank_output:Path=None,
     render:Path=None, 
     accessions:Path=None,
@@ -108,6 +120,14 @@ def refseq_to_seqtree(
     catalog:Path=None,
     ranks:str="superkingdom,kingdom,phylum,class,order",
     restrict_ranks:str="class,order",
+    mitochondrion_ranks:str="",
+    plastid_ranks:str="",
+    plasmid_ranks:str="",
+    nuclear_ranks:str="",
+    mitochondrion_restrict_ranks:str="",
+    plastid_restrict_ranks:str="",
+    plasmid_restrict_ranks:str="",
+    nuclear_restrict_ranks:str="",    
     print_tree:bool=False,
 ):
     catalog = catalog or get_catalogue()
@@ -132,11 +152,22 @@ def refseq_to_seqtree(
         type_nodes[type_str] = SoftmaxNode(type_str, parent=root, rank="type", nseq=0)
         type_taxon_to_node[type_str] = {}
 
-    if isinstance(ranks, str):
-        ranks = ranks.split(",")
+    rank_strings = dict(
+        mitochondrion = mitochondrion_ranks or ranks,
+        plastid = plastid_ranks or ranks,
+        plasmid = plasmid_ranks or ranks,
+        nuclear = nuclear_ranks or ranks,        
+    )
 
-    if isinstance(restrict_ranks, str):
-        restrict_ranks = set(restrict_ranks.split(","))
+    restrict_rank_strings = dict(
+        mitochondrion = mitochondrion_restrict_ranks or restrict_ranks,
+        plastid = plastid_restrict_ranks or restrict_ranks,
+        plasmid = plasmid_restrict_ranks or restrict_ranks,
+        nuclear = nuclear_restrict_ranks or restrict_ranks,        
+    )
+
+    ranks = {k.title():v.split(",") for k,v in rank_strings.items()}
+    restrict_ranks = {k.title():v.split(",") for k,v in restrict_rank_strings.items()}
 
     print('Loading taxonomy...')
     taxonomy = NcbiTx()
@@ -147,6 +178,10 @@ def refseq_to_seqtree(
                 line = line.decode()
             components = line.split("\t")
             accession = components[2]
+
+            if accession not in seqbank_accessions:
+                continue
+
             prefix = accession[:2]
 
             # Exclude non-DNA sequences
@@ -169,17 +204,14 @@ def refseq_to_seqtree(
             type_str = str(type_obj)
 
             # Get the node for this taxon
-            node = get_node(taxon, taxonomy, type_taxon_to_node[type_str], type_nodes[type_str], ranks=ranks)
+            node = get_node(taxon, taxonomy, type_taxon_to_node[type_str], type_nodes[type_str], ranks=ranks[type_str])
 
             # Skip if not in one of the allowed ranks (e.g. class, order)
-            if node.rank not in restrict_ranks:
+            if node.rank not in restrict_ranks[type_str]:
                 continue
 
             # Skip if we have too many sequences for this leaf node
             if max_seqs and node.nseq >= max_seqs:
-                continue
-
-            if accession not in seqbank_accessions:
                 continue
 
             data = seqbank[accession]            
