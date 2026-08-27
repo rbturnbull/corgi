@@ -1,10 +1,26 @@
 from torchapp.testing import TorchAppTestCase, CliRunner
 import re
-from corgi.apps import Corgi
+import pytest
+import torch
+import typer
+from corgi.apps import Corgi, limit_torch_threads
 from pathlib import Path
 from corgi.seqtree import SeqTree
 from polytorch import HierarchicalData
 from unittest.mock import patch
+
+
+def test_limit_torch_threads():
+    original_threads = torch.get_num_threads()
+    try:
+        limit_torch_threads(1)
+        assert torch.get_num_threads() == 1
+
+        with pytest.raises(typer.BadParameter):
+            limit_torch_threads(0)
+    finally:
+        torch.set_num_threads(original_threads)
+
 
 def mock_init(self):
     self.seqtree = SeqTree.load(Path(__file__).parent/"testdata/seqtree.pkl")
