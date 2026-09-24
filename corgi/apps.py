@@ -207,6 +207,14 @@ class Corgi(ta.TorchApp):
             tune_min=512,
             tune_max=2048,
         ),
+        attention_pooling: bool = ta.Param(
+            default=False,
+            help="Whether or not to use attention pooling instead of mean pooling.",
+        ),
+        attention_pooling_dims: int = ta.Param(
+            default=128,
+            help="The number of dimensions to use for attention pooling. Only used if attention_pooling is True.",
+        ),
         include_length: bool = True,
         transformer_heads: int = ta.Param(8, help="The number of heads in the transformer."),
         transformer_layers: int = ta.Param(0, help="The number of layers in the transformer. If zero then no transformer is used."),
@@ -274,6 +282,8 @@ class Corgi(ta.TorchApp):
             include_length=include_length,
             transformer_layers=transformer_layers,
             transformer_heads=transformer_heads,
+            attention_pooling=attention_pooling,
+            attention_pooling_dims=attention_pooling_dims,
         )
 
     @ta.method    

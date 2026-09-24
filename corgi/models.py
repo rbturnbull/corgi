@@ -11,6 +11,36 @@ from rich.console import Console
 console = Console()
 
 
+class AttentionPooling(nn.Module):
+    """Pool (batch, channels, length) into (batch, channels).
+
+    Learn one attention weight per position, shared across channels. Positions
+    containing NaNs are padding; every sequence must have a valid position.
+    """
+
+    def __init__(self,  attention_hidden_size:int= 128, activation=nn.Tanh):
+        super().__init__()
+
+        self.attention_layer = nn.Sequential(
+            nn.LazyConv1d(attention_hidden_size, kernel_size=1),
+            activation(),
+            nn.Conv1d(attention_hidden_size, 1, kernel_size=1),
+        )
+
+    def forward(self, feature_matrix: torch.Tensor) -> torch.Tensor:
+
+        if feature_matrix.ndim != 3:
+            raise ValueError("feature_matrix must have shape (batch, channels, length)")
+        mask = torch.isnan(feature_matrix).any(dim=1, keepdim=True)
+        if torch.any(mask.all(dim=-1)):
+            raise ValueError("every sequence must contain at least one valid position")
+        # Remove NaNs before scoring and summation: zero times NaN is NaN.
+        values = feature_matrix.masked_fill(mask, 0.0)
+        attn_scores = self.attention_layer(values).masked_fill(mask, -torch.inf)
+        attn_weights = torch.softmax(attn_scores, dim=-1)  # (batch, 1, length)
+        return torch.sum(attn_weights * values, dim=-1)
+
+
 class PositionalEncoding(nn.Module):
     """
     Adapted from https://pytorch.org/tutorials/beginner/transformer_tutorial.html
@@ -259,6 +289,11 @@ class ConvRecurrantClassifier(nn.Module):
         return out
 
 
+class MeanPool(nn.Module):
+    def forward(self, x):
+        return torch.mean(x, axis=-1)
+
+
 class ConvClassifier(nn.Module):
     def __init__(
         self,
@@ -281,6 +316,8 @@ class ConvClassifier(nn.Module):
         length_scaling:float = 3_000.0,
         transformer_heads: int = 8,
         transformer_layers: int = 6,
+        attention_pooling:bool=False,
+        attention_pooling_dims:int=128,
     ):
         super().__init__()
 
@@ -352,6 +389,11 @@ class ConvClassifier(nn.Module):
         else:
             current_dims = in_channels
 
+        if attention_pooling:
+            self.pool = AttentionPooling(attention_hidden_size=attention_pooling_dims, activation=nn.Tanh)
+        else:
+            self.pool = MeanPool()
+
         # self.average_pool = nn.AdaptiveAvgPool1d(1)
 
         current_dims += int(include_length)
@@ -385,6 +427,8 @@ class ConvClassifier(nn.Module):
         # elif hasattr(x, 'average_pool'):
         #     x = self.average_pool(x)
         #     x = torch.flatten(x, 1)
+        elif getattr(self, 'pool', None) is not None:
+            x = self.pool(x)
         else:
             x = torch.mean(x, axis=-1)
             # x = torch.sum(x, axis=-1)
