@@ -55,9 +55,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#seqtree-export">export</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#seqtree-intersection-seqbank">intersection-seqbank</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#seqtree-layer-size">layer-size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqtree-merge">merge</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#seqtree-pickle-tree">pickle-tree</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#seqtree-prune">prune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#seqtree-render">render</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqtree-set-partition">set-partition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#seqtree-sunburst">sunburst</a></li>
 </ul>
 </li>
@@ -138,12 +140,13 @@ This works like a dictionary in Python where the keys are the accessions in the 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-accessions-arg-SEQTREE">
 <span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-accessions-arg-SEQTREE" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f2d12cccf50&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f618d3cd410&gt;</p>
 </dd></dl>
 
 </section>
 <section id="seqtree-count">
 <h3>count<a class="headerlink" href="#seqtree-count" title="Link to this heading"></a></h3>
+<p>Print the number of accessions in a saved SeqTree.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>count<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE
 </pre></div>
 </div>
@@ -151,12 +154,15 @@ This works like a dictionary in Python where the keys are the accessions in the 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-count-arg-SEQTREE">
 <span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-count-arg-SEQTREE" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f2d12cc6850&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f618d3cd1d0&gt;</p>
 </dd></dl>
 
 </section>
 <section id="seqtree-export">
 <h3>export<a class="headerlink" href="#seqtree-export" title="Link to this heading"></a></h3>
+<p>Export sequences with accession and classification labels from a SeqBank.</p>
+<p>Optionally select a partition and pass length and seed options to the
+exporter. Infer the sequence format from the output path if omitted.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE<span class="w"> </span>SEQBANK<span class="w"> </span>OUTPUT
 </pre></div>
 </div>
@@ -198,19 +204,19 @@ This works like a dictionary in Python where the keys are the accessions in the 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-export-arg-SEQTREE">
 <span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-export-arg-SEQTREE" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f2d12ccc150&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f618d3cd790&gt;</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-export-arg-SEQBANK">
 <span class="sig-name descname"><span class="pre">SEQBANK</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-export-arg-SEQBANK" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqBank. &lt;typer.models.TyperPath object at 0x7f2d12ccc6d0&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqBank. &lt;typer.models.TyperPath object at 0x7f618d3ce390&gt;</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-export-arg-OUTPUT">
 <span class="sig-name descname"><span class="pre">OUTPUT</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-export-arg-OUTPUT" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the output file. &lt;typer.models.TyperPath object at 0x7f2d12ccc1d0&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the output file. &lt;typer.models.TyperPath object at 0x7f618d3cd3d0&gt;</p>
 </dd></dl>
 
 </section>
@@ -225,19 +231,19 @@ This works like a dictionary in Python where the keys are the accessions in the 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-intersection-seqbank-arg-SEQTREE">
 <span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-intersection-seqbank-arg-SEQTREE" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f2d12ecf890&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f618d6a99d0&gt;</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-intersection-seqbank-arg-SEQBANK">
 <span class="sig-name descname"><span class="pre">SEQBANK</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-intersection-seqbank-arg-SEQBANK" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqBank. &lt;typer.models.TyperPath object at 0x7f2d1335cf50&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqBank. &lt;typer.models.TyperPath object at 0x7f618d585450&gt;</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-intersection-seqbank-arg-OUTPUT">
 <span class="sig-name descname"><span class="pre">OUTPUT</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-intersection-seqbank-arg-OUTPUT" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqBank. &lt;typer.models.TyperPath object at 0x7f2d12cccfd0&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqBank. &lt;typer.models.TyperPath object at 0x7f618d3ce1d0&gt;</p>
 </dd></dl>
 
 </section>
@@ -251,12 +257,39 @@ This works like a dictionary in Python where the keys are the accessions in the 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-layer-size-arg-SEQTREE">
 <span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-layer-size-arg-SEQTREE" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f2d12cc6410&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f618d3c73d0&gt;</p>
+</dd></dl>
+
+</section>
+<section id="seqtree-merge">
+<h3>merge<a class="headerlink" href="#seqtree-merge" title="Link to this heading"></a></h3>
+<p>Merge another SeqTree into this one and save.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>merge<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE<span class="w"> </span>OTHER<span class="w"> </span>OUTPUT
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-merge-arg-SEQTREE">
+<span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-merge-arg-SEQTREE" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f618d3c5c90&gt;</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-merge-arg-OTHER">
+<span class="sig-name descname"><span class="pre">OTHER</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-merge-arg-OTHER" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the other SeqTree. &lt;typer.models.TyperPath object at 0x7f618d3c37d0&gt;</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-merge-arg-OUTPUT">
+<span class="sig-name descname"><span class="pre">OUTPUT</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-merge-arg-OUTPUT" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the output file. &lt;typer.models.TyperPath object at 0x7f618d3b49d0&gt;</p>
 </dd></dl>
 
 </section>
 <section id="seqtree-pickle-tree">
 <h3>pickle-tree<a class="headerlink" href="#seqtree-pickle-tree" title="Link to this heading"></a></h3>
+<p>Extract the classification tree from a saved SeqTree into a pickle file.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>pickle-tree<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE<span class="w"> </span>OUTPUT
 </pre></div>
 </div>
@@ -264,13 +297,13 @@ This works like a dictionary in Python where the keys are the accessions in the 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-pickle-tree-arg-SEQTREE">
 <span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-pickle-tree-arg-SEQTREE" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f2d12cc6b90&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f618d3c58d0&gt;</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-pickle-tree-arg-OUTPUT">
 <span class="sig-name descname"><span class="pre">OUTPUT</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-pickle-tree-arg-OUTPUT" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the output pickle file. &lt;typer.models.TyperPath object at 0x7f2d12cc5c50&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the output pickle file. &lt;typer.models.TyperPath object at 0x7f618d3c6c10&gt;</p>
 </dd></dl>
 
 </section>
@@ -284,7 +317,7 @@ This works like a dictionary in Python where the keys are the accessions in the 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-prune-arg-SEQTREE">
 <span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-prune-arg-SEQTREE" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f2d12cc66d0&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f618d3c7d10&gt;</p>
 </dd></dl>
 
 <dl class="std option">
@@ -296,12 +329,13 @@ This works like a dictionary in Python where the keys are the accessions in the 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-prune-arg-OUTPUT">
 <span class="sig-name descname"><span class="pre">OUTPUT</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-prune-arg-OUTPUT" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the output file. &lt;typer.models.TyperPath object at 0x7f2d12cc6c50&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the output file. &lt;typer.models.TyperPath object at 0x7f618d3c4b90&gt;</p>
 </dd></dl>
 
 </section>
 <section id="seqtree-render">
 <h3>render<a class="headerlink" href="#seqtree-render" title="Link to this heading"></a></h3>
+<p>Render a saved SeqTree, optionally displaying or saving accession counts.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>render<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE
 </pre></div>
 </div>
@@ -349,12 +383,47 @@ This works like a dictionary in Python where the keys are the accessions in the 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-render-arg-SEQTREE">
 <span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-render-arg-SEQTREE" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f2d12cc7bd0&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f618d3cc950&gt;</p>
+</dd></dl>
+
+</section>
+<section id="seqtree-set-partition">
+<h3>set-partition<a class="headerlink" href="#seqtree-set-partition" title="Link to this heading"></a></h3>
+<p>Set the partition for accessions matching a shell-style pattern and save.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>set-partition<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE<span class="w"> </span>PATTERN<span class="w"> </span>PARTITION<span class="w"> </span>OUTPUT
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-set-partition-arg-SEQTREE">
+<span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-set-partition-arg-SEQTREE" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f618d3c6bd0&gt;</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-set-partition-arg-PATTERN">
+<span class="sig-name descname"><span class="pre">PATTERN</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-set-partition-arg-PATTERN" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The pattern to match accessions. STRING</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-set-partition-arg-PARTITION">
+<span class="sig-name descname"><span class="pre">PARTITION</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-set-partition-arg-PARTITION" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The partition to set for matching accessions. INT</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-seqtree-set-partition-arg-OUTPUT">
+<span class="sig-name descname"><span class="pre">OUTPUT</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-set-partition-arg-OUTPUT" title="Link to this definition"></a></dt>
+<dd><p><strong>Required argument</strong> The path to the output file. &lt;typer.models.TyperPath object at 0x7f618d3c6750&gt;</p>
 </dd></dl>
 
 </section>
 <section id="seqtree-sunburst">
 <h3>sunburst<a class="headerlink" href="#seqtree-sunburst" title="Link to this heading"></a></h3>
+<p>Plot accession counts as a sunburst and optionally display or save it.</p>
+<p>Save HTML for an .html output path and an image otherwise. Default the
+plot height to its width when height is zero.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>seqtree<span class="w"> </span>sunburst<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SEQTREE
 </pre></div>
 </div>
@@ -402,7 +471,7 @@ This works like a dictionary in Python where the keys are the accessions in the 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-seqtree-sunburst-arg-SEQTREE">
 <span class="sig-name descname"><span class="pre">SEQTREE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-seqtree-sunburst-arg-SEQTREE" title="Link to this definition"></a></dt>
-<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f2d12cc4ad0&gt;</p>
+<dd><p><strong>Required argument</strong> The path to the SeqTree. &lt;typer.models.TyperPath object at 0x7f618d3c6310&gt;</p>
 </dd></dl>
 
 </section>
