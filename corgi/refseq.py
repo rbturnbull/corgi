@@ -1,6 +1,7 @@
 from multitax import NcbiTx
 from hierarchicalsoftmax import SoftmaxNode
 from pathlib import Path
+from typing import Annotated, Optional
 import requests
 from enum import Enum
 from appdirs import user_cache_dir
@@ -110,26 +111,32 @@ def get_node(taxon, taxonomy, taxon_to_node, root, ranks):
 
 @app.command()
 def refseq_to_seqtree(
-    output:Path, 
-    seqbank:Path,
-    seqbank_output:Path=None,
-    render:Path=None, 
-    accessions:Path=None,
-    partitions:int=6, 
-    max_seqs:int=100, 
-    catalog:Path=None,
-    ranks:str="superkingdom,kingdom,phylum,class,order",
-    restrict_ranks:str="class,order",
-    mitochondrion_ranks:str="",
-    plastid_ranks:str="",
-    plasmid_ranks:str="",
-    nuclear_ranks:str="",
-    mitochondrion_restrict_ranks:str="",
-    plastid_restrict_ranks:str="",
-    plasmid_restrict_ranks:str="",
-    nuclear_restrict_ranks:str="",    
-    print_tree:bool=False,
+    output:Annotated[Path, typer.Argument(help="The path to save the SeqTree.")],
+    seqbank:Annotated[Path, typer.Argument(help="The SeqBank with the sequences for the RefSeq accessions.")],
+    seqbank_output:Annotated[Optional[Path], typer.Option(help="Where to save a new SeqBank containing only the sequences selected for the SeqTree.")]=None,
+    engine:Annotated[Optional[str], typer.Option(help="The storage engine for the output SeqBank: 'rocksdict', 'lmdb' or 'speedict'. If not given, then RocksDict is used.")]=None,
+    render:Annotated[Optional[Path], typer.Option(help="The path to render an image of the SeqTree.")]=None,
+    accessions:Annotated[Optional[Path], typer.Option(help="The path to write a list of the accessions in the SeqTree.")]=None,
+    partitions:Annotated[int, typer.Option(help="The number of cross-validation partitions.")]=6,
+    max_seqs:Annotated[int, typer.Option(help="The maximum number of sequences for each leaf node. Use 0 for no limit.")]=100,
+    catalog:Annotated[Optional[Path], typer.Option(help="The path to a RefSeq catalog. If not given, then the latest release is downloaded.")]=None,
+    ranks:Annotated[str, typer.Option(help="The comma-separated taxonomic ranks to include in the tree.")]="superkingdom,kingdom,phylum,class,order",
+    restrict_ranks:Annotated[str, typer.Option(help="The comma-separated ranks of the nodes which sequences can be assigned to.")]="class,order",
+    mitochondrion_ranks:Annotated[str, typer.Option(help="Overrides `ranks` for mitochondrion sequences.")]="",
+    plastid_ranks:Annotated[str, typer.Option(help="Overrides `ranks` for plastid sequences.")]="",
+    plasmid_ranks:Annotated[str, typer.Option(help="Overrides `ranks` for plasmid sequences.")]="",
+    nuclear_ranks:Annotated[str, typer.Option(help="Overrides `ranks` for nuclear sequences.")]="",
+    mitochondrion_restrict_ranks:Annotated[str, typer.Option(help="Overrides `restrict_ranks` for mitochondrion sequences.")]="",
+    plastid_restrict_ranks:Annotated[str, typer.Option(help="Overrides `restrict_ranks` for plastid sequences.")]="",
+    plasmid_restrict_ranks:Annotated[str, typer.Option(help="Overrides `restrict_ranks` for plasmid sequences.")]="",
+    nuclear_restrict_ranks:Annotated[str, typer.Option(help="Overrides `restrict_ranks` for nuclear sequences.")]="",
+    print_tree:Annotated[bool, typer.Option(help="Whether or not to print the tree to the screen.")]=False,
 ):
+    """
+    Builds a SeqTree from the RefSeq catalog for the accessions found in a SeqBank.
+
+    Each accession is placed in the taxonomic tree and assigned to a cross-validation partition.
+    """
     catalog = catalog or get_catalogue()
     print(f"Using catalog: {catalog}")
     count = line_count(catalog)
@@ -137,9 +144,10 @@ def refseq_to_seqtree(
 
     seqbank = SeqBank(seqbank)
     seqbank_accessions = seqbank.get_accessions()
-    
-    print(f'Saving seqbank with accessions corresponding to {seqbank_output}')
-    seqbank_output = SeqBank(seqbank_output, write=True)
+
+    if seqbank_output:
+        print(f"Saving seqbank with accessions corresponding to {seqbank_output}")
+        seqbank_output = SeqBank(seqbank_output, write=True, engine=engine)
 
     root = SoftmaxNode("root", rank="root", nseq=0)
     seqtree = SeqTree(root)
@@ -166,8 +174,8 @@ def refseq_to_seqtree(
         nuclear = nuclear_restrict_ranks or restrict_ranks,        
     )
 
-    ranks = {k.title():v.split(",") for k,v in rank_strings.items()}
-    restrict_ranks = {k.title():v.split(",") for k,v in restrict_rank_strings.items()}
+    ranks_by_type = {k.title():v.split(",") for k,v in rank_strings.items()}
+    restrict_ranks_by_type = {k.title():v.split(",") for k,v in restrict_rank_strings.items()}
 
     print('Loading taxonomy...')
     taxonomy = NcbiTx()
@@ -204,18 +212,18 @@ def refseq_to_seqtree(
             type_str = str(type_obj)
 
             # Get the node for this taxon
-            node = get_node(taxon, taxonomy, type_taxon_to_node[type_str], type_nodes[type_str], ranks=ranks[type_str])
+            node = get_node(taxon, taxonomy, type_taxon_to_node[type_str], type_nodes[type_str], ranks=ranks_by_type[type_str])
 
             # Skip if not in one of the allowed ranks (e.g. class, order)
-            if node.rank not in restrict_ranks[type_str]:
+            if node.rank not in restrict_ranks_by_type[type_str]:
                 continue
 
             # Skip if we have too many sequences for this leaf node
             if max_seqs and node.nseq >= max_seqs:
                 continue
 
-            data = seqbank[accession]            
-            seqbank_output.add(data, accession)
+            if seqbank_output:
+                seqbank_output.add(seqbank[accession], accession)
 
             partition = node.nseq % partitions
 
@@ -227,7 +235,7 @@ def refseq_to_seqtree(
     seqtree.save(output)
 
     if render:
-        print(f'Rendering seqtree to {render}')
+        print(f"Rendering seqtree to {render}")
 
     for node in root.post_order_iter():
         node.render_str = f"{node.name} ({node.nseq})" if node.nseq else node.name
@@ -237,6 +245,10 @@ def refseq_to_seqtree(
     if accessions:
         print(f"Writing accessions to file {accessions}")
         seqtree.accessions_to_file(accessions)
+
+    if seqbank_output:
+        seqbank_output.close()
+    seqbank.close()
 
 
 if __name__ == "__main__":

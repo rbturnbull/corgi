@@ -575,4 +575,56 @@ class Corgi(ta.TorchApp):
         
         # return "https://figshare.unimelb.edu.au/ndownloader/files/55166714"
         return "https://ndownloader.figshare.com/files/55166714"
-    
+
+    @ta.tool
+    def refseq_to_seqtree(
+        output:Path = ta.Param(..., help="The path to save the SeqTree."),
+        seqbank:Path = ta.Param(..., help="The SeqBank with the sequences for the RefSeq accessions."),
+        seqbank_output:Path = ta.Param(default=None, help="Where to save a new SeqBank containing only the sequences selected for the SeqTree."),
+        engine:str = ta.Param(default=None, help="The storage engine for the output SeqBank: 'rocksdict', 'lmdb' or 'speedict'. If not given, then RocksDict is used."),
+        render:Path = ta.Param(default=None, help="The path to render an image of the SeqTree."),
+        accessions:Path = ta.Param(default=None, help="The path to write a list of the accessions in the SeqTree."),
+        partitions:int = ta.Param(default=6, help="The number of cross-validation partitions."),
+        max_seqs:int = ta.Param(default=100, help="The maximum number of sequences for each leaf node. Use 0 for no limit."),
+        catalog:Path = ta.Param(default=None, help="The path to a RefSeq catalog. If not given, then the latest release is downloaded."),
+        ranks:str = ta.Param(default="superkingdom,kingdom,phylum,class,order", help="The comma-separated taxonomic ranks to include in the tree."),
+        restrict_ranks:str = ta.Param(default="class,order", help="The comma-separated ranks of the nodes which sequences can be assigned to."),
+        mitochondrion_ranks:str = ta.Param(default="", help="Overrides `ranks` for mitochondrion sequences."),
+        plastid_ranks:str = ta.Param(default="", help="Overrides `ranks` for plastid sequences."),
+        plasmid_ranks:str = ta.Param(default="", help="Overrides `ranks` for plasmid sequences."),
+        nuclear_ranks:str = ta.Param(default="", help="Overrides `ranks` for nuclear sequences."),
+        mitochondrion_restrict_ranks:str = ta.Param(default="", help="Overrides `restrict_ranks` for mitochondrion sequences."),
+        plastid_restrict_ranks:str = ta.Param(default="", help="Overrides `restrict_ranks` for plastid sequences."),
+        plasmid_restrict_ranks:str = ta.Param(default="", help="Overrides `restrict_ranks` for plasmid sequences."),
+        nuclear_restrict_ranks:str = ta.Param(default="", help="Overrides `restrict_ranks` for nuclear sequences."),
+        print_tree:bool = ta.Param(default=False, help="Whether or not to print the tree to the screen."),
+    ):
+        """
+        Builds a SeqTree from the RefSeq catalog for the accessions found in a SeqBank.
+
+        Each accession is placed in the taxonomic tree and assigned to a cross-validation partition.
+        """
+        from .refseq import refseq_to_seqtree
+
+        return refseq_to_seqtree(
+            output=output,
+            seqbank=seqbank,
+            seqbank_output=seqbank_output,
+            engine=engine,
+            render=render,
+            accessions=accessions,
+            partitions=partitions,
+            max_seqs=max_seqs,
+            catalog=catalog,
+            ranks=ranks,
+            restrict_ranks=restrict_ranks,
+            mitochondrion_ranks=mitochondrion_ranks,
+            plastid_ranks=plastid_ranks,
+            plasmid_ranks=plasmid_ranks,
+            nuclear_ranks=nuclear_ranks,
+            mitochondrion_restrict_ranks=mitochondrion_restrict_ranks,
+            plastid_restrict_ranks=plastid_restrict_ranks,
+            plasmid_restrict_ranks=plasmid_restrict_ranks,
+            nuclear_restrict_ranks=nuclear_restrict_ranks,
+            print_tree=print_tree,
+        )
