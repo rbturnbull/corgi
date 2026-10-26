@@ -57,16 +57,23 @@ def test_collate_fixed():
 ENGINES = ["rocksdict", "lmdb", "speedict"]
 
 
-def skip_if_unavailable(engine):
-    """ Skips the test if the engine's Python package is not installed (e.g. speedict on Python >= 3.13). """
+@pytest.fixture(params=ENGINES)
+def seqbank(request):
+    """
+    Opens the test SeqBank for each storage engine.
+
+    Skips if the engine's Python package is not installed (e.g. speedict on Python >= 3.13).
+    The SeqBank is closed afterwards because LMDB cannot open the same environment twice in one process.
+    """
+    engine = request.param
     pytest.importorskip(engine)
-
-
-@pytest.mark.parametrize("engine", ENGINES)
-def test_train_dataloader(engine):
-    skip_if_unavailable(engine)
-    seqtree = SeqTree.load(TEST_DATA/"seqtree.pkl")
     seqbank = SeqBank(TEST_DATA/f"seqbank.{engine}.sb", engine=engine)
+    yield seqbank
+    seqbank.close()
+
+
+def test_train_dataloader(seqbank):
+    seqtree = SeqTree.load(TEST_DATA/"seqtree.pkl")
     data = CorgiDataModule(
         seqtree=seqtree, 
         seqbank=seqbank, 
@@ -82,11 +89,8 @@ def test_train_dataloader(engine):
     assert y.shape == (2,)
 
 
-@pytest.mark.parametrize("engine", ENGINES)
-def test_val_dataloader(engine):
-    skip_if_unavailable(engine)
+def test_val_dataloader(seqbank):
     seqtree = SeqTree.load(TEST_DATA/"seqtree.pkl")
-    seqbank = SeqBank(TEST_DATA/f"seqbank.{engine}.sb", engine=engine)
     data = CorgiDataModule(
         seqtree=seqtree, 
         seqbank=seqbank, 
