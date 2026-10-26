@@ -1,3 +1,4 @@
+import pytest
 from pathlib import Path
 import torch
 from torch import Tensor
@@ -53,9 +54,19 @@ def test_collate_fixed():
     assert x[1].tolist() == [1,2,3,4,1,2,3,4,1,2,3,4,1,1,1] + [0]*5
 
 
-def test_train_dataloader():
+ENGINES = ["rocksdict", "lmdb", "speedict"]
+
+
+def skip_if_unavailable(engine):
+    """ Skips the test if the engine's Python package is not installed (e.g. speedict on Python >= 3.13). """
+    pytest.importorskip(engine)
+
+
+@pytest.mark.parametrize("engine", ENGINES)
+def test_train_dataloader(engine):
+    skip_if_unavailable(engine)
     seqtree = SeqTree.load(TEST_DATA/"seqtree.pkl")
-    seqbank = SeqBank(TEST_DATA/"seqbank.sb")
+    seqbank = SeqBank(TEST_DATA/f"seqbank.{engine}.sb", engine=engine)
     data = CorgiDataModule(
         seqtree=seqtree, 
         seqbank=seqbank, 
@@ -71,9 +82,11 @@ def test_train_dataloader():
     assert y.shape == (2,)
 
 
-def test_val_dataloader():
+@pytest.mark.parametrize("engine", ENGINES)
+def test_val_dataloader(engine):
+    skip_if_unavailable(engine)
     seqtree = SeqTree.load(TEST_DATA/"seqtree.pkl")
-    seqbank = SeqBank(TEST_DATA/"seqbank.sb")
+    seqbank = SeqBank(TEST_DATA/f"seqbank.{engine}.sb", engine=engine)
     data = CorgiDataModule(
         seqtree=seqtree, 
         seqbank=seqbank, 

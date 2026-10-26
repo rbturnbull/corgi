@@ -169,6 +169,20 @@ class CorgiTrainingDataset(Dataset):
     def __len__(self):
         return len(self.accessions)
 
+    def __getstate__(self):
+        # The SeqBank holds an open database handle and a lock which cannot be pickled
+        # (needed for DataLoader workers with the 'spawn' and 'forkserver' start methods).
+        # Send the path and engine instead and reopen it in the worker.
+        state = self.__dict__.copy()
+        seqbank = state.pop("seqbank")
+        state["_seqbank_args"] = (seqbank.path, seqbank.engine)
+        return state
+
+    def __setstate__(self, state):
+        path, engine = state.pop("_seqbank_args")
+        self.__dict__.update(state)
+        self.seqbank = SeqBank(path, engine=engine)
+
     def __getitem__(self, idx):
         accession = self.accessions[idx]
         data = self.seqbank[accession]

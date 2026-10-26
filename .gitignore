@@ -199,3 +199,5 @@ lightning_logs/
 seqtree-to-treedict.py
 change-checkpoint-model.py
 docshtml/
+Repbase-seqtree-new.st
+Repbase-seqtree.st
