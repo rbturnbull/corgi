@@ -23,11 +23,11 @@ jobs:
       matrix:
         python-version: ["3.11"]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Install poetry
       run: pipx install poetry
     - name: Initialise Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
         cache: "poetry"
@@ -50,7 +50,7 @@ jobs:
         folder: gh-pages # The folder the action should deploy.
     
     - name: Create Coverage Badge
-      uses: schneegans/dynamic-badges-action@v1.1.0
+      uses: schneegans/dynamic-badges-action@v1.9.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: ee1b52dd314d6441e0aabc0e1e50dc2c
