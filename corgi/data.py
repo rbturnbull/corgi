@@ -183,6 +183,17 @@ class CorgiTrainingDataset(Dataset):
         self.__dict__.update(state)
         self.seqbank = SeqBank(path, engine=engine)
 
+    def reopen_seqbank(self):
+        """
+        Closes the SeqBank and replaces it with a new one on the same path and engine.
+
+        Used in DataLoader workers so that each worker has its own database handle
+        rather than one inherited from the parent process by 'fork'.
+        """
+        seqbank = self.seqbank
+        seqbank.close()
+        self.seqbank = SeqBank(seqbank.path, engine=seqbank.engine)
+
     def __getitem__(self, idx):
         accession = self.accessions[idx]
         data = self.seqbank[accession]
@@ -197,6 +208,12 @@ class CorgiTrainingDataset(Dataset):
         array = torch.as_tensor(memoryview(data), dtype=torch.uint8)
 
         return torch.Tensor(array), self.seqtree[accession].node_id
+
+
+def seqbank_worker_init(worker_id:int):
+    """ Gives each DataLoader worker its own SeqBank handle (not shared with the parent process). """
+    worker_info = torch.utils.data.get_worker_info()
+    worker_info.dataset.reopen_seqbank()
 
 
 @dataclass
@@ -268,6 +285,7 @@ class CorgiDataModule(L.LightningDataModule):
             self.train_dataset, 
             batch_size=self.batch_size, 
             num_workers=self.num_workers, 
+            worker_init_fn=seqbank_worker_init,
             shuffle=True, 
             collate_fn=CollateRandomLength(self.minimum_length, self.maximum_length, skewness=self.skewness, loc=self.loc, scale=self.scale),
         )
@@ -277,6 +295,7 @@ class CorgiDataModule(L.LightningDataModule):
             self.val_dataset, 
             batch_size=self.batch_size, 
             num_workers=self.num_workers, 
+            worker_init_fn=seqbank_worker_init,
             shuffle=False, 
             collate_fn=CollateFixedLength(self.validation_length),
         )
