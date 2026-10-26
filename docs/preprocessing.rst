@@ -19,6 +19,7 @@ First, create a SeqBank with the sequences from RefSeq using the `seqbank <https
     seqbank refseq refseq.sb
 
 This will download each raw RefSeq file and save the data for each accession.
+By default, the SeqBank is stored with the RocksDict engine. Use the ``--engine`` option to choose another (see :ref:`seqbank-engines` below).
 
 Create the SeqTree
 ==================
@@ -42,6 +43,8 @@ The sequences for these accessions are copied to the new SeqBank ``corgi-max200.
 Each accession will be assigned to one of six partitions. We will use partition 0 as the test set and partitions 1–5 as the cross-validation partitions.
 
 Corgi was trained with the 225 release of RefSeq. If you want to explicitly give it a RefSeq catalog, then you can specify the path to it with the ``--catalog`` option. 
+
+.. _seqbank-engines:
 
 Choosing the SeqBank storage engine
 -----------------------------------
@@ -73,3 +76,9 @@ The ``--engine`` option only applies when a new SeqBank is created.
 When Corgi opens an existing SeqBank, it detects the engine automatically, 
 so no option is needed for training or for the other commands. 
 SeqBanks created before engines were introduced are treated as ``speedict`` banks.
+
+To change the engine of an existing SeqBank, use the ``seqbank convert`` command, which copies it to a new directory:
+
+.. code-block:: bash
+
+    seqbank convert corgi-max200.sb corgi-max200-lmdb.sb --engine lmdb
