@@ -14,7 +14,7 @@ def camisim(
     genomes_dir: Path = typer.Argument(..., help="The directory containing the genomes"),
     output_csv: Path = typer.Argument(..., help="The output CSV file path"),
 ):
-    """ Convert GSA mapping to a CSV file with Corgi and Tiara labels as columns. """
+    """Convert GSA mapping to a CSV file with Corgi and Tiara labels as columns."""
     df = pd.read_csv(mapping, sep="\t", compression="gzip")
     df['corgi_category'] = ""
     df['tiara_category'] = ""
@@ -40,14 +40,14 @@ def camisim(
             taxon_id = df[row]['taxon_id'].values[0]
             superkingdom = taxonomy.parent_rank(taxon_id, "superkingdom")
             df.loc[row, 'corgi_category'] = f"Nuclear/{superkingdom}"
-            tiara_category = superkingdom.lower()[:3]  
+            tiara_category = superkingdom.lower()[:3]
             if tiara_category not in ["bac", "arc", "euk"]:
                 tiara_category = "unk1"
             df.loc[row, 'tiara_category'] = tiara_category
 
-    print(f"Writing to {output_csv}")        
+    print(f"Writing to {output_csv}")
     df.to_csv(output_csv, index=False)
-    
-    
+
+
 if __name__ == "__main__":
     app()

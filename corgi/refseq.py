@@ -34,7 +34,7 @@ class DNAType(Enum):
 
     @classmethod
     def from_description(cls, description: str):
-        """ Convert a description to a DNAType. """
+        """Convert a description to a DNAType."""
         description = description.lower()
         if "mitochondrion" in description:
             return cls.MITOCHONDRION
@@ -53,20 +53,22 @@ def my_open(file):
     return open(file, "r")
 
 
-def line_count(file:Path):
-    """ Adapted from https://stackoverflow.com/a/9631635 """
+def line_count(file: Path):
+    """Adapted from https://stackoverflow.com/a/9631635"""
+
     def blocks(stream, size=65536):
         while True:
             b = stream.read(size)
-            if not b: break
+            if not b:
+                break
             yield b
 
     with my_open(file) as f:
         if isinstance(f, gzip.GzipFile):
-            count = (sum(bl.count(b"\n") for bl in track(blocks(f), description="Counting lines:")))
+            count = sum(bl.count(b"\n") for bl in track(blocks(f), description="Counting lines:"))
         else:
-            count = (sum(bl.count("\n") for bl in track(blocks(f), description="Counting lines:")))
-    
+            count = sum(bl.count("\n") for bl in track(blocks(f), description="Counting lines:"))
+
     return count
 
 
@@ -82,7 +84,7 @@ def get_catalogue() -> Path:
     filename = f"RefSeq-release{version}.catalog.gz"
     url = f"https://ftp.ncbi.nlm.nih.gov/refseq/release/release-catalog/{filename}"
 
-    local_path = Path(user_cache_dir("torchapps"))/"Corgi"/filename
+    local_path = Path(user_cache_dir("torchapps")) / "Corgi" / filename
     cached_download(url, local_path=local_path)
     return local_path
 
@@ -91,10 +93,10 @@ def get_node_at_rank(taxon, taxonomy, taxon_to_node, current_node, rank):
     current_id = taxonomy.parent_rank(taxon, rank)
     if not current_id:
         return current_node
-    
+
     if current_id in taxon_to_node:
         return taxon_to_node[current_id]
-    
+
     name = taxonomy.name(current_id)
     current_node = SoftmaxNode(name, parent=current_node, id=current_id, rank=rank, nseq=0)
     taxon_to_node[current_id] = current_node
@@ -111,26 +113,47 @@ def get_node(taxon, taxonomy, taxon_to_node, root, ranks):
 
 @app.command()
 def refseq_to_seqtree(
-    output:Annotated[Path, typer.Argument(help="The path to save the SeqTree.")],
-    seqbank:Annotated[Path, typer.Argument(help="The SeqBank with the sequences for the RefSeq accessions.")],
-    seqbank_output:Annotated[Optional[Path], typer.Option(help="Where to save a new SeqBank containing only the sequences selected for the SeqTree.")]=None,
-    engine:Annotated[Optional[str], typer.Option(help="The storage engine for the output SeqBank: 'rocksdict', 'lmdb' or 'speedict'. If not given, then RocksDict is used.")]=None,
-    render:Annotated[Optional[Path], typer.Option(help="The path to render an image of the SeqTree.")]=None,
-    accessions:Annotated[Optional[Path], typer.Option(help="The path to write a list of the accessions in the SeqTree.")]=None,
-    partitions:Annotated[int, typer.Option(help="The number of cross-validation partitions.")]=6,
-    max_seqs:Annotated[int, typer.Option(help="The maximum number of sequences for each leaf node. Use 0 for no limit.")]=100,
-    catalog:Annotated[Optional[Path], typer.Option(help="The path to a RefSeq catalog. If not given, then the latest release is downloaded.")]=None,
-    ranks:Annotated[str, typer.Option(help="The comma-separated taxonomic ranks to include in the tree.")]="superkingdom,kingdom,phylum,class,order",
-    restrict_ranks:Annotated[str, typer.Option(help="The comma-separated ranks of the nodes which sequences can be assigned to.")]="class,order",
-    mitochondrion_ranks:Annotated[str, typer.Option(help="Overrides `ranks` for mitochondrion sequences.")]="",
-    plastid_ranks:Annotated[str, typer.Option(help="Overrides `ranks` for plastid sequences.")]="",
-    plasmid_ranks:Annotated[str, typer.Option(help="Overrides `ranks` for plasmid sequences.")]="",
-    nuclear_ranks:Annotated[str, typer.Option(help="Overrides `ranks` for nuclear sequences.")]="",
-    mitochondrion_restrict_ranks:Annotated[str, typer.Option(help="Overrides `restrict_ranks` for mitochondrion sequences.")]="",
-    plastid_restrict_ranks:Annotated[str, typer.Option(help="Overrides `restrict_ranks` for plastid sequences.")]="",
-    plasmid_restrict_ranks:Annotated[str, typer.Option(help="Overrides `restrict_ranks` for plasmid sequences.")]="",
-    nuclear_restrict_ranks:Annotated[str, typer.Option(help="Overrides `restrict_ranks` for nuclear sequences.")]="",
-    print_tree:Annotated[bool, typer.Option(help="Whether or not to print the tree to the screen.")]=False,
+    output: Annotated[Path, typer.Argument(help="The path to save the SeqTree.")],
+    seqbank: Annotated[Path, typer.Argument(help="The SeqBank with the sequences for the RefSeq accessions.")],
+    seqbank_output: Annotated[
+        Optional[Path],
+        typer.Option(help="Where to save a new SeqBank containing only the sequences selected for the SeqTree."),
+    ] = None,
+    engine: Annotated[
+        Optional[str],
+        typer.Option(
+            help="The storage engine for the output SeqBank: 'rocksdict', 'lmdb' or 'speedict'. If not given, then RocksDict is used."
+        ),
+    ] = None,
+    render: Annotated[Optional[Path], typer.Option(help="The path to render an image of the SeqTree.")] = None,
+    accessions: Annotated[
+        Optional[Path], typer.Option(help="The path to write a list of the accessions in the SeqTree.")
+    ] = None,
+    partitions: Annotated[int, typer.Option(help="The number of cross-validation partitions.")] = 6,
+    max_seqs: Annotated[
+        int, typer.Option(help="The maximum number of sequences for each leaf node. Use 0 for no limit.")
+    ] = 100,
+    catalog: Annotated[
+        Optional[Path],
+        typer.Option(help="The path to a RefSeq catalog. If not given, then the latest release is downloaded."),
+    ] = None,
+    ranks: Annotated[
+        str, typer.Option(help="The comma-separated taxonomic ranks to include in the tree.")
+    ] = "superkingdom,kingdom,phylum,class,order",
+    restrict_ranks: Annotated[
+        str, typer.Option(help="The comma-separated ranks of the nodes which sequences can be assigned to.")
+    ] = "class,order",
+    mitochondrion_ranks: Annotated[str, typer.Option(help="Overrides `ranks` for mitochondrion sequences.")] = "",
+    plastid_ranks: Annotated[str, typer.Option(help="Overrides `ranks` for plastid sequences.")] = "",
+    plasmid_ranks: Annotated[str, typer.Option(help="Overrides `ranks` for plasmid sequences.")] = "",
+    nuclear_ranks: Annotated[str, typer.Option(help="Overrides `ranks` for nuclear sequences.")] = "",
+    mitochondrion_restrict_ranks: Annotated[
+        str, typer.Option(help="Overrides `restrict_ranks` for mitochondrion sequences.")
+    ] = "",
+    plastid_restrict_ranks: Annotated[str, typer.Option(help="Overrides `restrict_ranks` for plastid sequences.")] = "",
+    plasmid_restrict_ranks: Annotated[str, typer.Option(help="Overrides `restrict_ranks` for plasmid sequences.")] = "",
+    nuclear_restrict_ranks: Annotated[str, typer.Option(help="Overrides `restrict_ranks` for nuclear sequences.")] = "",
+    print_tree: Annotated[bool, typer.Option(help="Whether or not to print the tree to the screen.")] = False,
 ):
     """
     Builds a SeqTree from the RefSeq catalog for the accessions found in a SeqBank.
@@ -161,21 +184,21 @@ def refseq_to_seqtree(
         type_taxon_to_node[type_str] = {}
 
     rank_strings = dict(
-        mitochondrion = mitochondrion_ranks or ranks,
-        plastid = plastid_ranks or ranks,
-        plasmid = plasmid_ranks or ranks,
-        nuclear = nuclear_ranks or ranks,        
+        mitochondrion=mitochondrion_ranks or ranks,
+        plastid=plastid_ranks or ranks,
+        plasmid=plasmid_ranks or ranks,
+        nuclear=nuclear_ranks or ranks,
     )
 
     restrict_rank_strings = dict(
-        mitochondrion = mitochondrion_restrict_ranks or restrict_ranks,
-        plastid = plastid_restrict_ranks or restrict_ranks,
-        plasmid = plasmid_restrict_ranks or restrict_ranks,
-        nuclear = nuclear_restrict_ranks or restrict_ranks,        
+        mitochondrion=mitochondrion_restrict_ranks or restrict_ranks,
+        plastid=plastid_restrict_ranks or restrict_ranks,
+        plasmid=plasmid_restrict_ranks or restrict_ranks,
+        nuclear=nuclear_restrict_ranks or restrict_ranks,
     )
 
-    ranks_by_type = {k.title():v.split(",") for k,v in rank_strings.items()}
-    restrict_ranks_by_type = {k.title():v.split(",") for k,v in restrict_rank_strings.items()}
+    ranks_by_type = {k.title(): v.split(",") for k, v in rank_strings.items()}
+    restrict_ranks_by_type = {k.title(): v.split(",") for k, v in restrict_rank_strings.items()}
 
     print('Loading taxonomy...')
     taxonomy = NcbiTx()
@@ -212,7 +235,9 @@ def refseq_to_seqtree(
             type_str = str(type_obj)
 
             # Get the node for this taxon
-            node = get_node(taxon, taxonomy, type_taxon_to_node[type_str], type_nodes[type_str], ranks=ranks_by_type[type_str])
+            node = get_node(
+                taxon, taxonomy, type_taxon_to_node[type_str], type_nodes[type_str], ranks=ranks_by_type[type_str]
+            )
 
             # Skip if not in one of the allowed ranks (e.g. class, order)
             if node.rank not in restrict_ranks_by_type[type_str]:

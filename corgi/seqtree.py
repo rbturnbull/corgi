@@ -8,25 +8,24 @@ import hashlib
 import typer
 from rich.progress import track
 
-
 if TYPE_CHECKING:
     from hierarchicalsoftmax import SoftmaxNode
 
 
-def str_to_int_hash(s:str)->int:
+def str_to_int_hash(s: str) -> int:
     """Return a deterministic 32-bit integer seed from the string's MD5 hash."""
     hash_object = hashlib.md5(s.encode())
     hash_digest = hash_object.digest()
 
     # Convert the hash to an integer
     seed_number = int.from_bytes(hash_digest, 'big')
-    seed_number = seed_number % (2**32) # The maximum value is 2**32-1 for a numpy seed
+    seed_number = seed_number % (2**32)  # The maximum value is 2**32-1 for a numpy seed
 
     return seed_number
 
 
-def node_to_str(node:"SoftmaxNode") -> str:
-    """ 
+def node_to_str(node: "SoftmaxNode") -> str:
+    """
     Converts the node to a string
     """
     # return "/".join([str(n) for n in node.ancestors[1:]] + [str(node)])
@@ -39,9 +38,9 @@ def node_to_str(node:"SoftmaxNode") -> str:
 
 @define
 class SeqDetail:
-    partition:int
-    node:"SoftmaxNode" = field(default=None, eq=False)
-    node_id:int = None
+    partition: int
+    node: "SoftmaxNode" = field(default=None, eq=False)
+    node_id: int = None
 
     def __getstate__(self):
         """Return the partition and node ID for pickling, omitting the node object."""
@@ -65,7 +64,7 @@ class SeqTree(UserDict):
         super().__init__()
         self.classification_tree = classification_tree or SoftmaxNode("root")
 
-    def add(self, accession:str, node:"SoftmaxNode", partition:int):
+    def add(self, accession: str, node: "SoftmaxNode", partition: int):
         """Add an accession and return its sequence details.
 
         The node must belong to this classification tree. Raise AlreadyExists
@@ -75,7 +74,9 @@ class SeqTree(UserDict):
         if accession in self:
             old_node = self.node(accession)
             if not node == old_node:
-                raise AlreadyExists(f"Accession {accession} already exists in SeqTree at node {self.node(accession)}. Cannot change to {node}")
+                raise AlreadyExists(
+                    f"Accession {accession} already exists in SeqTree at node {self.node(accession)}. Cannot change to {node}"
+                )
 
         detail = SeqDetail(
             partition=partition,
@@ -84,7 +85,7 @@ class SeqTree(UserDict):
         self[accession] = detail
         return detail
 
-    def merge(self, other:"SeqTree"):
+    def merge(self, other: "SeqTree"):
         """Merge another SeqTree into this one in place.
 
         Nodes with the same name under matching parents are shared; missing
@@ -99,8 +100,7 @@ class SeqTree(UserDict):
 
         # Resolve saved node IDs before changing the tree's indexes.
         existing_nodes = {accession: self.node(accession) for accession in self}
-        incoming = [(accession, other.node(accession), detail.partition)
-                    for accession, detail in other.items()]
+        incoming = [(accession, other.node(accession), detail.partition) for accession, detail in other.items()]
         source_nodes = list(other.classification_tree.pre_order_iter())
         for node in self.classification_tree.pre_order_iter():
             node.readonly = False
@@ -111,9 +111,14 @@ class SeqTree(UserDict):
             parent = node_map[node.parent]
             match = next((child for child in parent.children if child.name == node.name), None)
             if match is None:
-                match = SoftmaxNode(node.name, parent=parent, alpha=node.alpha,
-                                    weight=node.weight, label_smoothing=node.label_smoothing,
-                                    gamma=node.gamma)
+                match = SoftmaxNode(
+                    node.name,
+                    parent=parent,
+                    alpha=node.alpha,
+                    weight=node.weight,
+                    label_smoothing=node.label_smoothing,
+                    gamma=node.gamma,
+                )
             node_map[node] = match
 
         for accession, node in existing_nodes.items():
@@ -129,7 +134,7 @@ class SeqTree(UserDict):
             if detail.node:
                 detail.node_id = self.classification_tree.node_to_id[detail.node]
 
-    def save(self, path:Path):
+    def save(self, path: Path):
         """Index and pickle this SeqTree, creating parent directories as needed."""
         path = Path(path)
         path.parent.mkdir(exist_ok=True, parents=True)
@@ -139,36 +144,37 @@ class SeqTree(UserDict):
             pickle.dump(self, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     @classmethod
-    def load(self, path:Path):
+    def load(self, path: Path):
         """Load and return a SeqTree from a pickle file."""
         with open(path, 'rb') as handle:
             return pickle.load(handle)
 
-    def node(self, accession:str):
+    def node(self, accession: str):
         """Return an accession's node, resolving its stored node ID if necessary."""
         detail = self[accession]
         if detail.node is not None:
             return detail.node
         return self.classification_tree.node_list[detail.node_id]
-    
-    def accessions_in_partition(self, partition:int):
+
+    def accessions_in_partition(self, partition: int):
         """Yield accessions assigned to the given partition."""
         for accession, detail in self.items():
             if detail.partition == partition:
                 yield accession
 
-    def set_partition(self, pattern:str, partition:int):
+    def set_partition(self, pattern: str, partition: int):
         """Assign the partition to accessions matching a shell-style pattern."""
         import fnmatch
+
         for accession in self.keys():
             if fnmatch.fnmatch(accession, pattern):
                 self[accession].partition = partition
 
-    def accessions(self, partition:int|None = None):
+    def accessions(self, partition: int | None = None):
         """Return all accession keys or an iterator over the requested partition."""
         return self.keys() if partition is None else self.accessions_in_partition(partition)
-    
-    def prune(self, max_depth:int) -> "SeqTree":
+
+    def prune(self, max_depth: int) -> "SeqTree":
         """
         Prunes the tree to a maximum depth.
         """
@@ -177,7 +183,7 @@ class SeqTree(UserDict):
             node = self.node(accession)
             ancestors = node.ancestors
             if len(ancestors) >= max_depth:
-                node = ancestors[max_depth-1]
+                node = ancestors[max_depth - 1]
             new_tree.add(accession, node, self[accession].partition)
 
         # Remove any nodes that beyond the max depth
@@ -190,10 +196,18 @@ class SeqTree(UserDict):
         new_tree.set_indexes()
 
         return new_tree
-            
-    def export(self, seqbank:"SeqBank", output:Path|str, length:int=0, format:str="", seed:int=0, partition:int|None=None):
+
+    def export(
+        self,
+        seqbank: "SeqBank",
+        output: Path | str,
+        length: int = 0,
+        format: str = "",
+        seed: int = 0,
+        partition: int | None = None,
+    ):
         """
-        Outputs sequences from a seqbank into a file. 
+        Outputs sequences from a seqbank into a file.
 
         If the partition is given then only the accessions in the partition are exported.
         The format of the exported file. If not given, then it will be inferred from the file extension of the output.
@@ -204,7 +218,7 @@ class SeqTree(UserDict):
         """
         import numpy as np
         from Bio.Seq import Seq
-        from Bio import SeqIO        
+        from Bio import SeqIO
         from Bio.SeqRecord import SeqRecord
         from seqbank.transform import bytes_to_str
         from seqbank.io import get_file_format
@@ -216,7 +230,7 @@ class SeqTree(UserDict):
 
                 if partition is not None and detail.partition != partition:
                     continue
-                
+
                 node = self.node(accession)
                 # If the sequence is long enough, take a random slice
                 if length and length > len(data):
@@ -224,7 +238,7 @@ class SeqTree(UserDict):
                     my_seed = seed + str_to_int_hash(accession)
                     np.random.seed(my_seed % 2**32)
                     start = np.random.randint(0, start_max)
-                    data = data[start:start+length]
+                    data = data[start : start + length]
 
                 seq_string = bytes_to_str(data)
                 node_str = node_to_str(node)
@@ -235,9 +249,9 @@ class SeqTree(UserDict):
                 )
 
                 SeqIO.write(record, f, format)
-    
+
     def add_counts(self):
-        """ Adds a count to each node in the tree. """
+        """Adds a count to each node in the tree."""
         for node in self.classification_tree.post_order_iter():
             node.count = 0
 
@@ -246,7 +260,7 @@ class SeqTree(UserDict):
             node.count += 1
 
     def add_partition_counts(self):
-        """ Adds a count to each node in the tree. """
+        """Adds a count to each node in the tree."""
         for node in self.classification_tree.post_order_iter():
             node.partition_counts = Counter()
 
@@ -255,12 +269,14 @@ class SeqTree(UserDict):
             partition = detail.partition
             node.partition_counts[partition] += 1
 
-    def render(self, count:bool=False, partition_counts:bool=False, **kwargs):
-        """ Renders the SeqTree. """
+    def render(self, count: bool = False, partition_counts: bool = False, **kwargs):
+        """Renders the SeqTree."""
         if partition_counts:
             self.add_partition_counts()
             for node in self.classification_tree.post_order_iter():
-                partition_counts_str = "; ".join([f"{k}->{node.partition_counts[k]}" for k in sorted(node.partition_counts.keys())])
+                partition_counts_str = "; ".join(
+                    [f"{k}->{node.partition_counts[k]}" for k in sorted(node.partition_counts.keys())]
+                )
                 node.render_str = f"{node.name} {partition_counts_str}"
             kwargs['attr'] = "render_str"
         elif count:
@@ -271,7 +287,7 @@ class SeqTree(UserDict):
             kwargs['attr'] = "render_str"
 
         return self.classification_tree.render(**kwargs)
-    
+
     def sunburst(self, **kwargs) -> "go.Figure":
         """
         Renders the SeqTree as a sunburst plot.
@@ -292,26 +308,28 @@ class SeqTree(UserDict):
             parents.append(node.parent.name if node.parent else "")
             values.append(node.count)
 
-        fig = go.Figure(go.Sunburst(
-            labels=labels,
-            parents=parents,
-            values=values,
-            branchvalues="remainder",
-        ))
-        
+        fig = go.Figure(
+            go.Sunburst(
+                labels=labels,
+                parents=parents,
+                values=values,
+                branchvalues="remainder",
+            )
+        )
+
         fig.update_layout(margin=dict(t=10, l=10, r=10, b=10), **kwargs)
         return fig
 
-    def accessions_to_file(self, file:Path) -> None:
-        """ Writes all the accessions of this SeqTree to a file. """
+    def accessions_to_file(self, file: Path) -> None:
+        """Writes all the accessions of this SeqTree to a file."""
         with open(file, "w") as f:
             for accession in self.keys():
                 print(accession, file=f)
 
-    def intersection_seqbank(self, seqbank:"SeqBank") -> List[str]:
-        """ 
-        Removes any accession that is not found in a SeqBank. 
-        
+    def intersection_seqbank(self, seqbank: "SeqBank") -> List[str]:
+        """
+        Removes any accession that is not found in a SeqBank.
+
         Returns a list of missing accessions.
         """
         my_accessions = self.keys()
@@ -320,22 +338,22 @@ class SeqTree(UserDict):
             del self[accession]
         return missing
 
-    def pickle_tree(self, output:Path):
+    def pickle_tree(self, output: Path):
         """Write the classification tree to a pickle file."""
         with open(output, 'wb') as pickle_file:
             pickle.dump(self.classification_tree, pickle_file)
 
 
-
 app = typer.Typer()
+
 
 @app.command()
 def intersection_seqbank(
-    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
-    seqbank:Path = typer.Argument(...,help="The path to the SeqBank."), 
-    output:Path = typer.Argument(...,help="The path to the SeqBank."),
+    seqtree: Path = typer.Argument(..., help="The path to the SeqTree."),
+    seqbank: Path = typer.Argument(..., help="The path to the SeqBank."),
+    output: Path = typer.Argument(..., help="The path to the SeqBank."),
 ):
-    """ 
+    """
     Takes a SeqTree and removes any accession that is not found in a SeqBank.
 
     Saves the output SeqTree to `output`.
@@ -350,28 +368,34 @@ def intersection_seqbank(
 
 @app.command()
 def accessions(
-    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
-    partition:Optional[int] = typer.Option(None,help="The index of the partition to list."), 
+    seqtree: Path = typer.Argument(..., help="The path to the SeqTree."),
+    partition: Optional[int] = typer.Option(None, help="The index of the partition to list."),
 ):
-    """ 
-    Prints a list of accessions in a SeqTree. 
-    
+    """
+    Prints a list of accessions in a SeqTree.
+
     If a partition is given, then only the accessions for that partition are given.
     """
     seqtree = SeqTree.load(seqtree)
     for accession in seqtree.accessions(partition=partition):
         print(accession)
-    
+
 
 @app.command()
 def export(
-    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
-    seqbank:Path = typer.Argument(...,help="The path to the SeqBank."), 
-    output:Path = typer.Argument(...,help="The path to the output file."), 
-    length:int = typer.Option(None,help="If used then a subsequence this maximum length is selected."),
-    seed:int = typer.Option(42,help="The random seed to use when slicing the length."),
-    partition:Optional[int] = typer.Option(None,help="The index of the partition to include in the export. If not given then all accesions will be exported."), 
-    format:str = typer.Option("",help="The format of the exported file. If not given, then it will be inferred from the file extension of the output."), 
+    seqtree: Path = typer.Argument(..., help="The path to the SeqTree."),
+    seqbank: Path = typer.Argument(..., help="The path to the SeqBank."),
+    output: Path = typer.Argument(..., help="The path to the output file."),
+    length: int = typer.Option(None, help="If used then a subsequence this maximum length is selected."),
+    seed: int = typer.Option(42, help="The random seed to use when slicing the length."),
+    partition: Optional[int] = typer.Option(
+        None,
+        help="The index of the partition to include in the export. If not given then all accesions will be exported.",
+    ),
+    format: str = typer.Option(
+        "",
+        help="The format of the exported file. If not given, then it will be inferred from the file extension of the output.",
+    ),
 ):
     """Export sequences with accession and classification labels from a SeqBank.
 
@@ -387,11 +411,13 @@ def export(
 
 @app.command()
 def render(
-    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
-    output:Optional[Path] = typer.Option(None, help="The path to save the rendered tree."),
-    print:bool = typer.Option(True, help="Whether or not to print the tree to the screen."),
-    count:bool = typer.Option(False, help="Whether or not to print the count of accessions at each node."),
-    partition_counts:bool = typer.Option(False, help="Whether or not to print the count of each partition at each node."),
+    seqtree: Path = typer.Argument(..., help="The path to the SeqTree."),
+    output: Optional[Path] = typer.Option(None, help="The path to save the rendered tree."),
+    print: bool = typer.Option(True, help="Whether or not to print the tree to the screen."),
+    count: bool = typer.Option(False, help="Whether or not to print the count of accessions at each node."),
+    partition_counts: bool = typer.Option(
+        False, help="Whether or not to print the count of each partition at each node."
+    ),
 ):
     """Render a saved SeqTree, optionally displaying or saving accession counts."""
     seqtree = SeqTree.load(seqtree)
@@ -400,7 +426,7 @@ def render(
 
 @app.command()
 def count(
-    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
+    seqtree: Path = typer.Argument(..., help="The path to the SeqTree."),
 ):
     """Print the number of accessions in a saved SeqTree."""
     seqtree = SeqTree.load(seqtree)
@@ -409,11 +435,11 @@ def count(
 
 @app.command()
 def sunburst(
-    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
-    show:bool = typer.Option(False, help="Whether or not to show the plot."),
-    output:Path = typer.Option(None, help="The path to save the rendered tree."),
-    width:int = typer.Option(1000, help="The width of the plot."),
-    height:int = typer.Option(0, help="The height of the plot. If 0 then it will be calculated based on the width."),
+    seqtree: Path = typer.Argument(..., help="The path to the SeqTree."),
+    show: bool = typer.Option(False, help="Whether or not to show the plot."),
+    output: Path = typer.Option(None, help="The path to save the rendered tree."),
+    width: int = typer.Option(1000, help="The width of the plot."),
+    height: int = typer.Option(0, help="The height of the plot. If 0 then it will be calculated based on the width."),
 ):
     """Plot accession counts as a sunburst and optionally display or save it.
 
@@ -426,13 +452,14 @@ def sunburst(
     fig = seqtree.sunburst(width=width, height=height)
     if show:
         fig.show()
-    
+
     if output:
         output = Path(output)
         output.parent.mkdir(exist_ok=True, parents=True)
 
         # https://github.com/plotly/plotly.py/issues/3469
-        import plotly.io as pio   
+        import plotly.io as pio
+
         pio.kaleido.scope.mathjax = None
 
         output_func = fig.write_html if output.suffix.lower() == ".html" else fig.write_image
@@ -441,9 +468,9 @@ def sunburst(
 
 @app.command()
 def prune(
-    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."), 
-    max_depth:int = typer.Argument(...,help="The maximum depth to prune the tree."),
-    output:Path = typer.Argument(...,help="The path to the output file."),
+    seqtree: Path = typer.Argument(..., help="The path to the SeqTree."),
+    max_depth: int = typer.Argument(..., help="The maximum depth to prune the tree."),
+    output: Path = typer.Argument(..., help="The path to the output file."),
 ):
     """
     Prunes the tree to a maximum depth.
@@ -455,19 +482,19 @@ def prune(
 
 @app.command()
 def layer_size(
-    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."),         
+    seqtree: Path = typer.Argument(..., help="The path to the SeqTree."),
 ):
     """
     Prints the size of the neural network layer to predict the classification tree.
-    """    
+    """
     seqtree = SeqTree.load(seqtree)
     print(seqtree.classification_tree.layer_size)
 
 
 @app.command()
 def pickle_tree(
-    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."),    
-    output:Path = typer.Argument(...,help="The path to the output pickle file."),     
+    seqtree: Path = typer.Argument(..., help="The path to the SeqTree."),
+    output: Path = typer.Argument(..., help="The path to the output pickle file."),
 ):
     """Extract the classification tree from a saved SeqTree into a pickle file."""
     seqtree = SeqTree.load(seqtree)
@@ -476,10 +503,10 @@ def pickle_tree(
 
 @app.command()
 def set_partition(
-    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."),    
-    pattern:str = typer.Argument(...,help="The pattern to match accessions."),     
-    partition:int = typer.Argument(...,help="The partition to set for matching accessions."),     
-    output:Path = typer.Argument(...,help="The path to the output file."),
+    seqtree: Path = typer.Argument(..., help="The path to the SeqTree."),
+    pattern: str = typer.Argument(..., help="The pattern to match accessions."),
+    partition: int = typer.Argument(..., help="The partition to set for matching accessions."),
+    output: Path = typer.Argument(..., help="The path to the output file."),
 ):
     """Set the partition for accessions matching a shell-style pattern and save."""
     seqtree = SeqTree.load(seqtree)
@@ -489,9 +516,9 @@ def set_partition(
 
 @app.command()
 def merge(
-    seqtree:Path = typer.Argument(...,help="The path to the SeqTree."),    
-    other:Path = typer.Argument(...,help="The path to the other SeqTree."),     
-    output:Path = typer.Argument(...,help="The path to the output file."),
+    seqtree: Path = typer.Argument(..., help="The path to the SeqTree."),
+    other: Path = typer.Argument(..., help="The path to the other SeqTree."),
+    output: Path = typer.Argument(..., help="The path to the output file."),
 ):
     """Merge another SeqTree into this one and save."""
     seqtree = SeqTree.load(seqtree)

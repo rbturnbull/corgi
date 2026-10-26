@@ -31,6 +31,7 @@ class TensorDNA(TensorBase):
 
     def as_biopython(self):
         from Bio.Seq import Seq
+
         return Seq(self.as_chars())
 
 

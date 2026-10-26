@@ -8,7 +8,7 @@ from pathlib import Path
 
 from Bio import SeqIO
 from fastcore.foundation import mask2idxs
-from fastai.data.transforms import IndexSplitter 
+from fastai.data.transforms import IndexSplitter
 
 from fastcore.foundation import L
 from fastcore.dispatch import typedispatch
@@ -24,13 +24,11 @@ from .transforms import PadBatchX, DeterministicSliceBatch, GetXY, RandomSliceBa
 from .seqtree import SeqTree
 
 
-
-def open_path(path:Path):
+def open_path(path: Path):
     path = Path(path)
     if path.suffix == ".gz":
         return gzip.open(path, "rt")
     return open(path, "rt")
-
 
 
 @typedispatch
@@ -46,7 +44,16 @@ def show_batch(x: TensorDNA, y, samples, ctxs=None, max_n=20, trunc_at=150, **kw
 
 
 class SeqIODataloader:
-    def __init__(self, files, device, batch_size:int=1, min_length:int=128, max_length:int=5_000, max_seqs:int=None, format:str=""):
+    def __init__(
+        self,
+        files,
+        device,
+        batch_size: int = 1,
+        min_length: int = 128,
+        max_length: int = 5_000,
+        max_seqs: int = None,
+        format: str = "",
+    ):
         self.files = list(files)
         self.device = device
         self.format = format
@@ -66,15 +73,14 @@ class SeqIODataloader:
                 if self.max_seqs and seqs >= self.max_seqs:
                     break
 
-                chunks = len(record.seq)//self.max_length + 1
+                chunks = len(record.seq) // self.max_length + 1
                 self.count += chunks
                 seqs += 1
-
 
     def get_file_format(self, file):
         if self.format:
             return self.format
-        
+
         file = Path(file)
         suffix = file.suffix.lower()
 
@@ -91,7 +97,7 @@ class SeqIODataloader:
             return "fastq"
 
         raise ValueError(f"Cannot determine file format of {file}.")
-    
+
     def __len__(self):
         return self.count
 
@@ -117,10 +123,10 @@ class SeqIODataloader:
 
                 seqs += 1
                 t = dna_seq_to_tensor(record.seq)
-                chunks = len(t)//self.max_length + 1
+                chunks = len(t) // self.max_length + 1
 
                 for chunk_index, chunk in enumerate(t.chunk(chunks)):
-                    self.chunk_details.append( (file, record.id, chunk_index) )
+                    self.chunk_details.append((file, record.id, chunk_index))
                     batch.append(chunk)
                     if len(batch) >= self.batch_size:
                         batch = self.pad(batch)
@@ -133,7 +139,7 @@ class SeqIODataloader:
 
 
 class HierarchicalDataloader(TfmdDL):
-    def __init__(self, seqtree:SeqTree, exclude_partition:int=None, seed:int=42, batch_size=None, **kwargs):
+    def __init__(self, seqtree: SeqTree, exclude_partition: int = None, seed: int = 42, batch_size=None, **kwargs):
         # Later put in seqbank:SeqBank
         classification_tree = seqtree.classification_tree
         self.seqtree = seqtree
@@ -146,12 +152,12 @@ class HierarchicalDataloader(TfmdDL):
         # Add items to nodes
         for node in classification_tree.post_order_iter():
             node.idxs = set()
-    
+
         # Loop Through Tree and add accessions
-        for accession, detail in seqtree.items(): # should this be self.items
+        for accession, detail in seqtree.items():  # should this be self.items
             if exclude_partition is not None and exclude_partition == detail.partition:
                 continue
-            
+
             node = seqtree.node(accession)
 
             # Only allow leaf/tip nodes to have items
@@ -166,18 +172,16 @@ class HierarchicalDataloader(TfmdDL):
         random.seed(seed)
         for node in classification_tree.post_order_iter():
             if node.children:
-                child_min_items_before_repeat = min([
-                    child.min_items_before_repeat 
-                    for child in node.children 
-                    if child.min_items_before_repeat
-                ])
+                child_min_items_before_repeat = min(
+                    [child.min_items_before_repeat for child in node.children if child.min_items_before_repeat]
+                )
                 node.min_items_before_repeat = child_min_items_before_repeat * len(node.children)
             elif node.idxs:
-                node.min_items_before_repeat = len(node.idxs)  
+                node.min_items_before_repeat = len(node.idxs)
             else:
                 node.min_items_before_repeat = None
 
-            # Initialize queue            
+            # Initialize queue
             node.queue = None
 
         super().__init__(dataset=dataset, batch_size=batch_size, **kwargs)
@@ -186,7 +190,7 @@ class HierarchicalDataloader(TfmdDL):
     def node_queue(self, node):
         if not node.queue:
             node.queue = list(node.idxs) if node.idxs else list(node.children)
-            random.shuffle(node.queue)  
+            random.shuffle(node.queue)
 
         return node.queue
 
@@ -200,11 +204,11 @@ class HierarchicalDataloader(TfmdDL):
 
         if not queue:
             return None
-        
+
         item = queue.pop()
         if isinstance(item, SoftmaxNode):
             return self.next_idx(item)
-        
+
         return item
 
     def get_idxs(self) -> List[int]:
@@ -217,32 +221,32 @@ class HierarchicalDataloader(TfmdDL):
             if next_index:
                 indexes.append(next_index)
         return indexes
-        
+
 
 def create_hierarchical_training_dataloader(
-    seqtree:SeqTree, 
-    seqbank:SeqBank, 
-    batch_size:int, 
-    validation_partition:int, 
-    minimum: int = 150, 
+    seqtree: SeqTree,
+    seqbank: SeqBank,
+    batch_size: int,
+    validation_partition: int,
+    minimum: int = 150,
     maximum: int = 3_000,
 ) -> HierarchicalDataloader:
     return HierarchicalDataloader(
-        seqtree=seqtree, 
-        batch_size=batch_size, 
+        seqtree=seqtree,
+        batch_size=batch_size,
         exclude_partition=validation_partition,
         after_item=GetXY(seqbank=seqbank, seqtree=seqtree),
         before_batch=RandomSliceBatch(maximum=maximum, minimum=minimum),
-    )   
+    )
 
 
 class CorgiDataloaders(DataLoaders):
     def __init__(
-        self, 
-        *loaders, # `DataLoader` objects to wrap
-        path:str='.', # Path to store export objects
-        device=None, # Device to put `DataLoaders`
-        classification_tree:SoftmaxNode=None,
+        self,
+        *loaders,  # `DataLoader` objects to wrap
+        path: str = '.',  # Path to store export objects
+        device=None,  # Device to put `DataLoaders`
+        classification_tree: SoftmaxNode = None,
     ):
         super().__init__(*loaders, path=path, device=device)
         self.classification_tree = classification_tree
@@ -253,11 +257,11 @@ class CorgiDataloaders(DataLoaders):
 
 
 def create_training_dataloader(
-    seqtree:SeqTree, 
-    seqbank:SeqBank, 
-    batch_size:int, 
-    validation_partition:int, 
-    minimum: int = 150, 
+    seqtree: SeqTree,
+    seqbank: SeqBank,
+    batch_size: int,
+    validation_partition: int,
+    minimum: int = 150,
     maximum: int = 3_000,
     max_seqs: int = 0,
 ) -> TfmdDL:
@@ -271,19 +275,19 @@ def create_training_dataloader(
 
     return TfmdDL(
         dataset=accessions,
-        batch_size=batch_size, 
+        batch_size=batch_size,
         shuffle=True,
         after_item=GetXY(seqbank=seqbank, seqtree=seqtree, maximum=maximum, deterministic=False),
         before_batch=RandomSliceBatch(maximum=maximum, minimum=minimum),
-    )   
+    )
 
 
 def create_validation_dataloader(
-    seqtree:SeqTree, 
-    seqbank:SeqBank, 
-    batch_size:int, 
-    validation_partition:int, 
-    validation_length:int,
+    seqtree: SeqTree,
+    seqbank: SeqBank,
+    batch_size: int,
+    validation_partition: int,
+    validation_length: int,
     max_seqs: int = 0,
 ) -> TfmdDL:
     accessions = []
@@ -296,43 +300,42 @@ def create_validation_dataloader(
 
     return TfmdDL(
         dataset=accessions,
-        batch_size=batch_size, 
+        batch_size=batch_size,
         shuffle=False,
         after_item=GetXY(seqbank=seqbank, seqtree=seqtree, maximum=validation_length, deterministic=True),
         before_batch=PadBatch(),
-    )   
+    )
 
 
 def create_dataloaders(
-    seqtree:SeqTree, 
-    seqbank:SeqBank, 
-    batch_size:int, 
-    validation_partition:int,
-    validation_length:int=1_000,    
-    minimum: int = 150, 
-    maximum: int = 3_000, 
+    seqtree: SeqTree,
+    seqbank: SeqBank,
+    batch_size: int,
+    validation_partition: int,
+    validation_length: int = 1_000,
+    minimum: int = 150,
+    maximum: int = 3_000,
     hierarchical: bool = False,
-    max_seqs:int = 0,
-) -> CorgiDataloaders:    
+    max_seqs: int = 0,
+) -> CorgiDataloaders:
     training_dataloader_func = create_hierarchical_training_dataloader if hierarchical else create_training_dataloader
     train_dl = training_dataloader_func(
-        seqtree=seqtree, 
-        seqbank=seqbank, 
+        seqtree=seqtree,
+        seqbank=seqbank,
         batch_size=batch_size,
         validation_partition=validation_partition,
-        minimum=minimum, 
-        maximum=maximum, 
+        minimum=minimum,
+        maximum=maximum,
         max_seqs=max_seqs,
     )
 
     valid_dl = create_validation_dataloader(
-        seqtree=seqtree, 
-        seqbank=seqbank, 
+        seqtree=seqtree,
+        seqbank=seqbank,
         batch_size=batch_size,
-        validation_length=validation_length, 
+        validation_length=validation_length,
         validation_partition=validation_partition,
         max_seqs=max_seqs,
     )
     dls = CorgiDataloaders(train_dl, valid_dl, classification_tree=seqtree.classification_tree)
     return dls
-

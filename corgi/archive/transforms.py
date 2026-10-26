@@ -17,25 +17,22 @@ from ..seqtree import SeqTree
 
 
 class SplitTransform(Transform):
-    """ 
+    """
     Only performs the transform if the split index matches `only_split_index`
     """
+
     def __init__(self, only_split_index=None, **kwargs):
         super().__init__(**kwargs)
         self.current_split_idx = None
         self.only_split_index = only_split_index
 
-    def __call__(self, 
-        b, 
-        split_idx:int=None, # Index of the train/valid dataset
-        **kwargs
-    ):
+    def __call__(self, b, split_idx: int = None, **kwargs):  # Index of the train/valid dataset
         if self.only_split_index == split_idx or self.only_split_index is None:
             return super().__call__(b, split_idx=split_idx, **kwargs)
         return b
 
 
-def slice_tensor(tensor, size, start_index=None, pad:bool=True):
+def slice_tensor(tensor, size, start_index=None, pad: bool = True):
     original_length = tensor.shape[0]
     if start_index is None:
         if original_length <= size:
@@ -85,7 +82,7 @@ class CharsToTensorDNA(Transform):
 
 @dataclass
 class GetTensorDNA(Transform):
-    seqbank:SeqBank
+    seqbank: SeqBank
 
     def encodes(self, accession: str):
         array = torch.frombuffer(self.seqbank[accession], dtype=torch.uint8)
@@ -94,10 +91,10 @@ class GetTensorDNA(Transform):
 
 @dataclass
 class GetXY(Transform):
-    seqbank:SeqBank
-    seqtree:SeqTree
-    deterministic:bool=False
-    maximum:Optional[int]=None
+    seqbank: SeqBank
+    seqtree: SeqTree
+    deterministic: bool = False
+    maximum: Optional[int] = None
 
     def encodes(self, accession: str):
         data = self.seqbank[accession]
@@ -107,7 +104,7 @@ class GetXY(Transform):
         if self.maximum and length > self.maximum:
             rng = np.random.RandomState(adler32(accession.encode("ascii"))) if self.deterministic else np.random
             start_index = rng.randint(0, length - self.maximum)
-            data = data[start_index:start_index+self.maximum]
+            data = data[start_index : start_index + self.maximum]
 
         array = torch.frombuffer(data, dtype=torch.uint8)
         return TensorDNA(array), self.seqtree[accession].node_id
@@ -189,7 +186,7 @@ class PadBatchX(Transform):
         def pad(tensor):
             return slice_tensor(tensor, max_len).unsqueeze(dim=0)
 
-        return torch.cat(list(map(pad, batch))),
+        return (torch.cat(list(map(pad, batch))),)
 
 
 class DeformBatch(SplitTransform):
@@ -209,16 +206,16 @@ class DeformBatch(SplitTransform):
     #     weights = torch.cat( [probability_same, (1-probability_same).repeat(1,alt_states)/alt_states], dim=1)
     #     batch += torch.multinomial(weights, batch.shape[1], replacement=True)
     #     batch = batch % self.states
-        
+
     #     print(weights)
     #     return batch
 
     def deform(self, tensor):
         times = self.distribution.sample()
-        alt_states = self.states-1
-        probability_same = 1.0/self.states + alt_states/self.states * torch.exp(-times)
+        alt_states = self.states - 1
+        probability_same = 1.0 / self.states + alt_states / self.states * torch.exp(-times)
         # weights = torch.cat( [probability_same, (1-probability_same).repeat(1,alt_states)/alt_states], dim=1)
-        weights = torch.as_tensor([probability_same] + alt_states * [(1-probability_same)/alt_states])
+        weights = torch.as_tensor([probability_same] + alt_states * [(1 - probability_same) / alt_states])
         x = tensor[0] + torch.multinomial(weights, len(tensor[0]), replacement=True)
         x = x % self.states
 

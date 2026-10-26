@@ -4,7 +4,6 @@ import typer
 import torchapp as ta
 from rich.console import Console
 
-
 if TYPE_CHECKING:
     from torch import nn
     import pandas as pd
@@ -48,21 +47,12 @@ def output_results_bar_chart(predictions: "pd.Series", top_k: int = 10, bar_size
         count = sum(original_value_counts.iloc[top_k:])
         proportion = count / len(predictions)
         bar = "█" * int(proportion * bar_size)
-        table.add_row(
-            "Other Categories",
-            f"{bar} {proportion:.1%}",
-            f"{count}"
-        )
+        table.add_row("Other Categories", f"{bar} {proportion:.1%}", f"{count}")
     # Add line
     table.add_row('────────────────────', '─' * bar_size, '─' * 10, style="red")
-    table.add_row(
-        "Total",
-        "",
-        f"{len(predictions)}"
-    )
+    table.add_row("Total", "", f"{len(predictions)}")
 
     console.print(table)
-
 
 
 def set_alphas_with_phi(tree, phi=1.0):
@@ -76,24 +66,43 @@ class Corgi(ta.TorchApp):
     """
     corgi - Classifier for ORganelle Genomes (Inter alia)
     """
+
     @ta.method
     def data(
         self,
         seqtree: Path = ta.Param(..., help="The seqtree which has the sequences to use."),
         seqbank: Path = ta.Param(..., help="The seqbank file with the sequences."),
-        validation_partition:int = ta.Param(default=0, help="The partition to use for validation."),
+        validation_partition: int = ta.Param(default=0, help="The partition to use for validation."),
         batch_size: int = ta.Param(default=32, help="The batch size."),
-        validation_length:int = ta.Param(default=1_000, help="The standard length of sequences to use for validation."),
-        phi:float=ta.Param(default=1.0, tune=True, tune_min=0.8, tune_max=1.2, help="A multiplication factor for the loss at each level of the tree."),
-        test_partition:int = ta.Param(default=-1, help="The partition to retain for testing (by default, -1 so that it is not used)."),
-        minimum_length: int = ta.Param(default=150, help="The minimum length to truncate sequences in a training batch."),
-        maximum_length: int = ta.Param(default=3_000, help="The maximum length to truncate sequences in a training batch."),
-        skewness:float = ta.Param(default=5, help="The skewness of the distribution of sequence lengths in a batch."),
-        loc:float = ta.Param(default=600, help="A parameter to shift the centre of the distribution of sequence lengths."),
-        scale:float = ta.Param(default=1000, help="A parameter to scale the distribution of sequence lengths."),
+        validation_length: int = ta.Param(
+            default=1_000, help="The standard length of sequences to use for validation."
+        ),
+        phi: float = ta.Param(
+            default=1.0,
+            tune=True,
+            tune_min=0.8,
+            tune_max=1.2,
+            help="A multiplication factor for the loss at each level of the tree.",
+        ),
+        test_partition: int = ta.Param(
+            default=-1, help="The partition to retain for testing (by default, -1 so that it is not used)."
+        ),
+        minimum_length: int = ta.Param(
+            default=150, help="The minimum length to truncate sequences in a training batch."
+        ),
+        maximum_length: int = ta.Param(
+            default=3_000, help="The maximum length to truncate sequences in a training batch."
+        ),
+        skewness: float = ta.Param(default=5, help="The skewness of the distribution of sequence lengths in a batch."),
+        loc: float = ta.Param(
+            default=600, help="A parameter to shift the centre of the distribution of sequence lengths."
+        ),
+        scale: float = ta.Param(default=1000, help="A parameter to scale the distribution of sequence lengths."),
         # tips_mode:bool = False,
-        max_items:int = ta.Param(default=0, help="The maximum number of items to use for training. If zero then all items are used."),
-        train_all:bool = ta.Param(default=False, help="Whether or not to use the validation partition for training."),
+        max_items: int = ta.Param(
+            default=0, help="The maximum number of items to use for training. If zero then all items are used."
+        ),
+        train_all: bool = ta.Param(default=False, help="Whether or not to use the validation partition for training."),
     ) -> "CorgiDataModule":
         """
         Creates a Pytorch Lightning object which Corgi uses in training and prediction.
@@ -102,11 +111,10 @@ class Corgi(ta.TorchApp):
         from polytorch import HierarchicalData
         from .data import CorgiDataModule
         from .seqtree import SeqTree
-        
 
         assert seqtree is not None, "No seqtree given"
         assert seqbank is not None, "No seqbank given"
-        
+
         seqtree = Path(seqtree)
         seqbank = Path(seqbank)
 
@@ -143,16 +151,17 @@ class Corgi(ta.TorchApp):
         )
 
         return data
-    
+
     @ta.method
     def module_class(self, **kwargs) -> 'CorgiLightningModule':
         from .modules import CorgiLightningModule
+
         return CorgiLightningModule
 
     @ta.method("module_class", "checkpoint")
     def model(
         self,
-        pretrained:Path = ta.Param(None, help="A pretrained model to finetune."),
+        pretrained: Path = ta.Param(None, help="A pretrained model to finetune."),
         embedding_dim: int = ta.Param(
             default=8,
             help="The size of the embeddings for the nucleotides (N, A, G, C, T).",
@@ -209,8 +218,10 @@ class Corgi(ta.TorchApp):
         ),
         include_length: bool = True,
         transformer_heads: int = ta.Param(8, help="The number of heads in the transformer."),
-        transformer_layers: int = ta.Param(0, help="The number of layers in the transformer. If zero then no transformer is used."),
-        macc:int = ta.Param(
+        transformer_layers: int = ta.Param(
+            0, help="The number of layers in the transformer. If zero then no transformer is used."
+        ),
+        macc: int = ta.Param(
             default=10_000_000,
             help="The approximate number of multiply or accumulate operations in the model. Used to set cnn_dims_start if not provided explicitly.",
         ),
@@ -251,7 +262,7 @@ class Corgi(ta.TorchApp):
 
             cnn_dims_start = calc_cnn_dims_start(
                 macc=macc,
-                seq_len=1024, # arbitary number
+                seq_len=1024,  # arbitary number
                 embedding_dim=embedding_dim,
                 cnn_layers=cnn_layers,
                 kernel_size=kernel_size,
@@ -276,22 +287,22 @@ class Corgi(ta.TorchApp):
             transformer_heads=transformer_heads,
         )
 
-    @ta.method    
-    def metrics(self) -> list[tuple[str,'Metric']]:
+    @ta.method
+    def metrics(self) -> list[tuple[str, 'Metric']]:
         from hierarchicalsoftmax.metrics import RankAccuracyTorchMetric
 
         rank_accuracy = RankAccuracyTorchMetric(
-            root=self.classification_tree, 
+            root=self.classification_tree,
             ranks={
-                1:"type_accuracy", 
-                2:"superkingdom_accuracy",
-                3:"kingdom_accuracy",
-                4:"phylum_accuracy",
-                5:"class_accuracy",
-                6:"order_accuracy",
+                1: "type_accuracy",
+                2: "superkingdom_accuracy",
+                3: "kingdom_accuracy",
+                4: "phylum_accuracy",
+                5: "class_accuracy",
+                6: "order_accuracy",
             },
         )
-                
+
         return [('rank_accuracy', rank_accuracy)]
 
     @ta.method
@@ -311,26 +322,34 @@ class Corgi(ta.TorchApp):
         """
         return "bio-corgi"
 
-    def find_input_paths(self, files:list[str], base_extensions:set[str]|None=None) -> list[Path]:
+    def find_input_paths(self, files: list[str], base_extensions: set[str] | None = None) -> list[Path]:
         base_extensions = base_extensions or {
-            ".fa", ".fasta", ".fna", ".fas", ".frn", ".ref", # FASTA
-            ".genbank", ".gb", ".gbk",  # Genbank
-            ".tab", ".tsv", # Tabular
-            ".fastq", ".fq", # Fastq
+            ".fa",
+            ".fasta",
+            ".fna",
+            ".fas",
+            ".frn",
+            ".ref",  # FASTA
+            ".genbank",
+            ".gb",
+            ".gbk",  # Genbank
+            ".tab",
+            ".tsv",  # Tabular
+            ".fastq",
+            ".fq",  # Fastq
         }
 
         # Function to check if a file matches allowed extensions (including .gz)
         def matches_extensions(file: Path):
-            return (
-                file.suffix in base_extensions or
-                (file.suffix == ".gz" and any(file.stem.endswith(ext) for ext in base_extensions))
+            return file.suffix in base_extensions or (
+                file.suffix == ".gz" and any(file.stem.endswith(ext) for ext in base_extensions)
             )
 
         # Expand the list
         fasta_paths = []
 
         # If 'files' is a string or Path, convert it to a list
-        if isinstance(files, (str,Path)):
+        if isinstance(files, (str, Path)):
             files = [files]
 
         for path in files:
@@ -344,8 +363,8 @@ class Corgi(ta.TorchApp):
                     fasta_paths.append(path)
 
         return fasta_paths
-    
-    def find_fasta_paths(self, files:list[str]) -> list[Path]:
+
+    def find_fasta_paths(self, files: list[str]) -> list[Path]:
         return self.find_input_paths(files, base_extensions={".fa", ".fasta", ".fna", ".fas", ".frn", ".ref"})
 
     @ta.method
@@ -353,13 +372,15 @@ class Corgi(ta.TorchApp):
         self,
         module,
         input: list[str] = ta.Param(None, help="A FASTA file with sequences to be classified."),
-        file: list[Path] = ta.Param(None, help="A FASTA file with sequences to be classified (DEPRECATED. Use `input`)."),
+        file: list[Path] = ta.Param(
+            None, help="A FASTA file with sequences to be classified (DEPRECATED. Use `input`)."
+        ),
         seqtree: Path = ta.Param(None, help="The seqtree with the classification tree to use. DEPRECATED."),
         embeddings: Path = ta.Param(None, help="A path to save the embeddings from the model output."),
         max_seqs: int = None,
-        batch_size:int = 1,
-        max_length:int = 5_000,
-        min_length:int = 128,
+        batch_size: int = 1,
+        max_length: int = 5_000,
+        min_length: int = 128,
         num_threads: int = ta.Param(
             default=None,
             help="The maximum number of PyTorch CPU threads to use during prediction. If not set, PyTorch uses its default.",
@@ -386,7 +407,9 @@ class Corgi(ta.TorchApp):
             self.classification_tree = seqtree.classification_tree
         else:
             self.classification_tree = module.hparams['classification_tree']
-        self.dataloader = SeqIODataloader(files=files, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length)
+        self.dataloader = SeqIODataloader(
+            files=files, batch_size=batch_size, max_length=max_length, max_seqs=max_seqs, min_length=min_length
+        )
 
         if embeddings:
             module.set_embedding_path(
@@ -395,11 +418,12 @@ class Corgi(ta.TorchApp):
             )
         return self.dataloader
 
-    def node_to_str(self, node:'SoftmaxNode') -> str:
-        """ 
+    def node_to_str(self, node: 'SoftmaxNode') -> str:
+        """
         Converts the node to a string
         """
         from .seqtree import node_to_str
+
         return node_to_str(node)
 
     @ta.method
@@ -407,30 +431,36 @@ class Corgi(ta.TorchApp):
         self,
         results,
         output_csv: Path = ta.Param(default=None, help="A path to output the results as a CSV."),
-        output_tips_csv: Path = ta.Param(default=None, help="A path to output the results as a CSV which only stores the probabilities at the tips."),
+        output_tips_csv: Path = ta.Param(
+            default=None, help="A path to output the results as a CSV which only stores the probabilities at the tips."
+        ),
         # output_fasta: Path = ta.Param(default=None, help="A path to output the results in FASTA format."),
         image_dir: Path = ta.Param(default=None, help="A directory to output the results as images."),
-        image_format:str = "svg",
-        image_threshold:float = 0.005,
-        prediction_threshold:float = ta.Param(default=0.5, help="The threshold value for making hierarchical predictions."),
+        image_format: str = "svg",
+        image_threshold: float = 0.005,
+        prediction_threshold: float = ta.Param(
+            default=0.5, help="The threshold value for making hierarchical predictions."
+        ),
         **kwargs,
     ):
         import torch
         import pandas as pd
         from hierarchicalsoftmax.inference import node_probabilities, greedy_predictions, render_probabilities
-        
-        assert self.classification_tree # This should be saved on the checkpoint
-        
+
+        assert self.classification_tree  # This should be saved on the checkpoint
+
         classification_probabilities = node_probabilities(results[0], root=self.classification_tree)
 
         if hasattr(self.classification_tree, "node_list_softmax"):
             category_names = [self.node_to_str(node) for node in self.classification_tree.node_list_softmax]
         else:
-            # Backwards compatibility for older seqtree files which don't have the node_list_softmax attribute, 
-            # in which case we just use all non-root nodes as categories. 
+            # Backwards compatibility for older seqtree files which don't have the node_list_softmax attribute,
+            # in which case we just use all non-root nodes as categories.
             category_names = [self.node_to_str(node) for node in self.classification_tree.node_list if not node.is_root]
 
-        chunk_details = pd.DataFrame(self.dataloader.chunk_details, columns=["file", "original_id", "description", "chunk"])
+        chunk_details = pd.DataFrame(
+            self.dataloader.chunk_details, columns=["file", "original_id", "description", "chunk"]
+        )
         predictions_df = pd.DataFrame(classification_probabilities.numpy(), columns=category_names)
 
         results_df = pd.concat(
@@ -444,34 +474,33 @@ class Corgi(ta.TorchApp):
 
         # sort to get original order
         results_df = results_df.sort_values(by="chunk_index").drop(columns=["chunk_index"])
-        
+
         # Get new tensors now that we've averaged over chunks
-        classification_probabilities = torch.as_tensor(results_df[category_names].to_numpy()) 
+        classification_probabilities = torch.as_tensor(results_df[category_names].to_numpy())
 
         # get greedy predictions which can use the raw activation or the softmax probabilities
         predictions = greedy_predictions(
-            classification_probabilities, 
-            root=self.classification_tree, 
+            classification_probabilities,
+            root=self.classification_tree,
             threshold=prediction_threshold,
         )
 
-        results_df['prediction'] = [
-            self.node_to_str(node)
-            for node in predictions
-        ]
+        results_df['prediction'] = [self.node_to_str(node) for node in predictions]
 
         results_df['accession'] = results_df['original_id'].apply(lambda x: x.split("#")[0])
-        
+
         def get_prediction_probability(row):
             prediction = row["prediction"]
             if prediction in row:
                 return row[prediction]
             return 1.0
-        
+
         results_df['probability'] = results_df.apply(get_prediction_probability, axis=1)
 
         # Reorder columns
-        results_df = results_df[["file", "accession", "prediction", "probability", "original_id", "description" ] + category_names]
+        results_df = results_df[
+            ["file", "accession", "prediction", "probability", "original_id", "description"] + category_names
+        ]
 
         # Output images
         if image_dir:
@@ -485,7 +514,7 @@ class Corgi(ta.TorchApp):
                 image_paths.append(image_path)
 
             render_probabilities(
-                root=self.classification_tree, 
+                root=self.classification_tree,
                 filepaths=image_paths,
                 probabilities=classification_probabilities,
                 predictions=predictions,
@@ -497,7 +526,7 @@ class Corgi(ta.TorchApp):
 
         if not (image_dir or output_csv or output_tips_csv):
             print("No output files requested.")
-            
+
         # if output_fasta:
         #     console.print(f"Writing results for {len(results_df)} repeats to: {output_fasta}")
         #     with open(output_fasta, "w") as fasta_out:
@@ -511,10 +540,10 @@ class Corgi(ta.TorchApp):
 
         #                 accession = row['accession'].item()
         #                 prediction = row["prediction"].item()
-                        
+
         #                 new_id = f"{accession}#{prediction}"
         #                 record.id = new_id
-                        
+
         #                 # Adapt description
         #                 record.description = record.description.replace(original_id, "")
         #                 last_bracket = record.description.rfind(")")
@@ -555,16 +584,20 @@ class Corgi(ta.TorchApp):
 
     @ta.method
     def extra_hyperparameters(self) -> dict:
-        """ Extra hyperparameters to save with the module. """
+        """Extra hyperparameters to save with the module."""
         return dict(
             classification_tree=self.classification_tree,
         )
 
     @ta.method
     def checkpoint(
-        self, 
-        checkpoint:Path=ta.Param(default=None, help="A path to a checkpoint to load. If not given then a default checkpoint is used."),
-        large: bool = ta.Param(default=False, help="Whether or not to use a large checkpoint (overridden by `checkpoint` parameter)."),
+        self,
+        checkpoint: Path = ta.Param(
+            default=None, help="A path to a checkpoint to load. If not given then a default checkpoint is used."
+        ),
+        large: bool = ta.Param(
+            default=False, help="Whether or not to use a large checkpoint (overridden by `checkpoint` parameter)."
+        ),
     ) -> str:
         if checkpoint:
             return checkpoint
@@ -572,32 +605,48 @@ class Corgi(ta.TorchApp):
             # return "https://figshare.unimelb.edu.au/ndownloader/files/55166705"
             return "https://ndownloader.figshare.com/files/55166705"
             raise NotImplementedError("Large checkpoint not yet available.")
-        
+
         # return "https://figshare.unimelb.edu.au/ndownloader/files/55166714"
         return "https://ndownloader.figshare.com/files/55166714"
 
     @ta.tool
     def refseq_to_seqtree(
-        output:Path = ta.Param(..., help="The path to save the SeqTree."),
-        seqbank:Path = ta.Param(..., help="The SeqBank with the sequences for the RefSeq accessions."),
-        seqbank_output:Path = ta.Param(default=None, help="Where to save a new SeqBank containing only the sequences selected for the SeqTree."),
-        engine:str = ta.Param(default=None, help="The storage engine for the output SeqBank: 'rocksdict', 'lmdb' or 'speedict'. If not given, then RocksDict is used."),
-        render:Path = ta.Param(default=None, help="The path to render an image of the SeqTree."),
-        accessions:Path = ta.Param(default=None, help="The path to write a list of the accessions in the SeqTree."),
-        partitions:int = ta.Param(default=6, help="The number of cross-validation partitions."),
-        max_seqs:int = ta.Param(default=100, help="The maximum number of sequences for each leaf node. Use 0 for no limit."),
-        catalog:Path = ta.Param(default=None, help="The path to a RefSeq catalog. If not given, then the latest release is downloaded."),
-        ranks:str = ta.Param(default="superkingdom,kingdom,phylum,class,order", help="The comma-separated taxonomic ranks to include in the tree."),
-        restrict_ranks:str = ta.Param(default="class,order", help="The comma-separated ranks of the nodes which sequences can be assigned to."),
-        mitochondrion_ranks:str = ta.Param(default="", help="Overrides `ranks` for mitochondrion sequences."),
-        plastid_ranks:str = ta.Param(default="", help="Overrides `ranks` for plastid sequences."),
-        plasmid_ranks:str = ta.Param(default="", help="Overrides `ranks` for plasmid sequences."),
-        nuclear_ranks:str = ta.Param(default="", help="Overrides `ranks` for nuclear sequences."),
-        mitochondrion_restrict_ranks:str = ta.Param(default="", help="Overrides `restrict_ranks` for mitochondrion sequences."),
-        plastid_restrict_ranks:str = ta.Param(default="", help="Overrides `restrict_ranks` for plastid sequences."),
-        plasmid_restrict_ranks:str = ta.Param(default="", help="Overrides `restrict_ranks` for plasmid sequences."),
-        nuclear_restrict_ranks:str = ta.Param(default="", help="Overrides `restrict_ranks` for nuclear sequences."),
-        print_tree:bool = ta.Param(default=False, help="Whether or not to print the tree to the screen."),
+        output: Path = ta.Param(..., help="The path to save the SeqTree."),
+        seqbank: Path = ta.Param(..., help="The SeqBank with the sequences for the RefSeq accessions."),
+        seqbank_output: Path = ta.Param(
+            default=None, help="Where to save a new SeqBank containing only the sequences selected for the SeqTree."
+        ),
+        engine: str = ta.Param(
+            default=None,
+            help="The storage engine for the output SeqBank: 'rocksdict', 'lmdb' or 'speedict'. If not given, then RocksDict is used.",
+        ),
+        render: Path = ta.Param(default=None, help="The path to render an image of the SeqTree."),
+        accessions: Path = ta.Param(default=None, help="The path to write a list of the accessions in the SeqTree."),
+        partitions: int = ta.Param(default=6, help="The number of cross-validation partitions."),
+        max_seqs: int = ta.Param(
+            default=100, help="The maximum number of sequences for each leaf node. Use 0 for no limit."
+        ),
+        catalog: Path = ta.Param(
+            default=None, help="The path to a RefSeq catalog. If not given, then the latest release is downloaded."
+        ),
+        ranks: str = ta.Param(
+            default="superkingdom,kingdom,phylum,class,order",
+            help="The comma-separated taxonomic ranks to include in the tree.",
+        ),
+        restrict_ranks: str = ta.Param(
+            default="class,order", help="The comma-separated ranks of the nodes which sequences can be assigned to."
+        ),
+        mitochondrion_ranks: str = ta.Param(default="", help="Overrides `ranks` for mitochondrion sequences."),
+        plastid_ranks: str = ta.Param(default="", help="Overrides `ranks` for plastid sequences."),
+        plasmid_ranks: str = ta.Param(default="", help="Overrides `ranks` for plasmid sequences."),
+        nuclear_ranks: str = ta.Param(default="", help="Overrides `ranks` for nuclear sequences."),
+        mitochondrion_restrict_ranks: str = ta.Param(
+            default="", help="Overrides `restrict_ranks` for mitochondrion sequences."
+        ),
+        plastid_restrict_ranks: str = ta.Param(default="", help="Overrides `restrict_ranks` for plastid sequences."),
+        plasmid_restrict_ranks: str = ta.Param(default="", help="Overrides `restrict_ranks` for plasmid sequences."),
+        nuclear_restrict_ranks: str = ta.Param(default="", help="Overrides `restrict_ranks` for nuclear sequences."),
+        print_tree: bool = ta.Param(default=False, help="Whether or not to print the tree to the screen."),
     ):
         """
         Builds a SeqTree from the RefSeq catalog for the accessions found in a SeqBank.

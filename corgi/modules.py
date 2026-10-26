@@ -6,6 +6,7 @@ from rich.console import Console
 
 console = Console()
 
+
 class CorgiLightningModule(GeneralLightningModule):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -14,7 +15,7 @@ class CorgiLightningModule(GeneralLightningModule):
         self.dataloader = None
         self.current_position = 0
 
-    def set_embedding_path(self, embeddings_path:Path|str, dataloader):
+    def set_embedding_path(self, embeddings_path: Path | str, dataloader):
         """
         Set the path for the memmap array and initialize it if necessary.
         """
@@ -35,20 +36,20 @@ class CorgiLightningModule(GeneralLightningModule):
             with open(embeddings_index, 'w') as f:
                 for file, record_id, _, _ in self.dataloader.chunk_details:
                     # Replace pipe with underscore for file names
-                    file = str(file).replace("\t", "_")  
+                    file = str(file).replace("\t", "_")
                     record_id = str(record_id).replace("\t", "_")
                     f.write(f"{file}\t{record_id}\n")
-    
+
     def predict_step(self, batch):
         assert isinstance(batch, tuple)
         assert len(batch) >= self.input_count
-        x = batch[:self.input_count]
+        x = batch[: self.input_count]
 
-        self.model.return_embeddings = (self.embeddings_path is not None)
+        self.model.return_embeddings = self.embeddings_path is not None
         if not self.model.return_embeddings:
-            result  = self(*x)
+            result = self(*x)
         else:
-            result, embedding  = self(*x)
+            result, embedding = self(*x)
 
             # Create memmap array if it is the first time
             embedding = embedding.half().cpu().numpy()
@@ -60,14 +61,14 @@ class CorgiLightningModule(GeneralLightningModule):
 
             # Save embeddings to memmap
             batch_size = len(x[0])
-            self.embeddings[self.current_position:self.current_position+batch_size, :] = embedding
+            self.embeddings[self.current_position : self.current_position + batch_size, :] = embedding
             self.current_position += batch_size
 
         # Return result of the model
         return result
-    
 
-def read_memmap(path, count, dtype:str="float16") -> np.memmap:
+
+def read_memmap(path, count, dtype: str = "float16") -> np.memmap:
     file_size = os.path.getsize(path)
     dtype_size = np.dtype(dtype).itemsize
     num_elements = file_size // dtype_size
@@ -76,7 +77,9 @@ def read_memmap(path, count, dtype:str="float16") -> np.memmap:
     return np.memmap(path, dtype=dtype, mode='r', shape=shape)
 
 
-def read_embeddings(embeddings_path:Path|str, embeddings_index:Path=None, merge:bool=True) -> tuple[np.ndarray, list[str]]:
+def read_embeddings(
+    embeddings_path: Path | str, embeddings_index: Path = None, merge: bool = True
+) -> tuple[np.ndarray, list[str]]:
     """
     Read embeddings from a memmap file.
     """
@@ -85,11 +88,12 @@ def read_embeddings(embeddings_path:Path|str, embeddings_index:Path=None, merge:
     index_path = Path(index_path)
     assert index_path.exists(), f"Index file '{index_path}' does not exist."
     index_with_tabs = Path(index_path).read_text().strip().splitlines()
-    
+
     embeddings = read_memmap(embeddings_path, len(index_with_tabs))
 
     if merge:
         import pandas as pd
+
         df = pd.DataFrame(embeddings)
         df["index_with_tabs"] = index_with_tabs
 

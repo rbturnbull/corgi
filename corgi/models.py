@@ -8,6 +8,7 @@ from torch import Tensor
 from polytorch import split_tensor, total_size
 
 from rich.console import Console
+
 console = Console()
 
 
@@ -32,9 +33,8 @@ class PositionalEncoding(nn.Module):
         Arguments:
             x: Tensor, shape ``[seq_len, batch_size, embedding_dim]``
         """
-        x = x + self.pe[:x.size(0)]
+        x = x + self.pe[: x.size(0)]
         return self.dropout(x)
-
 
 
 def conv3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv1d:
@@ -267,7 +267,7 @@ class ConvClassifier(nn.Module):
         output_types=None,
         cnn_dims_start=64,
         kernel_size_maxpool=2,
-        return_embeddings:bool=False,
+        return_embeddings: bool = False,
         num_embeddings=5,  # i.e. the size of the vocab which is N, A, C, G, T
         kernel_size=3,
         factor=2,
@@ -278,7 +278,7 @@ class ConvClassifier(nn.Module):
         lstm_dims: int = 0,
         penultimate_dims: int = 1028,
         include_length: bool = False,
-        length_scaling:float = 3_000.0,
+        length_scaling: float = 3_000.0,
         transformer_heads: int = 8,
         transformer_layers: int = 6,
     ):
@@ -333,7 +333,9 @@ class ConvClassifier(nn.Module):
 
         if self.transformer_layers:
             self.positional_encoding = PositionalEncoding(d_model=in_channels)
-            encoder_layer = nn.TransformerEncoderLayer(d_model=in_channels, nhead=self.transformer_heads, batch_first=True)
+            encoder_layer = nn.TransformerEncoderLayer(
+                d_model=in_channels, nhead=self.transformer_heads, batch_first=True
+            )
             self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=self.transformer_layers)
         else:
             self.transformer_encoder = None
@@ -356,7 +358,9 @@ class ConvClassifier(nn.Module):
 
         current_dims += int(include_length)
         self.penultimate = nn.Linear(in_features=current_dims, out_features=penultimate_dims, bias=True)
-        self.final = nn.Linear(in_features=penultimate_dims, out_features=total_size(self.output_types), bias=final_bias)
+        self.final = nn.Linear(
+            in_features=penultimate_dims, out_features=total_size(self.output_types), bias=final_bias
+        )
 
     def forward(self, x):
         # Convert to int because it may be simply a byte
@@ -390,7 +394,7 @@ class ConvClassifier(nn.Module):
             # x = torch.sum(x, axis=-1)
 
         if getattr(self, 'include_length', False):
-            length_tensor = torch.full( (x.shape[0], 1), length/self.length_scaling, device=x.device )
+            length_tensor = torch.full((x.shape[0], 1), length / self.length_scaling, device=x.device)
             x = torch.cat([x, length_tensor], dim=1)
 
         penultimate_result = self.penultimate(x)
@@ -400,18 +404,19 @@ class ConvClassifier(nn.Module):
 
         if getattr(self, "return_embeddings", False):
             return split_predictions, penultimate_result
-    
+
         return split_predictions
 
-    def replace_output_types(self, output_types, final_bias:bool=None) -> None:
+    def replace_output_types(self, output_types, final_bias: bool = None) -> None:
         device = next(self.parameters()).device
         self.output_types = output_types
         penultimate_dims = self.penultimate.out_features
         if final_bias is None:
             final_bias = self.final.bias
-        
-        self.final = nn.Linear(in_features=penultimate_dims, out_features=total_size(self.output_types), bias=final_bias, device=device)
-        
+
+        self.final = nn.Linear(
+            in_features=penultimate_dims, out_features=total_size(self.output_types), bias=final_bias, device=device
+        )
 
 
 class SequentialDebug(nn.Sequential):
@@ -422,7 +427,7 @@ class SequentialDebug(nn.Sequential):
         console.print(f"Input shape {input.shape}")
         for module in self:
             console.print(f"Module: {module} ({type(module)})")
-            macs, _ = profile(module, inputs=(input, ))
+            macs, _ = profile(module, inputs=(input,))
             macs_cummulative += int(macs)
             console.print(f"MACs: {int(macs)} (cummulative {macs_cummulative})")
 
@@ -430,7 +435,6 @@ class SequentialDebug(nn.Sequential):
             console.print(f"Output shape: {input.shape}")
 
         return input
-
 
 
 class ConvProcessor(nn.Sequential):
@@ -475,11 +479,11 @@ class ConvProcessor(nn.Sequential):
 
 def calc_cnn_dims_start(
     macc,
-    seq_len:int,
-    embedding_dim:int,
-    cnn_layers:int,
-    kernel_size:int,
-    factor:float,
+    seq_len: int,
+    embedding_dim: int,
+    cnn_layers: int,
+    kernel_size: int,
+    factor: float,
     penultimate_dims: int,
     num_classes: int,
 ):
@@ -494,16 +498,16 @@ def calc_cnn_dims_start(
         kernel_size (int): The size of the kernel in the CNN
         factor (float): The multiplying factor for the CNN output layers.
     """
-    b = kernel_size * embedding_dim * seq_len + factor ** (cnn_layers-1) * penultimate_dims
+    b = kernel_size * embedding_dim * seq_len + factor ** (cnn_layers - 1) * penultimate_dims
     c = penultimate_dims * num_classes - macc
 
     if cnn_layers == 1:
-        cnn_dims_start = -c/b
-    else:        
+        cnn_dims_start = -c / b
+    else:
         a = 0.0
         for layer_index in range(1, cnn_layers):
-            a += seq_len * kernel_size * (0.5**layer_index) * (factor**(2 * layer_index - 1))
-        
-        cnn_dims_start = (-b + np.sqrt(b**2 - 4*a*c))/(2 * a)
+            a += seq_len * kernel_size * (0.5**layer_index) * (factor ** (2 * layer_index - 1))
+
+        cnn_dims_start = (-b + np.sqrt(b**2 - 4 * a * c)) / (2 * a)
 
     return int(cnn_dims_start + 0.5)

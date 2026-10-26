@@ -21,7 +21,10 @@ from rich.console import Console
 
 console = Console()
 
-def generate_overlapping_intervals(total: int, interval_size: int, min_overlap: int, check:bool=True, variable_size:bool=False) -> list[tuple[int, int]]:
+
+def generate_overlapping_intervals(
+    total: int, interval_size: int, min_overlap: int, check: bool = True, variable_size: bool = False
+) -> list[tuple[int, int]]:
     """
     Creates a list of overlapping intervals within a specified range, adjusting the interval size to ensure
     that the overlap is approximately the same across all intervals.
@@ -33,7 +36,7 @@ def generate_overlapping_intervals(total: int, interval_size: int, min_overlap: 
         check (bool): If True, checks are performed to ensure that the intervals meet the specified conditions.
 
     Returns:
-        list[tuple[int, int]]: A list of tuples where each tuple represents the start (inclusive) 
+        list[tuple[int, int]]: A list of tuples where each tuple represents the start (inclusive)
         and end (exclusive) of an interval.
 
     Example:
@@ -42,17 +45,19 @@ def generate_overlapping_intervals(total: int, interval_size: int, min_overlap: 
     """
     if total <= interval_size:
         return [(0, total)]
-    
+
     intervals = []
     start = 0
 
     if total == 0:
         return intervals
-    
+
     max_interval_size = interval_size
     assert interval_size
     assert min_overlap is not None
-    assert interval_size > min_overlap, f"Max interval size of {interval_size} must be greater than min overlap of {min_overlap}"
+    assert (
+        interval_size > min_overlap
+    ), f"Max interval size of {interval_size} must be greater than min overlap of {min_overlap}"
 
     # Calculate the number of intervals needed to cover the range
     num_intervals, remainder = divmod(total - min_overlap, interval_size - min_overlap)
@@ -69,7 +74,7 @@ def generate_overlapping_intervals(total: int, interval_size: int, min_overlap: 
     else:
         # If the size is fixed, then vary the overlap to keep it even
         if num_intervals > 1:
-            overlap, remainder = divmod( num_intervals * interval_size - total, num_intervals - 1)
+            overlap, remainder = divmod(num_intervals * interval_size - total, num_intervals - 1)
             if overlap < min_overlap:
                 overlap = min_overlap
 
@@ -77,7 +82,7 @@ def generate_overlapping_intervals(total: int, interval_size: int, min_overlap: 
         end = start + interval_size
         if end > total:
             end = total
-            start = max(end - interval_size,0)
+            start = max(end - interval_size, 0)
         intervals.append((start, end))
         start += interval_size - overlap
         if end >= total:
@@ -88,17 +93,24 @@ def generate_overlapping_intervals(total: int, interval_size: int, min_overlap: 
         assert intervals[-1][1] == total
         assert len(intervals) == num_intervals, f"Expected {num_intervals} intervals, got {len(intervals)}"
 
-        assert interval_size <= max_interval_size, f"Interval size of {interval_size} exceeds max interval size of {max_interval_size}"
+        assert (
+            interval_size <= max_interval_size
+        ), f"Interval size of {interval_size} exceeds max interval size of {max_interval_size}"
         for interval in intervals:
-            assert interval[1] - interval[0] == interval_size, f"Interval size of {interval[1] - interval[0]} is not the expected size {interval_size}"
+            assert (
+                interval[1] - interval[0] == interval_size
+            ), f"Interval size of {interval[1] - interval[0]} is not the expected size {interval_size}"
 
         for i in range(1, len(intervals)):
             overlap = intervals[i - 1][1] - intervals[i][0]
-            assert overlap >= min_overlap, f"Min overlap condition of {min_overlap} not met for intervals {intervals[i - 1]} and {intervals[i]} (overlap {overlap})"
+            assert (
+                overlap >= min_overlap
+            ), f"Min overlap condition of {min_overlap} not met for intervals {intervals[i - 1]} and {intervals[i]} (overlap {overlap})"
 
     return intervals
 
-def slice_tensor(tensor, size, start_index=None, pad:bool=True):
+
+def slice_tensor(tensor, size, start_index=None, pad: bool = True):
     original_length = tensor.shape[0]
     if start_index is None:
         if original_length <= size:
@@ -115,7 +127,7 @@ def slice_tensor(tensor, size, start_index=None, pad:bool=True):
 
 
 @dataclass
-class Collate():
+class Collate:
     def get_length(self) -> int:
         raise NotImplementedError
 
@@ -128,20 +140,20 @@ class Collate():
 
 @dataclass
 class CollateFixedLength(Collate):
-    length:int
+    length: int
 
     def get_length(self):
         return self.length
-    
+
 
 @dataclass
 class CollateRandomLength(Collate):
-    minimum_length:int
-    maximum_length:int
-    skewness:float=5
-    loc:float=600
-    scale:float=1000
-    seed:int=42
+    minimum_length: int
+    maximum_length: int
+    skewness: float = 5
+    loc: float = 600
+    scale: float = 1000
+    seed: int = 42
 
     def __post_init__(self):
         assert self.minimum_length > 0
@@ -157,14 +169,13 @@ class CollateRandomLength(Collate):
             return seq_len
 
 
-
 @dataclass(kw_only=True)
 class CorgiTrainingDataset(Dataset):
     accessions: list[str]
-    seqbank:SeqBank
-    seqtree:SeqTree
-    deterministic:bool=False
-    maximum:int=0
+    seqbank: SeqBank
+    seqtree: SeqTree
+    deterministic: bool = False
+    maximum: int = 0
 
     def __len__(self):
         return len(self.accessions)
@@ -203,35 +214,35 @@ class CorgiTrainingDataset(Dataset):
         if self.maximum and length > self.maximum:
             rng = np.random.RandomState(adler32(accession.encode("ascii"))) if self.deterministic else np.random
             start_index = rng.randint(0, length - self.maximum)
-            data = data[start_index:start_index+self.maximum]
+            data = data[start_index : start_index + self.maximum]
 
         array = torch.as_tensor(memoryview(data), dtype=torch.uint8)
 
         return torch.Tensor(array), self.seqtree[accession].node_id
 
 
-def seqbank_worker_init(worker_id:int):
-    """ Gives each DataLoader worker its own SeqBank handle (not shared with the parent process). """
+def seqbank_worker_init(worker_id: int):
+    """Gives each DataLoader worker its own SeqBank handle (not shared with the parent process)."""
     worker_info = torch.utils.data.get_worker_info()
     worker_info.dataset.reopen_seqbank()
 
 
 @dataclass
 class CorgiDataModule(L.LightningDataModule):
-    seqtree:SeqTree 
-    seqbank:SeqBank 
-    batch_size:int
-    max_items:int=0
+    seqtree: SeqTree
+    seqbank: SeqBank
+    batch_size: int
+    max_items: int = 0
     minimum_length: int = 150
     maximum_length: int = 3_000
-    validation_length:int=1000
-    validation_partition:int=1
-    test_partition:int=0
-    skewness:float=5
-    loc:float=600
-    scale:float=1000
-    num_workers:int|None = None
-    train_all:bool=False
+    validation_length: int = 1000
+    validation_partition: int = 1
+    test_partition: int = 0
+    skewness: float = 5
+    loc: float = 600
+    scale: float = 1000
+    num_workers: int | None = None
+    train_all: bool = False
 
     def __post_init__(self):
         super().__init__()
@@ -244,32 +255,38 @@ class CorgiDataModule(L.LightningDataModule):
         training_accessions = []
         validation_accessions = []
 
-        assert self.validation_partition != self.test_partition, f"Validation partition {self.validation_partition} the same as test partition {self.test_partition}"
-        
+        assert (
+            self.validation_partition != self.test_partition
+        ), f"Validation partition {self.validation_partition} the same as test partition {self.test_partition}"
+
         for accession, details in self.seqtree.items():
             # Ignore test partition so we do not validate or train on it
             if details.partition == self.test_partition:
                 continue
 
-            accessions_list = validation_accessions if details.partition == self.validation_partition else training_accessions
+            accessions_list = (
+                validation_accessions if details.partition == self.validation_partition else training_accessions
+            )
             accessions_list.append(accession)
 
         if self.train_all:
             training_accessions += validation_accessions
 
         if len(validation_accessions) == 0:
-            console.print(f"[bold red]WARNING: No validation accessions found. Check the validation partition {self.validation_partition}. Using all the training examples for validation.")
+            console.print(
+                f"[bold red]WARNING: No validation accessions found. Check the validation partition {self.validation_partition}. Using all the training examples for validation."
+            )
             validation_accessions = training_accessions
-        
+
         if self.max_items:
-            training_accessions = training_accessions[:self.max_items]
-            validation_accessions = validation_accessions[:self.max_items]
+            training_accessions = training_accessions[: self.max_items]
+            validation_accessions = validation_accessions[: self.max_items]
 
         self.train_dataset = CorgiTrainingDataset(
-            accessions=training_accessions, 
-            seqtree=self.seqtree, 
-            seqbank=self.seqbank, 
-            deterministic=False, 
+            accessions=training_accessions,
+            seqtree=self.seqtree,
+            seqbank=self.seqbank,
+            deterministic=False,
             maximum=self.maximum_length,
         )
         self.val_dataset = CorgiTrainingDataset(
@@ -282,27 +299,38 @@ class CorgiDataModule(L.LightningDataModule):
 
     def train_dataloader(self):
         return DataLoader(
-            self.train_dataset, 
-            batch_size=self.batch_size, 
-            num_workers=self.num_workers, 
+            self.train_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
             worker_init_fn=seqbank_worker_init,
-            shuffle=True, 
-            collate_fn=CollateRandomLength(self.minimum_length, self.maximum_length, skewness=self.skewness, loc=self.loc, scale=self.scale),
+            shuffle=True,
+            collate_fn=CollateRandomLength(
+                self.minimum_length, self.maximum_length, skewness=self.skewness, loc=self.loc, scale=self.scale
+            ),
         )
 
     def val_dataloader(self):
         return DataLoader(
-            self.val_dataset, 
-            batch_size=self.batch_size, 
-            num_workers=self.num_workers, 
+            self.val_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
             worker_init_fn=seqbank_worker_init,
-            shuffle=False, 
+            shuffle=False,
             collate_fn=CollateFixedLength(self.validation_length),
         )
 
 
 class SeqIODataloader:
-    def __init__(self, files, batch_size:int=1, min_length:int=128, max_length:int=5_000, max_seqs:int=None, overlap:int=256, format:str=""):
+    def __init__(
+        self,
+        files,
+        batch_size: int = 1,
+        min_length: int = 128,
+        max_length: int = 5_000,
+        max_seqs: int = None,
+        overlap: int = 256,
+        format: str = "",
+    ):
         self.format = format
         self.chunk_details = []
         self.max_length = max_length
@@ -317,16 +345,15 @@ class SeqIODataloader:
 
         # Function to check if a file matches allowed extensions (including .gz)
         def matches_extensions(file: Path):
-            return (
-                file.suffix in base_extensions or
-                (file.suffix == ".gz" and any(file.stem.endswith(ext) for ext in base_extensions))
+            return file.suffix in base_extensions or (
+                file.suffix == ".gz" and any(file.stem.endswith(ext) for ext in base_extensions)
             )
 
         # Expand the list
         self.files = []
 
         # If 'files' is a string or Path, convert it to a list
-        if isinstance(files, (str,Path)):
+        if isinstance(files, (str, Path)):
             files = [Path(files)]
 
         for path in files:
@@ -354,7 +381,7 @@ class SeqIODataloader:
     def get_file_format(self, file):
         if self.format:
             return self.format
-        
+
         file = Path(file)
         suffixes = [suffix.lower() for suffix in file.suffixes]
 
@@ -374,13 +401,13 @@ class SeqIODataloader:
             return "fastq"
 
         raise ValueError(f"Cannot determine file format of {file}.")
-    
+
     def __len__(self):
         return self.count
 
-    def parse(self, file:Path):
+    def parse(self, file: Path):
         file_format = self.get_file_format(file)
-        
+
         if file.name.endswith('.gz'):
             with gzip.open(file, "rt") as f:
                 yield from SeqIO.parse(f, file_format)
@@ -410,8 +437,8 @@ class SeqIODataloader:
                 intervals = generate_overlapping_intervals(len(t), self.max_length, self.overlap)
 
                 for chunk_index, interval in enumerate(intervals):
-                    self.chunk_details.append( (file, record.id, record.description, chunk_index) )
-                    batch.append(t[interval[0]:interval[1]])
+                    self.chunk_details.append((file, record.id, record.description, chunk_index))
+                    batch.append(t[interval[0] : interval[1]])
                     if len(batch) >= self.batch_size:
                         batch = self.pad(batch)
                         yield batch
@@ -429,4 +456,4 @@ class SeqIODataloader:
         def pad(tensor):
             return slice_tensor(tensor, max_len).unsqueeze(dim=0)
 
-        return torch.cat(list(map(pad, batch))),
+        return (torch.cat(list(map(pad, batch))),)
