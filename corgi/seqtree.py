@@ -466,13 +466,17 @@ def sunburst(
         output = Path(output)
         output.parent.mkdir(exist_ok=True, parents=True)
 
-        # https://github.com/plotly/plotly.py/issues/3469
-        import plotly.io as pio
+        if output.suffix.lower() == ".html":
+            fig.write_html(output)
+        else:
+            # https://github.com/plotly/plotly.py/issues/3469
+            import plotly.io as pio
 
-        pio.kaleido.scope.mathjax = None
-
-        output_func = fig.write_html if output.suffix.lower() == ".html" else fig.write_image
-        output_func(output)
+            try:  # Kaleido 0.x only
+                pio.kaleido.scope.mathjax = None
+            except AttributeError:
+                pass
+            fig.write_image(output)
 
 
 @app.command()

@@ -230,3 +230,40 @@ def test_seqtree_render_alphabetical():
 
     sorted_lines = str(seqtree.render(alphabetical=True)).splitlines()
     assert [line.split()[-1] for line in sorted_lines[1:]] == ["a", "b"]
+
+
+def make_small_seqtree() -> SeqTree:
+    root = SoftmaxNode("root")
+    animal = SoftmaxNode("Animalia", parent=root)
+    plant = SoftmaxNode("Plantae", parent=root)
+    seqtree = SeqTree(root)
+    seqtree.add("NC_1", animal, 0)
+    seqtree.add("NC_2", plant, 1)
+    return seqtree
+
+
+def test_sunburst_command_html(tmp_path):
+    seqtree_path = tmp_path / "tree.st"
+    make_small_seqtree().save(seqtree_path)
+    output = tmp_path / "subdir" / "sunburst.html"
+
+    result = CliRunner().invoke(app, ["sunburst", str(seqtree_path), "--output", str(output)])
+
+    assert result.exit_code == 0, result.output
+    html = output.read_text()
+    assert "Animalia" in html
+    assert "Plantae" in html
+
+
+def test_sunburst_command_image(tmp_path):
+    pytest.importorskip("kaleido")
+    seqtree_path = tmp_path / "tree.st"
+    make_small_seqtree().save(seqtree_path)
+    output = tmp_path / "sunburst.svg"
+
+    result = CliRunner().invoke(app, ["sunburst", str(seqtree_path), "--output", str(output)])
+
+    if result.exception is not None and "Chrome" in str(result.exception):
+        pytest.skip("Chrome is not available for Kaleido image export")
+    assert result.exit_code == 0, result.output
+    assert output.exists()
