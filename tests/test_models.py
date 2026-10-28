@@ -153,3 +153,62 @@ def test_calc_cnn_dims_start():
     assert isinstance(multi, int) and multi > 0
     # A larger compute budget allows more filters
     assert models.calc_cnn_dims_start(10_000_000, cnn_layers=6, **kwargs) > multi
+
+
+def small_tree(*names):
+    from hierarchicalsoftmax import SoftmaxNode
+
+    root = SoftmaxNode("root")
+    for name in names:
+        SoftmaxNode(name, parent=root)
+    root.set_indexes_if_unset()
+    return root
+
+
+def small_model(root):
+    return models.ConvClassifier(
+        output_types=[HierarchicalData(root=root)],
+        cnn_layers=1,
+        cnn_dims_start=8,
+        penultimate_dims=16,
+        transformer_layers=0,
+    )
+
+
+def test_output_types_match_same_tree():
+    model = small_model(small_tree("a", "b"))
+    assert model.output_types_match([HierarchicalData(root=small_tree("a", "b"))])
+
+
+def test_output_types_match_different_names_same_size():
+    model = small_model(small_tree("a", "b"))
+    assert not model.output_types_match([HierarchicalData(root=small_tree("a", "c"))])
+
+
+def test_output_types_match_different_order():
+    model = small_model(small_tree("a", "b"))
+    assert not model.output_types_match([HierarchicalData(root=small_tree("b", "a"))])
+
+
+def test_output_types_match_different_size():
+    model = small_model(small_tree("a", "b"))
+    assert not model.output_types_match([HierarchicalData(root=small_tree("a", "b", "c"))])
+
+
+def test_output_types_match_different_number_of_outputs():
+    model = small_model(small_tree("a", "b"))
+    root = small_tree("a", "b")
+    assert not model.output_types_match([HierarchicalData(root=root), HierarchicalData(root=root)])
+
+
+def test_output_types_match_missing():
+    model = small_model(small_tree("a", "b"))
+    assert not model.output_types_match(None)
+    model.output_types = None
+    assert not model.output_types_match([HierarchicalData(root=small_tree("a", "b"))])
+
+
+def test_output_types_match_final_layer_out_of_sync():
+    model = small_model(small_tree("a", "b"))
+    model.final = torch.nn.Linear(16, model.final.out_features + 1)
+    assert not model.output_types_match([HierarchicalData(root=small_tree("a", "b"))])

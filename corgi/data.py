@@ -1,3 +1,5 @@
+"""Data loading for Corgi: sequence slicing, collation, datasets and dataloaders."""
+
 import os
 import gzip
 import random
@@ -111,6 +113,18 @@ def generate_overlapping_intervals(
 
 
 def slice_tensor(tensor, size, start_index=None, pad: bool = True):
+    """Slices a 1D tensor to a given size.
+
+    Args:
+        tensor (Tensor): The tensor to slice.
+        size (int): The length of the slice.
+        start_index (int | None): Where the slice starts. If None, then it is chosen randomly (or 0 if the tensor
+            is no longer than `size`).
+        pad (bool): Whether or not to pad with zeros at the end if the slice extends beyond the tensor.
+
+    Returns:
+        Tensor: The slice.
+    """
     original_length = tensor.shape[0]
     if start_index is None:
         if original_length <= size:
@@ -128,10 +142,21 @@ def slice_tensor(tensor, size, start_index=None, pad: bool = True):
 
 @dataclass
 class Collate:
+    """Base class for collating a batch of variable length sequences into tensors of the same length."""
+
     def get_length(self) -> int:
+        """Returns the length that the sequences in the next batch will be sliced or padded to."""
         raise NotImplementedError
 
     def __call__(self, batch):
+        """Collates a batch of (sequence, target) pairs.
+
+        Args:
+            batch: A list of (sequence tensor, target) pairs.
+
+        Returns:
+            tuple[Tensor, Tensor]: The stacked sequences, sliced or padded to the same length, and the targets.
+        """
         x_batch, y_batch = zip(*batch)
         length = self.get_length()
 
@@ -140,14 +165,22 @@ class Collate:
 
 @dataclass
 class CollateFixedLength(Collate):
+    """Collates batches so that every sequence has the same fixed length."""
+
     length: int
 
     def get_length(self):
+        """Returns the fixed length."""
         return self.length
 
 
 @dataclass
 class CollateRandomLength(Collate):
+    """Collates batches to a random length for each batch.
+
+    The lengths are drawn from a skew-normal distribution, truncated to the minimum and maximum lengths.
+    """
+
     minimum_length: int
     maximum_length: int
     skewness: float = 5
@@ -156,12 +189,14 @@ class CollateRandomLength(Collate):
     seed: int = 42
 
     def __post_init__(self):
+        """Checks the lengths and creates the random state and length distribution."""
         assert self.minimum_length > 0
         assert self.minimum_length <= self.maximum_length
         self.random_state = np.random.default_rng(self.seed)
         self.distribution = skewnorm(self.skewness, loc=self.loc, scale=self.scale)
 
     def get_length(self) -> int:
+        """Draws a length from the distribution which is between the minimum and maximum lengths (inclusive)."""
         while True:
             seq_len = int(self.distribution.rvs(random_state=self.random_state))
             if seq_len < self.minimum_length or seq_len > self.maximum_length:
@@ -171,6 +206,16 @@ class CollateRandomLength(Collate):
 
 @dataclass(kw_only=True)
 class CorgiTrainingDataset(Dataset):
+    """A dataset of sequences from a SeqBank, with the node in the classification tree as the target.
+
+    Args:
+        accessions (list[str]): The accessions in the dataset.
+        seqbank (SeqBank): The SeqBank which holds the sequences.
+        seqtree (SeqTree): The SeqTree which gives the node for each accession.
+        deterministic (bool): Whether or not truncation of long sequences always takes the same slice for an accession.
+        maximum (int): The maximum length of a sequence. Longer sequences are truncated. If zero, they are not truncated.
+    """
+
     accessions: list[str]
     seqbank: SeqBank
     seqtree: SeqTree
@@ -178,18 +223,21 @@ class CorgiTrainingDataset(Dataset):
     maximum: int = 0
 
     def __len__(self):
+        """Returns the number of accessions."""
         return len(self.accessions)
 
     def __getstate__(self):
         # The SeqBank holds an open database handle and a lock which cannot be pickled
         # (needed for DataLoader workers with the 'spawn' and 'forkserver' start methods).
         # Send the path and engine instead and reopen it in the worker.
+        """Returns the state for pickling, replacing the SeqBank with its path and engine so it can be reopened in a worker."""
         state = self.__dict__.copy()
         seqbank = state.pop("seqbank")
         state["_seqbank_args"] = (seqbank.path, seqbank.engine)
         return state
 
     def __setstate__(self, state):
+        """Restores the state after pickling and reopens the SeqBank."""
         path, engine = state.pop("_seqbank_args")
         self.__dict__.update(state)
         self.seqbank = SeqBank(path, engine=engine)
@@ -206,6 +254,13 @@ class CorgiTrainingDataset(Dataset):
         self.seqbank = SeqBank(seqbank.path, engine=seqbank.engine)
 
     def __getitem__(self, idx):
+        """Returns the sequence and target for an accession.
+
+        Sequences longer than `maximum` are truncated to a random slice (or a fixed one if `deterministic`).
+
+        Returns:
+            tuple[Tensor, int]: The sequence tensor and the ID of the node in the classification tree.
+        """
         accession = self.accessions[idx]
         data = self.seqbank[accession]
         length = len(data)
@@ -229,6 +284,11 @@ def seqbank_worker_init(worker_id: int):
 
 @dataclass
 class CorgiDataModule(L.LightningDataModule):
+    """A Lightning data module which loads sequences from a SeqBank for the nodes in a SeqTree.
+
+    The accessions are split into training and validation sets using the partitions in the SeqTree.
+    """
+
     seqtree: SeqTree
     seqbank: SeqBank
     batch_size: int
@@ -245,9 +305,14 @@ class CorgiDataModule(L.LightningDataModule):
     train_all: bool = False
 
     def __post_init__(self):
+        """Initializes the Lightning data module."""
         super().__init__()
 
     def setup(self, stage=None):
+        """Creates the training and validation datasets from the partitions in the SeqTree.
+
+        The test partition is excluded. If there are no validation accessions, then the training set is used for validation.
+        """
         if self.num_workers is None:
             self.num_workers = min(os.cpu_count(), 8)
 
@@ -298,6 +363,7 @@ class CorgiDataModule(L.LightningDataModule):
         )
 
     def train_dataloader(self):
+        """Returns the training dataloader, which shuffles the data and collates batches to random lengths."""
         return DataLoader(
             self.train_dataset,
             batch_size=self.batch_size,
@@ -310,6 +376,7 @@ class CorgiDataModule(L.LightningDataModule):
         )
 
     def val_dataloader(self):
+        """Returns the validation dataloader, which collates batches to a fixed length."""
         return DataLoader(
             self.val_dataset,
             batch_size=self.batch_size,
@@ -321,6 +388,12 @@ class CorgiDataModule(L.LightningDataModule):
 
 
 class SeqIODataloader:
+    """Iterates over sequence files, giving batches of chunks of sequences as tensors for prediction.
+
+    Sequences longer than `max_length` are split into overlapping chunks. Details of each chunk yielded are recorded
+    in `chunk_details`.
+    """
+
     def __init__(
         self,
         files,
@@ -331,6 +404,17 @@ class SeqIODataloader:
         overlap: int = 256,
         format: str = "",
     ):
+        """Finds the sequence files and counts the chunks.
+
+        Args:
+            files: A path or list of paths to sequence files or directories (searched recursively).
+            batch_size (int): The number of chunks in each batch.
+            min_length (int): Sequences shorter than this are skipped.
+            max_length (int): The maximum length of a chunk.
+            max_seqs (int | None): The maximum number of sequences to use. If not set, then there is no limit.
+            overlap (int): The minimum overlap between consecutive chunks of a sequence.
+            format (str): The file format. If not given, then it is inferred from the file extension.
+        """
         self.format = format
         self.chunk_details = []
         self.max_length = max_length
@@ -345,6 +429,7 @@ class SeqIODataloader:
 
         # Function to check if a file matches allowed extensions (including .gz)
         def matches_extensions(file: Path):
+            """Returns whether the file has a FASTA extension, with or without a '.gz' suffix."""
             return file.suffix in base_extensions or (
                 file.suffix == ".gz" and any(file.stem.endswith(ext) for ext in base_extensions)
             )
@@ -379,6 +464,11 @@ class SeqIODataloader:
                 seqs += 1
 
     def get_file_format(self, file):
+        """Returns the Biopython format name of a file, inferred from its extension unless `format` was given.
+
+        Raises:
+            ValueError: If the format cannot be determined.
+        """
         if self.format:
             return self.format
 
@@ -403,9 +493,11 @@ class SeqIODataloader:
         raise ValueError(f"Cannot determine file format of {file}.")
 
     def __len__(self):
+        """Returns the total number of chunks."""
         return self.count
 
     def parse(self, file: Path):
+        """Yields the records in a file, which may be gzipped."""
         file_format = self.get_file_format(file)
 
         if file.name.endswith('.gz'):
@@ -415,11 +507,16 @@ class SeqIODataloader:
             yield from SeqIO.parse(file, file_format)
 
     def iter_records(self):
+        """Yields (file, record) pairs for every record in every file."""
         for file in self.files:
             for record in self.parse(file):
                 yield file, record
 
     def __iter__(self):
+        """Yields batches of chunks as a one-element tuple of a padded tensor.
+
+        The details of each chunk are appended to `chunk_details`.
+        """
         batch = []
         seqs = 0
 
@@ -449,11 +546,13 @@ class SeqIODataloader:
             yield batch
 
     def pad(self, batch):
+        """Pads the tensors in a batch to the same length and stacks them in a one-element tuple."""
         max_len = 0
         for item in batch:
             max_len = max(item.shape[0], max_len)
 
         def pad(tensor):
+            """Pads a tensor to the maximum length and adds a batch dimension."""
             return slice_tensor(tensor, max_len).unsqueeze(dim=0)
 
         return (torch.cat(list(map(pad, batch))),)

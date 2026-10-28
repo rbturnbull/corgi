@@ -1,3 +1,5 @@
+"""Command to prepare labels for evaluating Corgi on CAMISIM benchmark data."""
+
 from multitax import NcbiTx
 import pandas as pd
 from pathlib import Path

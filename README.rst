@@ -43,11 +43,23 @@ The software can be installed using ``pip``
 
     Do not try just ``pip install corgi`` because that is a different package.
 
+Corgi requires Python 3.11 to 3.14. It can also be installed as a command line tool with `uv <https://docs.astral.sh/uv/>`_:
+
+.. code-block:: bash
+
+    uv tool install bio-corgi
+
 To install the latest version from the repository, you can use this command:
 
 .. code-block:: bash
 
     pip install git+https://github.com/rbturnbull/corgi.git
+
+To save static images of SeqTree plots (``seqtree sunburst``), install the optional ``images`` extra:
+
+.. code-block:: bash
+
+    pip install "bio-corgi[images]"
 
 .. note ::
 
@@ -78,6 +90,9 @@ For help on training a model with corgi, run:
 .. code-block:: bash
 
     corgi-tools --help
+
+This also lists the tools for building the training data, such as ``refseq-to-seqtree``. 
+See the preprocessing tutorial in the documentation for details.
 
 .. end-quickstart
 

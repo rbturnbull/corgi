@@ -1,3 +1,5 @@
+"""Neural network models for classifying DNA sequences."""
+
 from typing import Callable, Optional
 import math
 import numpy as np
@@ -18,6 +20,13 @@ class PositionalEncoding(nn.Module):
     """
 
     def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = 5000):
+        """Creates the sinusoidal positional encodings.
+
+        Args:
+            d_model (int): The size of the embeddings.
+            dropout (float): The dropout probability.
+            max_len (int): The maximum sequence length.
+        """
         super().__init__()
         self.dropout = nn.Dropout(p=dropout)
 
@@ -62,6 +71,15 @@ class ResidualBlock1D(nn.Module):
         downsample: Optional[nn.Module] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
     ) -> None:
+        """Creates the layers of the block.
+
+        Args:
+            inplanes (int): The number of input channels.
+            planes (int): The number of output channels.
+            stride (int): The stride of the first convolution. If not 1, then the identity is downsampled to match.
+            downsample (nn.Module | None): A module to downsample the identity.
+            norm_layer: The normalization layer class. Defaults to BatchNorm1d.
+        """
         super().__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm1d
@@ -82,6 +100,7 @@ class ResidualBlock1D(nn.Module):
         self.stride = stride
 
     def forward(self, x: Tensor) -> Tensor:
+        """Applies two convolutions and adds the (possibly downsampled) input."""
         identity = x
 
         out = self.conv1(x)
@@ -101,6 +120,11 @@ class ResidualBlock1D(nn.Module):
 
 
 class ConvRecurrantClassifier(nn.Module):
+    """A CNN followed by an optional bidirectional LSTM which classifies a sequence into a number of classes.
+
+    The input is a tensor of nucleotide indices (N, A, C, G, T) of shape (batch, sequence length).
+    """
+
     def __init__(
         self,
         num_classes,
@@ -116,6 +140,22 @@ class ConvRecurrantClassifier(nn.Module):
         final_bias: bool = True,
         multi_kernel_sizes: bool = True,
     ):
+        """Creates the layers of the classifier.
+
+        Args:
+            num_classes (int): The number of output classes.
+            embedding_dim (int): The size of the nucleotide embeddings.
+            filters (int): The number of filters in each convolution.
+            cnn_layers (int): The number of convolutions when `multi_kernel_sizes` is True.
+            kernel_size_cnn (int): The kernel size of the convolution when `multi_kernel_sizes` is False.
+            lstm_dims (int): The hidden size of the LSTM. If zero, then no LSTM is used.
+            final_layer_dims (int): The size of an extra linear layer before the output. If zero, it is not used.
+            dropout (float): The dropout probability.
+            kernel_size_maxpool (int): The size of the max pooling.
+            residual_blocks (bool): Whether to use residual blocks instead of a single convolution.
+            final_bias (bool): Whether the output layer has a bias.
+            multi_kernel_sizes (bool): Whether to use parallel convolutions with increasing kernel sizes.
+        """
         super().__init__()
 
         num_embeddings = 5  # i.e. the size of the vocab which is N, A, C, G, T
@@ -210,6 +250,14 @@ class ConvRecurrantClassifier(nn.Module):
         # x = Tensor(x)
 
         # Convert to int because it may be simply a byte
+        """Returns the logits for a batch of sequences.
+
+        Args:
+            x (Tensor): Nucleotide indices of shape (batch, sequence length).
+
+        Returns:
+            Tensor: Logits of shape (batch, num_classes).
+        """
         x = x.int()
         x = self.embed(x)
 
@@ -260,6 +308,11 @@ class ConvRecurrantClassifier(nn.Module):
 
 
 class ConvClassifier(nn.Module):
+    """A convolutional classifier with an optional transformer encoder or bidirectional LSTM.
+
+    The output is split according to `output_types` (e.g. for hierarchical classification).
+    """
+
     def __init__(
         self,
         embedding_dim=8,
@@ -282,6 +335,29 @@ class ConvClassifier(nn.Module):
         transformer_heads: int = 8,
         transformer_layers: int = 6,
     ):
+        """Creates the layers of the classifier.
+
+        Args:
+            embedding_dim (int): The size of the nucleotide embeddings.
+            cnn_layers (int): The number of convolutional layers.
+            output_types: The output data types, which determine the size and splitting of the output.
+            cnn_dims_start (int): The number of filters in the first convolution.
+            kernel_size_maxpool (int): The size of the max pooling after each convolution.
+            return_embeddings (bool): Whether the forward pass also returns the penultimate layer's activations.
+            num_embeddings (int): The vocabulary size (N, A, C, G, T).
+            kernel_size (int): The kernel size of the convolutions.
+            factor (float): The factor by which the number of filters grows with each layer.
+            padding (str): The padding of the convolutions.
+            padding_mode (str): The padding mode of the convolutions.
+            dropout (float): The dropout probability.
+            final_bias (bool): Whether the output layer has a bias.
+            lstm_dims (int): The hidden size of the LSTM. If zero, then the sequence is averaged instead.
+            penultimate_dims (int): The size of the penultimate linear layer.
+            include_length (bool): Whether to give the (scaled) sequence length as an extra feature.
+            length_scaling (float): The divisor used to scale the sequence length.
+            transformer_heads (int): The number of attention heads in the transformer.
+            transformer_layers (int): The number of transformer layers. If zero, then no transformer is used.
+        """
         super().__init__()
 
         self.embedding_dim = embedding_dim
@@ -364,6 +440,15 @@ class ConvClassifier(nn.Module):
 
     def forward(self, x):
         # Convert to int because it may be simply a byte
+        """Returns the predictions for a batch of sequences.
+
+        Args:
+            x (Tensor): Nucleotide indices of shape (batch, sequence length).
+
+        Returns:
+            The predictions split by output type. If `return_embeddings` is set, then the penultimate layer's
+            activations are also returned.
+        """
         x = x.int()
         length = x.shape[-1]
         x = self.embedding(x)
@@ -407,7 +492,39 @@ class ConvClassifier(nn.Module):
 
         return split_predictions
 
+    def output_types_match(self, output_types) -> bool:
+        """Returns whether the final layer of this model is already suitable for the given output types.
+
+        This is the case when the number of outputs is the same and each output type is equivalent to the
+        corresponding current one. Hierarchical outputs are equivalent if their classification trees have
+        the same nodes (by name and ancestry) in the same order, because the final layer's weights are
+        specific to each node.
+
+        Args:
+            output_types: The output types to compare to the current output types.
+        """
+        current = self.output_types
+        if current is None or output_types is None:
+            return False
+
+        if len(current) != len(output_types) or total_size(current) != total_size(output_types):
+            return False
+
+        if self.final.out_features != total_size(output_types):
+            return False
+
+        return all(
+            type(old) is type(new) and _output_type_signature(old) == _output_type_signature(new)
+            for old, new in zip(current, output_types)
+        )
+
     def replace_output_types(self, output_types, final_bias: bool = None) -> None:
+        """Replaces the final layer so that the model has outputs for new output types.
+
+        Args:
+            output_types: The new output types.
+            final_bias (bool | None): Whether the new final layer has a bias. If None, then it matches the current layer.
+        """
         device = next(self.parameters()).device
         self.output_types = output_types
         penultimate_dims = self.penultimate.out_features
@@ -419,8 +536,23 @@ class ConvClassifier(nn.Module):
         )
 
 
+def _output_type_signature(output_type):
+    """Returns a value which is equal for output types that are equivalent.
+
+    For types with a classification tree (a `root`), this is the path of names to each node in the tree
+    in pre-order. Otherwise it is the output type itself.
+    """
+    root = getattr(output_type, "root", None)
+    if root is None:
+        return output_type
+    return tuple(tuple(str(n.name) for n in (node, *node.ancestors)) for node in root.pre_order_iter())
+
+
 class SequentialDebug(nn.Sequential):
+    """A sequential module which prints the shapes and multiply-accumulate operations of each layer."""
+
     def forward(self, input):
+        """Runs each module, printing its shape and the cumulative MACs. Requires `thop`."""
         macs_cummulative = 0
         from thop import profile
 
@@ -438,6 +570,8 @@ class SequentialDebug(nn.Sequential):
 
 
 class ConvProcessor(nn.Sequential):
+    """A stack of convolution, ReLU, dropout and max pooling layers which increase the number of channels."""
+
     def __init__(
         self,
         in_channels=8,
@@ -450,6 +584,19 @@ class ConvProcessor(nn.Sequential):
         padding="same",
         padding_mode="zeros",
     ):
+        """Creates the layers.
+
+        Args:
+            in_channels (int): The number of input channels.
+            cnn_layers (int): The number of convolutional layers.
+            cnn_dims_start (int): The number of filters in the first convolution.
+            kernel_size_maxpool (int): The size of the max pooling after each convolution.
+            kernel_size (int): The kernel size of the convolutions.
+            factor (float): The factor by which the number of filters grows with each layer.
+            dropout (float): The dropout probability.
+            padding (str): The padding of the convolutions.
+            padding_mode (str): The padding mode of the convolutions.
+        """
         out_channels = cnn_dims_start
         conv_layers = []
         for layer_index in range(cnn_layers):

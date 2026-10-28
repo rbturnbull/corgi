@@ -6,8 +6,9 @@ import typer
 from corgi.apps import Corgi, limit_torch_threads
 from pathlib import Path
 from corgi.seqtree import SeqTree
-from polytorch import HierarchicalData
+from polytorch import HierarchicalData, total_size
 from unittest.mock import patch
+from hierarchicalsoftmax import SoftmaxNode
 
 
 def test_limit_torch_threads():
@@ -23,7 +24,7 @@ def test_limit_torch_threads():
 
 
 def mock_init(self):
-    self.seqtree = SeqTree.load(Path(__file__).parent/"testdata/seqtree.pkl")
+    self.seqtree = SeqTree.load(Path(__file__).parent / "testdata/seqtree.pkl")
     self.classification_tree = self.seqtree.classification_tree
     self.output_types = [
         HierarchicalData(root=self.classification_tree),
@@ -132,18 +133,56 @@ def test_app_model_pretrained_missing(app, tmp_path):
         app.model(pretrained=tmp_path / "missing.ckpt")
 
 
-def test_app_model_pretrained(app, tmp_path):
+def pretrained_setup(app, tmp_path):
     original = app.model(cnn_layers=1, cnn_dims_start=8, penultimate_dims=16)
     checkpoint = tmp_path / "model.ckpt"
     checkpoint.write_text("placeholder")
-    module = SimpleNamespace(model=original)
     module_class = MagicMock()
-    module_class.load_from_checkpoint.return_value = module
+    module_class.load_from_checkpoint.return_value = SimpleNamespace(model=original)
+    return original, checkpoint, module_class
+
+
+def test_app_model_pretrained_keeps_matching_final_layer(app, tmp_path, capsys):
+    original, checkpoint, module_class = pretrained_setup(app, tmp_path)
+    final = original.final
+    weights = final.weight.detach().clone()
+    new_output_types = [HierarchicalData(root=app.classification_tree)]
+
+    app.output_types = new_output_types
     with patch.object(app, "module_class", return_value=module_class):
         model = app.model(pretrained=checkpoint, final_bias=False)
+
     assert model is original
     module_class.load_from_checkpoint.assert_called_once_with(str(checkpoint))
+    assert model.final is final
+    assert torch.equal(model.final.weight, weights)
+    assert model.final.bias is not None  # The existing layer is retained, whatever `final_bias` is
+    assert model.output_types is new_output_types
+    assert "Keeping its final layer" in capsys.readouterr().out
+
+
+def test_app_model_pretrained_replaces_different_final_layer(app, tmp_path, capsys):
+    original, checkpoint, module_class = pretrained_setup(app, tmp_path)
+    final = original.final
+    old_outputs = final.out_features
+
+    root = SoftmaxNode("root")
+    SoftmaxNode("a", parent=root)
+    SoftmaxNode("b", parent=root)
+    root.set_indexes_if_unset()
+    app.classification_tree = root
+    app.output_types = [HierarchicalData(root=root)]
+
+    with patch.object(app, "module_class", return_value=module_class):
+        model = app.model(pretrained=checkpoint, final_bias=False)
+
+    assert model is original
+    assert model.final is not final
+    assert model.final.out_features == total_size(app.output_types) != old_outputs
     assert model.final.bias is None
+    output = capsys.readouterr().out
+    assert "Replacing its final layer" in output
+    assert str(old_outputs) in output
 
 
 def test_app_model_pretrained_default(app, tmp_path):
@@ -152,9 +191,10 @@ def test_app_model_pretrained_default(app, tmp_path):
     original = app.model(cnn_layers=1, cnn_dims_start=8, penultimate_dims=16)
     module_class = MagicMock()
     module_class.load_from_checkpoint.return_value = SimpleNamespace(model=original)
-    with patch.object(app, "module_class", return_value=module_class), patch.object(
-        app, "process_location", return_value=checkpoint
-    ) as process_location:
+    with (
+        patch.object(app, "module_class", return_value=module_class),
+        patch.object(app, "process_location", return_value=checkpoint) as process_location,
+    ):
         app.model(pretrained=Path("default"))
     process_location.assert_called_once()
     module_class.load_from_checkpoint.assert_called_once_with(str(checkpoint))
@@ -230,7 +270,7 @@ def test_prediction_dataloader_classification_tree_from_module(app, fasta_file):
 
 
 def run_predictions(app, fasta_file):
-    """ Runs the dataloader through an untrained model to give the inputs for output_results. """
+    """Runs the dataloader through an untrained model to give the inputs for output_results."""
     model = app.model(cnn_layers=1, cnn_dims_start=8, penultimate_dims=16, include_length=True)
     model.eval()
     app.prediction_dataloader(
@@ -283,12 +323,18 @@ def test_refseq_to_seqtree_tool(app, tmp_path):
             app.tools_app,
             [
                 "refseq-to-seqtree",
-                "--output", str(tmp_path / "out.st"),
-                "--seqbank", str(tmp_path / "in.sb"),
-                "--seqbank-output", str(tmp_path / "out.sb"),
-                "--engine", "lmdb",
-                "--max-seqs", "7",
-                "--ranks", "phylum",
+                "--output",
+                str(tmp_path / "out.st"),
+                "--seqbank",
+                str(tmp_path / "in.sb"),
+                "--seqbank-output",
+                str(tmp_path / "out.sb"),
+                "--engine",
+                "lmdb",
+                "--max-seqs",
+                "7",
+                "--ranks",
+                "phylum",
             ],
         )
     assert result.exit_code == 0, result.output

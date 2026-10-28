@@ -1,3 +1,5 @@
+"""The Corgi application: training, prediction and tools built with torchapp."""
+
 from typing import TYPE_CHECKING
 from pathlib import Path
 import typer
@@ -15,6 +17,14 @@ console = Console()
 
 
 def limit_torch_threads(num_threads: int | None) -> None:
+    """Limits the number of CPU threads that PyTorch uses.
+
+    Args:
+        num_threads (int | None): The maximum number of threads. If None, then the PyTorch default is left unchanged.
+
+    Raises:
+        typer.BadParameter: If `num_threads` is less than 1.
+    """
     if num_threads is None:
         return
 
@@ -27,6 +37,14 @@ def limit_torch_threads(num_threads: int | None) -> None:
 
 
 def output_results_bar_chart(predictions: "pd.Series", top_k: int = 10, bar_size: int = 80):
+    """Prints a table with a bar chart of the proportion of each prediction.
+
+    Args:
+        predictions (pd.Series): The prediction for each sequence.
+        top_k (int): The number of most common predictions to show. The rest are summed into 'Other Categories'.
+            If zero, then all predictions are shown.
+        bar_size (int): The number of characters in a bar which represents 100%.
+    """
     from rich.table import Table
     from rich.box import SIMPLE
 
@@ -56,6 +74,12 @@ def output_results_bar_chart(predictions: "pd.Series", top_k: int = 10, bar_size
 
 
 def set_alphas_with_phi(tree, phi=1.0):
+    """Sets the `alpha` (loss weight) of each node in the tree to `phi` raised to the power of the node's depth.
+
+    Args:
+        tree (SoftmaxNode): The root of the classification tree.
+        phi (float): The multiplication factor for the loss at each level of the tree.
+    """
     import numpy as np
 
     for node in tree.pre_order_iter():
@@ -154,6 +178,7 @@ class Corgi(ta.TorchApp):
 
     @ta.method
     def module_class(self, **kwargs) -> 'CorgiLightningModule':
+        """Returns the class of the Lightning module, which adds support for saving embeddings during prediction."""
         from .modules import CorgiLightningModule
 
         return CorgiLightningModule
@@ -253,7 +278,20 @@ class Corgi(ta.TorchApp):
             module_class = self.module_class(**kwargs)
             module = module_class.load_from_checkpoint(str(pretrained))
             model = module.model
-            model.replace_output_types(self.output_types, final_bias=final_bias)
+            if model.output_types_match(self.output_types):
+                console.print(
+                    f"[green]The output types of the pretrained model match the classification tree "
+                    f"({num_classes} outputs). Keeping its final layer."
+                )
+                model.output_types = self.output_types
+            else:
+                old_outputs = model.final.out_features
+                console.print(
+                    f"[yellow]The output types of the pretrained model ({old_outputs} outputs) are different from "
+                    f"the classification tree ({num_classes} outputs). Replacing its final layer with a new, "
+                    f"randomly initialised one."
+                )
+                model.replace_output_types(self.output_types, final_bias=final_bias)
             return model
 
         # if cnn_dims_start not given then calculate it from the MACC
@@ -289,6 +327,7 @@ class Corgi(ta.TorchApp):
 
     @ta.method
     def metrics(self) -> list[tuple[str, 'Metric']]:
+        """Returns the metrics to track during validation, which are the accuracy at each rank of the taxonomic tree."""
         from hierarchicalsoftmax.metrics import RankAccuracyTorchMetric
 
         rank_accuracy = RankAccuracyTorchMetric(
@@ -307,10 +346,12 @@ class Corgi(ta.TorchApp):
 
     @ta.method
     def monitor(self):
+        """Returns the name of the metric to monitor when selecting the best checkpoint."""
         return "superkingdom_accuracy"
 
     @ta.method
     def loss_function(self):
+        """Returns the loss function, which combines the losses for the hierarchical output of the model."""
         from polytorch import PolyLoss
 
         assert self.output_types
@@ -323,6 +364,18 @@ class Corgi(ta.TorchApp):
         return "bio-corgi"
 
     def find_input_paths(self, files: list[str], base_extensions: set[str] | None = None) -> list[Path]:
+        """Finds the sequence files to classify.
+
+        Directories are searched recursively for files with a recognised sequence file extension (optionally gzipped).
+
+        Args:
+            files (list[str]): Paths or URLs of files or directories.
+            base_extensions (set[str] | None): The file extensions to accept. If not given, then the extensions for
+                FASTA, GenBank, tabular and FASTQ files are used.
+
+        Returns:
+            list[Path]: The paths of the matching files.
+        """
         base_extensions = base_extensions or {
             ".fa",
             ".fasta",
@@ -341,6 +394,7 @@ class Corgi(ta.TorchApp):
 
         # Function to check if a file matches allowed extensions (including .gz)
         def matches_extensions(file: Path):
+            """Returns whether the file has one of the allowed extensions, with or without a '.gz' suffix."""
             return file.suffix in base_extensions or (
                 file.suffix == ".gz" and any(file.stem.endswith(ext) for ext in base_extensions)
             )
@@ -365,6 +419,14 @@ class Corgi(ta.TorchApp):
         return fasta_paths
 
     def find_fasta_paths(self, files: list[str]) -> list[Path]:
+        """Finds the FASTA files to classify.
+
+        Args:
+            files (list[str]): Paths or URLs of files or directories.
+
+        Returns:
+            list[Path]: The paths of the FASTA files.
+        """
         return self.find_input_paths(files, base_extensions={".fa", ".fasta", ".fna", ".fas", ".frn", ".ref"})
 
     @ta.method
@@ -387,6 +449,14 @@ class Corgi(ta.TorchApp):
         ),
         **kwargs,
     ):
+        """Creates the dataloader for the sequences to be classified.
+
+        Long sequences are split into overlapping chunks. The details of the chunks are recorded as the dataloader is
+        iterated so that the predictions can be combined for each sequence.
+
+        Raises:
+            typer.BadParameter: If no sequence files are found in the input.
+        """
         from .data import SeqIODataloader
         from .seqtree import SeqTree
 
@@ -443,6 +513,12 @@ class Corgi(ta.TorchApp):
         ),
         **kwargs,
     ):
+        """Processes the model output into predictions and writes the requested outputs.
+
+        The probabilities for the chunks of each sequence are averaged, a greedy hierarchical prediction is made, and a
+        summary bar chart is printed. Optionally the results are written to CSV files and images of the probabilities
+        are rendered for each sequence.
+        """
         import torch
         import pandas as pd
         from hierarchicalsoftmax.inference import node_probabilities, greedy_predictions, render_probabilities
@@ -490,6 +566,7 @@ class Corgi(ta.TorchApp):
         results_df['accession'] = results_df['original_id'].apply(lambda x: x.split("#")[0])
 
         def get_prediction_probability(row):
+            """Returns the probability of the predicted node in a row of results, or 1.0 if it is the root."""
             prediction = row["prediction"]
             if prediction in row:
                 return row[prediction]
@@ -599,6 +676,7 @@ class Corgi(ta.TorchApp):
             default=False, help="Whether or not to use a large checkpoint (overridden by `checkpoint` parameter)."
         ),
     ) -> str:
+        """Returns the location of the checkpoint to use: the given path, or a default (small or large) pretrained model."""
         if checkpoint:
             return checkpoint
         if large:

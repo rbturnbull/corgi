@@ -2,12 +2,16 @@
 Command Line Interface Reference
 ================================
 
-More information coming soon.
-.. .. click:: corgi.apps:Corgi.main_app
-..    :prog: corgi
-..    :nested: full
+Corgi installs these command line tools. Each has a ``--help`` option which describes its arguments.
 
+``corgi``
+    Classifies sequences. See the :doc:`quickstart`.
 
-.. .. click:: corgi.apps:Corgi.tools_app
-..    :prog: corgi-train
-..    :nested: full
+``corgi-tools``
+    Training, evaluation and data preparation tools, including ``refseq-to-seqtree``. See :doc:`preprocessing`.
+
+``seqtree``
+    Commands to inspect, render, edit and export SeqTree files. See :doc:`seqtree`.
+
+``refseq-to-seqtree``
+    Builds a SeqTree from the RefSeq catalog. This is also available as ``corgi-tools refseq-to-seqtree``. See :doc:`preprocessing`.

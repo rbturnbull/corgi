@@ -1,3 +1,5 @@
+"""Tools for building a SeqTree from the RefSeq catalog and taxonomy."""
+
 from multitax import NcbiTx
 from hierarchicalsoftmax import SoftmaxNode
 from pathlib import Path
@@ -24,12 +26,15 @@ RANKS = ("superkingdom", "kingdom", "phylum", "class", "order")
 
 
 class DNAType(Enum):
+    """The types of DNA sequence that are classified."""
+
     NUCLEAR = "Nuclear"
     MITOCHONDRION = "Mitochondrion"
     PLASTID = "Plastid"
     PLASMID = "Plasmid"
 
     def __str__(self):
+        """Returns the name of the type."""
         return str(self.value)
 
     @classmethod
@@ -47,6 +52,7 @@ class DNAType(Enum):
 
 
 def my_open(file):
+    """Opens a text file for reading, or a gzipped file in binary mode."""
     file = Path(file)
     if file.suffix.lower() == ".gz":
         return gzip.open(file, 'rb')
@@ -57,6 +63,7 @@ def line_count(file: Path):
     """Adapted from https://stackoverflow.com/a/9631635"""
 
     def blocks(stream, size=65536):
+        """Yields blocks of the stream until it is exhausted."""
         while True:
             b = stream.read(size)
             if not b:
@@ -73,6 +80,7 @@ def line_count(file: Path):
 
 
 def get_refseq_release() -> int:
+    """Returns the number of the current RefSeq release."""
     url = "https://ftp.ncbi.nlm.nih.gov/refseq/release/RELEASE_NUMBER"
     response = requests.get(url)
     data = response.text.strip()
@@ -80,6 +88,7 @@ def get_refseq_release() -> int:
 
 
 def get_catalogue() -> Path:
+    """Downloads (or reuses from the cache) the catalog for the current RefSeq release and returns its path."""
     version = get_refseq_release()
     filename = f"RefSeq-release{version}.catalog.gz"
     url = f"https://ftp.ncbi.nlm.nih.gov/refseq/release/release-catalog/{filename}"
@@ -90,6 +99,17 @@ def get_catalogue() -> Path:
 
 
 def get_node_at_rank(taxon, taxonomy, taxon_to_node, current_node, rank):
+    """Returns the node for the taxon's ancestor at a rank, creating it under `current_node` if needed.
+
+    If the taxon has no ancestor at the rank, then `current_node` is returned.
+
+    Args:
+        taxon: The taxon ID.
+        taxonomy: The taxonomy (e.g. multitax.NcbiTx).
+        taxon_to_node (dict): The nodes already created, by taxon ID.
+        current_node (SoftmaxNode): The parent node for any new node.
+        rank (str): The taxonomic rank.
+    """
     current_id = taxonomy.parent_rank(taxon, rank)
     if not current_id:
         return current_node
@@ -104,6 +124,15 @@ def get_node_at_rank(taxon, taxonomy, taxon_to_node, current_node, rank):
 
 
 def get_node(taxon, taxonomy, taxon_to_node, root, ranks):
+    """Returns the node in the tree for a taxon, creating nodes for its ancestors at the given ranks as needed.
+
+    Args:
+        taxon: The taxon ID.
+        taxonomy: The taxonomy (e.g. multitax.NcbiTx).
+        taxon_to_node (dict): The nodes already created, by taxon ID.
+        root (SoftmaxNode): The node to start from.
+        ranks (list[str]): The ranks to include, from the highest to the lowest.
+    """
     current_node = root
     for rank in ranks:
         current_node = get_node_at_rank(taxon, taxonomy, taxon_to_node, current_node, rank)

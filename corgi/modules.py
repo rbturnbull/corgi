@@ -1,3 +1,5 @@
+"""Lightning module for Corgi with support for saving embeddings during prediction."""
+
 from pathlib import Path
 from torchapp.modules import GeneralLightningModule
 import numpy as np
@@ -8,7 +10,10 @@ console = Console()
 
 
 class CorgiLightningModule(GeneralLightningModule):
+    """A Lightning module which can write the model's embeddings to a memory-mapped file during prediction."""
+
     def __init__(self, *args, **kwargs):
+        """Initializes the module with no embeddings output."""
         super().__init__(*args, **kwargs)
         self.embeddings_path = None
         self.embeddings = None
@@ -23,6 +28,10 @@ class CorgiLightningModule(GeneralLightningModule):
         self.dataloader = dataloader
 
     def on_predict_epoch_end(self):
+        """Flushes the embeddings to disk and writes an index file beside them.
+
+        The index has a line with the file and record ID (tab-separated) for each chunk.
+        """
         if self.embeddings is not None:
             self.embeddings.flush()
             del self.embeddings
@@ -41,6 +50,11 @@ class CorgiLightningModule(GeneralLightningModule):
                     f.write(f"{file}\t{record_id}\n")
 
     def predict_step(self, batch):
+        """Returns the model's predictions for a batch, saving the embeddings if an embeddings path was set.
+
+        Args:
+            batch (tuple): The inputs for the model.
+        """
         assert isinstance(batch, tuple)
         assert len(batch) >= self.input_count
         x = batch[: self.input_count]
@@ -69,6 +83,13 @@ class CorgiLightningModule(GeneralLightningModule):
 
 
 def read_memmap(path, count, dtype: str = "float16") -> np.memmap:
+    """Opens a memory-mapped array of embeddings.
+
+    Args:
+        path: The path to the embeddings file.
+        count (int): The number of embeddings (rows) in the file.
+        dtype (str): The data type stored in the file.
+    """
     file_size = os.path.getsize(path)
     dtype_size = np.dtype(dtype).itemsize
     num_elements = file_size // dtype_size

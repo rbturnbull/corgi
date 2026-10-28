@@ -1,3 +1,5 @@
+"""SeqTree: a mapping from sequence accessions to partitions and nodes in a classification tree."""
+
 from typing import TYPE_CHECKING, List, Optional
 from collections import Counter
 from pathlib import Path
@@ -38,6 +40,14 @@ def node_to_str(node: "SoftmaxNode") -> str:
 
 @define
 class SeqDetail:
+    """The details of an accession in a SeqTree.
+
+    Args:
+        partition (int): The cross-validation partition of the accession.
+        node (SoftmaxNode): The node in the classification tree. This is not pickled, only `node_id` is.
+        node_id (int): The index of the node, which is used to restore `node` after loading.
+    """
+
     partition: int
     node: "SoftmaxNode" = field(default=None, eq=False)
     node_id: int = None
@@ -53,10 +63,14 @@ class SeqDetail:
 
 
 class AlreadyExists(Exception):
+    """Raised when adding an accession to a SeqTree under a different node to the one it already has."""
+
     pass
 
 
 class SeqTree(UserDict):
+    """A dictionary from accessions to `SeqDetail` objects which give the partition and the node in a classification tree."""
+
     def __init__(self, classification_tree=None):
         """Create an empty accession mapping with the given tree or a new root."""
         from hierarchicalsoftmax import SoftmaxNode

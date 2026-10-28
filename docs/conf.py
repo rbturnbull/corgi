@@ -23,9 +23,9 @@ copyright = "2022–2025, Robert Turnbull"
 author = "Robert Turnbull"
 
 # The full version, including alpha/beta/rc tags
-release = "0.2.0"
-# import importlib.metadata
-# release = importlib.metadata.version('corgi')
+import importlib.metadata
+
+release = importlib.metadata.version("bio-corgi")
 
 
 # -- General configuration ---------------------------------------------------
