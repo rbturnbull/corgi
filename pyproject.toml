@@ -46,7 +46,6 @@ Documentation = "https://rbturnbull.github.io/corgi/"
 corgi = "corgi.apps:Corgi.main"
 corgi-tools = "corgi.apps:Corgi.tools"
 seqtree = "corgi.seqtree:app"
-refseq-to-seqtree = "corgi.refseq:app"
 
 [dependency-groups]
 dev = [

@@ -3,7 +3,6 @@
 from multitax import NcbiTx
 from hierarchicalsoftmax import SoftmaxNode
 from pathlib import Path
-from typing import Annotated, Optional
 import requests
 from enum import Enum
 from appdirs import user_cache_dir
@@ -12,12 +11,8 @@ from rich.progress import track
 from seqbank import SeqBank
 import gzip
 
-import typer
-
 
 from .seqtree import SeqTree
-
-app = typer.Typer()
 
 # https://academic.oup.com/nar/article/44/D1/D733/2502674
 DNA_PREFIXES = {"NC", "AC", "NZ", "NT", "NW", "NG"}
@@ -140,54 +135,56 @@ def get_node(taxon, taxonomy, taxon_to_node, root, ranks):
     return current_node
 
 
-@app.command()
 def refseq_to_seqtree(
-    output: Annotated[Path, typer.Argument(help="The path to save the SeqTree.")],
-    seqbank: Annotated[Path, typer.Argument(help="The SeqBank with the sequences for the RefSeq accessions.")],
-    seqbank_output: Annotated[
-        Optional[Path],
-        typer.Option(help="Where to save a new SeqBank containing only the sequences selected for the SeqTree."),
-    ] = None,
-    engine: Annotated[
-        Optional[str],
-        typer.Option(
-            help="The storage engine for the output SeqBank: 'rocksdict', 'lmdb' or 'speedict'. If not given, then RocksDict is used."
-        ),
-    ] = None,
-    render: Annotated[Optional[Path], typer.Option(help="The path to render an image of the SeqTree.")] = None,
-    accessions: Annotated[
-        Optional[Path], typer.Option(help="The path to write a list of the accessions in the SeqTree.")
-    ] = None,
-    partitions: Annotated[int, typer.Option(help="The number of cross-validation partitions.")] = 6,
-    max_seqs: Annotated[
-        int, typer.Option(help="The maximum number of sequences for each leaf node. Use 0 for no limit.")
-    ] = 100,
-    catalog: Annotated[
-        Optional[Path],
-        typer.Option(help="The path to a RefSeq catalog. If not given, then the latest release is downloaded."),
-    ] = None,
-    ranks: Annotated[
-        str, typer.Option(help="The comma-separated taxonomic ranks to include in the tree.")
-    ] = "superkingdom,kingdom,phylum,class,order",
-    restrict_ranks: Annotated[
-        str, typer.Option(help="The comma-separated ranks of the nodes which sequences can be assigned to.")
-    ] = "class,order",
-    mitochondrion_ranks: Annotated[str, typer.Option(help="Overrides `ranks` for mitochondrion sequences.")] = "",
-    plastid_ranks: Annotated[str, typer.Option(help="Overrides `ranks` for plastid sequences.")] = "",
-    plasmid_ranks: Annotated[str, typer.Option(help="Overrides `ranks` for plasmid sequences.")] = "",
-    nuclear_ranks: Annotated[str, typer.Option(help="Overrides `ranks` for nuclear sequences.")] = "",
-    mitochondrion_restrict_ranks: Annotated[
-        str, typer.Option(help="Overrides `restrict_ranks` for mitochondrion sequences.")
-    ] = "",
-    plastid_restrict_ranks: Annotated[str, typer.Option(help="Overrides `restrict_ranks` for plastid sequences.")] = "",
-    plasmid_restrict_ranks: Annotated[str, typer.Option(help="Overrides `restrict_ranks` for plasmid sequences.")] = "",
-    nuclear_restrict_ranks: Annotated[str, typer.Option(help="Overrides `restrict_ranks` for nuclear sequences.")] = "",
-    print_tree: Annotated[bool, typer.Option(help="Whether or not to print the tree to the screen.")] = False,
+    output: Path,
+    seqbank: Path,
+    seqbank_output: Path | None = None,
+    engine: str | None = None,
+    render: Path | None = None,
+    accessions: Path | None = None,
+    partitions: int = 6,
+    max_seqs: int = 100,
+    catalog: Path | None = None,
+    ranks: str = "superkingdom,kingdom,phylum,class,order",
+    restrict_ranks: str = "class,order",
+    mitochondrion_ranks: str = "",
+    plastid_ranks: str = "",
+    plasmid_ranks: str = "",
+    nuclear_ranks: str = "",
+    mitochondrion_restrict_ranks: str = "",
+    plastid_restrict_ranks: str = "",
+    plasmid_restrict_ranks: str = "",
+    nuclear_restrict_ranks: str = "",
+    print_tree: bool = False,
 ):
-    """
-    Builds a SeqTree from the RefSeq catalog for the accessions found in a SeqBank.
+    """Builds a SeqTree from the RefSeq catalog for the accessions found in a SeqBank.
 
     Each accession is placed in the taxonomic tree and assigned to a cross-validation partition.
+    This is available on the command line as `corgi-tools refseq-to-seqtree`.
+
+    Args:
+        output (Path): The path to save the SeqTree.
+        seqbank (Path): The SeqBank with the sequences for the RefSeq accessions.
+        seqbank_output (Path | None): Where to save a new SeqBank containing only the sequences selected for
+            the SeqTree.
+        engine (str | None): The storage engine for the output SeqBank: 'rocksdict', 'lmdb' or 'speedict'.
+            If not given, then RocksDict is used.
+        render (Path | None): The path to render an image of the SeqTree.
+        accessions (Path | None): The path to write a list of the accessions in the SeqTree.
+        partitions (int): The number of cross-validation partitions.
+        max_seqs (int): The maximum number of sequences for each leaf node. Use 0 for no limit.
+        catalog (Path | None): The path to a RefSeq catalog. If not given, then the latest release is downloaded.
+        ranks (str): The comma-separated taxonomic ranks to include in the tree.
+        restrict_ranks (str): The comma-separated ranks of the nodes which sequences can be assigned to.
+        mitochondrion_ranks (str): Overrides `ranks` for mitochondrion sequences.
+        plastid_ranks (str): Overrides `ranks` for plastid sequences.
+        plasmid_ranks (str): Overrides `ranks` for plasmid sequences.
+        nuclear_ranks (str): Overrides `ranks` for nuclear sequences.
+        mitochondrion_restrict_ranks (str): Overrides `restrict_ranks` for mitochondrion sequences.
+        plastid_restrict_ranks (str): Overrides `restrict_ranks` for plastid sequences.
+        plasmid_restrict_ranks (str): Overrides `restrict_ranks` for plasmid sequences.
+        nuclear_restrict_ranks (str): Overrides `restrict_ranks` for nuclear sequences.
+        print_tree (bool): Whether or not to print the tree to the screen.
     """
     catalog = catalog or get_catalogue()
     print(f"Using catalog: {catalog}")
@@ -303,7 +300,3 @@ def refseq_to_seqtree(
     if seqbank_output is not None:
         seqbank_output.close()
     seqbank.close()
-
-
-if __name__ == "__main__":
-    app()
