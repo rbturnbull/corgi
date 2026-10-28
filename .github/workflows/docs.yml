@@ -7,14 +7,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
 concurrency:
   group: "pages"
   cancel-in-progress: false
-    
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,27 +24,35 @@ jobs:
         python-version: ["3.11"]
     steps:
     - uses: actions/checkout@v7
-    - name: Install uv
+    - name: Install uv and Python ${{ matrix.python-version }}
       uses: astral-sh/setup-uv@v10.3.2
       with:
         python-version: ${{ matrix.python-version }}
         enable-cache: true
     - name: Install dependencies for Python ${{ matrix.python-version }}
       run: uv sync --locked
-    - name: Docs
+
+    - name: Build Sphinx docs
+      run: uv run --no-sync sphinx-build -b html docs gh-pages
+
+    - name: Run tests and generate coverage report
       run: |
-        uv run sphinx-build -b html docs gh-pages
-    - name: Coverage
-      run: |
-        uv run coverage run -m pytest
-        echo "COVERAGE=$(uv run coverage report --precision 2 | grep TOTAL | tr -s ' ' | cut -f 4 -d " ")" >> $GITHUB_ENV
-        uv run coverage html --directory gh-pages/coverage
-    - name: Deploy 🚀
-      uses: JamesIves/github-pages-deploy-action@v4
+        uv run --no-sync coverage run -m pytest
+        echo "COVERAGE=$(uv run --no-sync coverage report --precision 2 | grep TOTAL | tr -s ' ' | cut -f 4 -d " ")" >> $GITHUB_ENV
+        uv run --no-sync coverage html --directory gh-pages/coverage
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v6
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v5
       with:
-        branch: gh-pages # The branch the action should deploy to.
-        folder: gh-pages # The folder the action should deploy.
-    
+        path: 'gh-pages'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v5
+
     - name: Create Coverage Badge
       uses: schneegans/dynamic-badges-action@v1.9.0
       with:
@@ -54,4 +62,3 @@ jobs:
         label: coverage
         message: ${{ env.COVERAGE }}
         color: green
-    
