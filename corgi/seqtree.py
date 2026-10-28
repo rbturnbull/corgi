@@ -269,8 +269,14 @@ class SeqTree(UserDict):
             partition = detail.partition
             node.partition_counts[partition] += 1
 
-    def render(self, count: bool = False, partition_counts: bool = False, **kwargs):
-        """Renders the SeqTree."""
+    def render(self, count: bool = False, partition_counts: bool = False, alphabetical: bool = False, **kwargs):
+        """Renders the SeqTree. If `alphabetical` is True, then the children of each node are sorted by name."""
+        if alphabetical:
+            kwargs.setdefault(
+                "childiter",
+                lambda children: sorted(children, key=lambda child: child.name),
+            )
+
         if partition_counts:
             self.add_partition_counts()
             for node in self.classification_tree.post_order_iter():
@@ -418,10 +424,13 @@ def render(
     partition_counts: bool = typer.Option(
         False, help="Whether or not to print the count of each partition at each node."
     ),
+    alphabetical: bool = typer.Option(False, help="Whether or not to sort the children of each node alphabetically."),
 ):
     """Render a saved SeqTree, optionally displaying or saving accession counts."""
     seqtree = SeqTree.load(seqtree)
-    seqtree.render(filepath=output, print=print, count=count, partition_counts=partition_counts)
+    seqtree.render(
+        filepath=output, print=print, count=count, partition_counts=partition_counts, alphabetical=alphabetical
+    )
 
 
 @app.command()

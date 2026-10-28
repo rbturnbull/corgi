@@ -217,3 +217,16 @@ def test_merge_command(tmp_path):
         └── Virus
     """)
     assert [path.read_bytes() for path in (seqtree_path, other_path)] == input_bytes
+
+
+def test_seqtree_render_alphabetical():
+    root = SoftmaxNode("root")
+    SoftmaxNode("b", parent=root)
+    SoftmaxNode("a", parent=root)
+    seqtree = SeqTree(root)
+
+    unsorted_lines = str(seqtree.render()).splitlines()
+    assert [line.split()[-1] for line in unsorted_lines[1:]] == ["b", "a"]
+
+    sorted_lines = str(seqtree.render(alphabetical=True)).splitlines()
+    assert [line.split()[-1] for line in sorted_lines[1:]] == ["a", "b"]
