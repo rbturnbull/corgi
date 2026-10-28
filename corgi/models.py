@@ -412,7 +412,7 @@ class ConvClassifier(nn.Module):
         self.output_types = output_types
         penultimate_dims = self.penultimate.out_features
         if final_bias is None:
-            final_bias = self.final.bias
+            final_bias = self.final.bias is not None
 
         self.final = nn.Linear(
             in_features=penultimate_dims, out_features=total_size(self.output_types), bias=final_bias, device=device
@@ -487,7 +487,7 @@ def calc_cnn_dims_start(
     penultimate_dims: int,
     num_classes: int,
 ):
-    """
+    r"""
     Solving equation M = s k e c + \sum_{l=1}^{L-1} \frac{s}{2^{l} } k c^2 f^{2l-1} + c f^{L-1} p + p o
     for c.
 

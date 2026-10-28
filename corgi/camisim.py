@@ -25,7 +25,9 @@ def camisim(
     dataloader = SeqIODataloader(genomes_dir)
     for _, record in dataloader.iter_records():
         dna_type = DNAType.from_description(record.description)
-        row = df['contig_id'] == record.accession
+        row = df['contig_id'] == record.id
+        if not row.any():
+            continue
         if dna_type == DNAType.MITOCHONDRION:
             df.loc[row, 'corgi_category'] = "Mitochondrion"
             df.loc[row, 'tiara_category'] = "mit"

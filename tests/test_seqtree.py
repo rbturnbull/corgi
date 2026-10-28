@@ -4,6 +4,8 @@ import pytest
 from pathlib import Path
 from hierarchicalsoftmax import SoftmaxNode
 from typer.testing import CliRunner
+from unittest.mock import patch
+from Bio import SeqIO
 from corgi.seqtree import SeqTree, app, str_to_int_hash
 
 
@@ -267,3 +269,254 @@ def test_sunburst_command_image(tmp_path):
         pytest.skip("Chrome is not available for Kaleido image export")
     assert result.exit_code == 0, result.output
     assert output.exists()
+
+
+import pickle
+from corgi.seqtree import AlreadyExists, SeqDetail, node_to_str
+from seqbank import SeqBank
+
+TEST_DATA = Path(__file__).parent / "testdata"
+runner = CliRunner()
+
+
+@pytest.fixture
+def seqtree_path():
+    return TEST_DATA / "seqtree.pkl"
+
+
+@pytest.fixture
+def seqbank():
+    seqbank = SeqBank(TEST_DATA / "seqbank.rocksdict.sb", engine="rocksdict")
+    yield seqbank
+    seqbank.close()
+
+
+def invoke(*args):
+    result = runner.invoke(app, [str(arg) for arg in args])
+    assert result.exit_code == 0, result.output
+    return result
+
+
+def test_node_to_str():
+    root = SoftmaxNode("root")
+    a = SoftmaxNode("a", parent=root)
+    b = SoftmaxNode("b", parent=a)
+    c = SoftmaxNode("c", parent=b)
+    assert node_to_str(root) == "root"
+    assert node_to_str(a) == "a"
+    assert node_to_str(b) == "a/b"
+    assert node_to_str(c) == "a/c"
+
+
+def test_seq_detail_pickle():
+    detail = SeqDetail(partition=3, node=SoftmaxNode("x"), node_id=7)
+    clone = pickle.loads(pickle.dumps(detail))
+    assert clone.partition == 3
+    assert clone.node_id == 7
+    assert clone.node is None
+
+
+def test_add_already_exists():
+    seqtree = SeqTree()
+    a = SoftmaxNode("a", parent=seqtree.classification_tree)
+    b = SoftmaxNode("b", parent=seqtree.classification_tree)
+    seqtree.add("acc", a, 0)
+    seqtree.add("acc", a, 1)  # Same node is allowed
+    assert seqtree["acc"].partition == 1
+    with pytest.raises(AlreadyExists):
+        seqtree.add("acc", b, 0)
+
+
+def test_accessions_and_partitions(seqtree_path):
+    seqtree = SeqTree.load(seqtree_path)
+    assert set(seqtree.accessions()) == set(seqtree.keys())
+    assert set(seqtree.accessions(partition=2)) == {"NC_036112.1", "NC_036113.1"}
+    assert set(seqtree.accessions_in_partition(0)) == {"NZ_JAJNFP010000161.1"}
+
+    seqtree.set_partition("NC_03611*", 5)
+    assert set(seqtree.accessions(partition=5)) == {"NC_036112.1", "NC_036113.1"}
+    assert seqtree["NC_024664.1"].partition == 1
+
+
+def test_node_resolves_from_node_id(seqtree_path):
+    seqtree = SeqTree.load(seqtree_path)
+    assert seqtree["NC_036112.1"].node is None
+    assert seqtree.node("NC_036112.1").name == "Plant"
+
+
+def test_counts(seqtree_path):
+    seqtree = SeqTree.load(seqtree_path)
+    seqtree.add_counts()
+    counts = {node.name: node.count for node in seqtree.classification_tree.pre_order_iter()}
+    assert counts == {"root": 0, "Bacteria": 1, "Eukaryota": 1, "Virus": 1, "Plant": 2}
+
+    seqtree.add_partition_counts()
+    plant = next(n for n in seqtree.classification_tree.pre_order_iter() if n.name == "Plant")
+    assert dict(plant.partition_counts) == {2: 2}
+
+
+def test_render_options(seqtree_path):
+    seqtree = SeqTree.load(seqtree_path)
+    assert "Plant (2)" in str(seqtree.render(count=True))
+    assert "Plant 2->2" in str(seqtree.render(partition_counts=True))
+
+
+def test_pickle_tree(seqtree_path, tmp_path):
+    seqtree = SeqTree.load(seqtree_path)
+    output = tmp_path / "tree.pkl"
+    seqtree.pickle_tree(output)
+    with open(output, "rb") as f:
+        tree = pickle.load(f)
+    assert tree.name == "root"
+
+
+def test_prune():
+    root = SoftmaxNode("root")
+    a = SoftmaxNode("a", parent=root)
+    b = SoftmaxNode("b", parent=a)
+    c = SoftmaxNode("c", parent=b)
+    seqtree = SeqTree(root)
+    seqtree.add("deep", c, 1)
+    seqtree.add("shallow", a, 2)
+
+    pruned = seqtree.prune(max_depth=2)
+    # The root counts as the first level so nothing deeper than the first level below it is kept
+    assert pruned.node("deep").name == "a"
+    assert pruned.node("shallow").name == "a"
+    assert pruned["deep"].partition == 1
+    assert [n.name for n in pruned.classification_tree.pre_order_iter()] == ["root", "a"]
+
+
+def test_intersection_seqbank(seqtree_path, seqbank):
+    seqtree = SeqTree.load(seqtree_path)
+    seqtree.add("NOT_IN_SEQBANK", seqtree.node("NC_036112.1"), 0)
+    missing = seqtree.intersection_seqbank(seqbank)
+    assert missing == {"NOT_IN_SEQBANK"}
+    assert "NOT_IN_SEQBANK" not in seqtree
+
+
+def test_export(seqtree_path, seqbank, tmp_path):
+    seqtree = SeqTree.load(seqtree_path)
+    output = tmp_path / "all.fasta"
+    seqtree.export(seqbank, output)
+    records = list(SeqIO.parse(output, "fasta"))
+    assert len(records) == 5
+    assert {r.id for r in records} == {
+        "NZ_JAJNFP010000161.1#Bacteria",
+        "NC_024664.1#Eukaryota",
+        "NC_010663.1#Virus",
+        "NC_036112.1#Plant",
+        "NC_036113.1#Plant",
+    }
+
+
+def test_export_partition_and_length(seqtree_path, seqbank, tmp_path):
+    seqtree = SeqTree.load(seqtree_path)
+    output = tmp_path / "part.fa"
+    seqtree.export(seqbank, output, length=100, seed=1, partition=2)
+    records = list(SeqIO.parse(output, "fasta"))
+    assert {r.id for r in records} == {"NC_036112.1#Plant", "NC_036113.1#Plant"}
+    assert all(len(r.seq) == 100 for r in records)
+
+    # The slice is reproducible given the seed
+    again = tmp_path / "again.fa"
+    seqtree.export(seqbank, again, length=100, seed=1, partition=2)
+    assert [str(r.seq) for r in SeqIO.parse(again, "fasta")] == [str(r.seq) for r in records]
+
+
+def test_export_length_longer_than_sequence(seqtree_path, seqbank, tmp_path):
+    seqtree = SeqTree.load(seqtree_path)
+    output = tmp_path / "long.fasta"
+    seqtree.export(seqbank, output, length=10_000_000, partition=2)
+    assert all(len(r.seq) == len(seqbank[r.id.split("#")[0]]) for r in SeqIO.parse(output, "fasta"))
+
+
+def test_sunburst_figure(seqtree_path):
+    fig = SeqTree.load(seqtree_path).sunburst(width=300)
+    assert set(fig.data[0].labels) == {"root", "Bacteria", "Eukaryota", "Virus", "Plant"}
+    assert fig.layout.width == 300
+
+
+def test_accessions_to_file(seqtree_path, tmp_path):
+    output = tmp_path / "accessions.txt"
+    SeqTree.load(seqtree_path).accessions_to_file(output)
+    assert set(output.read_text().split()) == set(SeqTree.load(seqtree_path).keys())
+
+
+def test_cli_intersection_seqbank(seqtree_path, tmp_path):
+    seqtree = SeqTree.load(seqtree_path)
+    seqtree.add("NOT_IN_SEQBANK", seqtree.node("NC_036112.1"), 0)
+    modified = tmp_path / "modified.st"
+    seqtree.save(modified)
+    output = tmp_path / "out.st"
+    invoke("intersection-seqbank", modified, TEST_DATA / "seqbank.rocksdict.sb", output)
+    result = SeqTree.load(output)
+    assert "NOT_IN_SEQBANK" not in result
+    assert len(result) == 5
+
+
+def test_cli_accessions(seqtree_path):
+    result = invoke("accessions", seqtree_path)
+    assert set(result.output.split()) == set(SeqTree.load(seqtree_path).keys())
+
+    result = invoke("accessions", seqtree_path, "--partition", 2)
+    assert set(result.output.split()) == {"NC_036112.1", "NC_036113.1"}
+
+
+def test_cli_export(seqtree_path, tmp_path):
+    output = tmp_path / "export.fasta"
+    invoke(
+        "export", seqtree_path, TEST_DATA / "seqbank.rocksdict.sb", output, "--partition", 2, "--length", 50, "--seed", 3
+    )
+    assert len(list(SeqIO.parse(output, "fasta"))) == 2
+
+
+def test_cli_render(seqtree_path, tmp_path):
+    assert "Plant" in invoke("render", seqtree_path).output
+    assert "Plant (2)" in invoke("render", seqtree_path, "--count").output
+    assert "Plant 2->2" in invoke("render", seqtree_path, "--partition-counts").output
+
+    output = tmp_path / "tree.txt"
+    result = invoke("render", seqtree_path, "--no-print", "--output", output, "--alphabetical")
+    assert "Plant" not in result.output
+    text = output.read_text()
+    assert text.index("Bacteria") < text.index("Eukaryota") < text.index("Plant") < text.index("Virus")
+
+
+def test_cli_count(seqtree_path):
+    assert invoke("count", seqtree_path).output.strip() == "5"
+
+
+def test_cli_sunburst_show_and_size(seqtree_path, tmp_path):
+    output = tmp_path / "plot.html"
+    with patch("plotly.graph_objects.Figure.show") as show:
+        invoke("sunburst", seqtree_path, "--show", "--output", output, "--width", 400, "--height", 0)
+    show.assert_called_once()
+    assert output.exists()
+
+
+def test_cli_prune(seqtree_path, tmp_path):
+    output = tmp_path / "pruned.st"
+    invoke("prune", seqtree_path, 2, output)
+    pruned = SeqTree.load(output)
+    assert len(pruned) == 5
+    assert pruned.node("NC_036112.1").name == "Plant"
+
+
+def test_cli_layer_size(seqtree_path):
+    expected = SeqTree.load(seqtree_path).classification_tree.layer_size
+    assert invoke("layer-size", seqtree_path).output.strip() == str(expected)
+
+
+def test_cli_pickle_tree(seqtree_path, tmp_path):
+    output = tmp_path / "tree.pkl"
+    invoke("pickle-tree", seqtree_path, output)
+    assert output.exists()
+
+
+def test_cli_set_partition(seqtree_path, tmp_path):
+    output = tmp_path / "partitioned.st"
+    invoke("set-partition", seqtree_path, "NC_*", 9, output)
+    seqtree = SeqTree.load(output)
+    assert set(seqtree.accessions(partition=9)) == {"NC_024664.1", "NC_010663.1", "NC_036112.1", "NC_036113.1"}
+    assert seqtree["NZ_JAJNFP010000161.1"].partition == 0

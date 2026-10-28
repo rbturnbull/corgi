@@ -168,7 +168,7 @@ def refseq_to_seqtree(
     seqbank = SeqBank(seqbank)
     seqbank_accessions = seqbank.get_accessions()
 
-    if seqbank_output:
+    if seqbank_output is not None:
         print(f"Saving seqbank with accessions corresponding to {seqbank_output}")
         seqbank_output = SeqBank(seqbank_output, write=True, engine=engine)
 
@@ -247,7 +247,7 @@ def refseq_to_seqtree(
             if max_seqs and node.nseq >= max_seqs:
                 continue
 
-            if seqbank_output:
+            if seqbank_output is not None:
                 seqbank_output.add(seqbank[accession], accession)
 
             partition = node.nseq % partitions
@@ -271,7 +271,7 @@ def refseq_to_seqtree(
         print(f"Writing accessions to file {accessions}")
         seqtree.accessions_to_file(accessions)
 
-    if seqbank_output:
+    if seqbank_output is not None:
         seqbank_output.close()
     seqbank.close()
 

@@ -611,6 +611,7 @@ class Corgi(ta.TorchApp):
 
     @ta.tool
     def refseq_to_seqtree(
+        self,
         output: Path = ta.Param(..., help="The path to save the SeqTree."),
         seqbank: Path = ta.Param(..., help="The SeqBank with the sequences for the RefSeq accessions."),
         seqbank_output: Path = ta.Param(

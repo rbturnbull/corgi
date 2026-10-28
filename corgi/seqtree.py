@@ -226,18 +226,17 @@ class SeqTree(UserDict):
         format = format or get_file_format(output)
         with open(output, "w") as f:
             for accession, detail in track(self.items()):
-                data = seqbank[accession]
-
                 if partition is not None and detail.partition != partition:
                     continue
 
+                data = seqbank[accession]
                 node = self.node(accession)
                 # If the sequence is long enough, take a random slice
-                if length and length > len(data):
+                if length and len(data) > length:
                     start_max = len(data) - length
                     my_seed = seed + str_to_int_hash(accession)
                     np.random.seed(my_seed % 2**32)
-                    start = np.random.randint(0, start_max)
+                    start = np.random.randint(0, start_max + 1)
                     data = data[start : start + length]
 
                 seq_string = bytes_to_str(data)
