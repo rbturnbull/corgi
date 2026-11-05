@@ -30,7 +30,7 @@ dependencies = [
     "hierarchicalsoftmax>=1.4.1",
     "attrs>=23.1.0",
     "polytorch>=0.1.3",
-    "seqbank[rocksdict]>=0.4.1",
+    "seqbank[rocksdict]>=0.4.0",
     "multitax>=1.3.1",
 ]
 

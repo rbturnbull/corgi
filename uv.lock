@@ -371,7 +371,7 @@ requires-dist = [
     { name = "polytorch", specifier = ">=0.1.3" },
     { name = "pyarrow", specifier = ">=5.0.0" },
     { name = "pymysql", specifier = ">=1.0.2" },
-    { name = "seqbank", extras = ["rocksdict"], specifier = ">=0.4.1" },
+    { name = "seqbank", extras = ["rocksdict"], specifier = ">=0.4.0" },
     { name = "termgraph", specifier = ">=0.5.3" },
     { name = "torch", specifier = ">=2.0.0" },
     { name = "torchapp", specifier = ">=0.5.9" },
