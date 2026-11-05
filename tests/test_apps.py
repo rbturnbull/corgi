@@ -153,7 +153,7 @@ def test_app_model_pretrained_keeps_matching_final_layer(app, tmp_path, capsys):
         model = app.model(pretrained=checkpoint, final_bias=False)
 
     assert model is original
-    module_class.load_from_checkpoint.assert_called_once_with(str(checkpoint))
+    module_class.load_from_checkpoint.assert_called_once_with(str(checkpoint), weights_only=False)
     assert model.final is final
     assert torch.equal(model.final.weight, weights)
     assert model.final.bias is not None  # The existing layer is retained, whatever `final_bias` is
@@ -197,7 +197,7 @@ def test_app_model_pretrained_default(app, tmp_path):
     ):
         app.model(pretrained=Path("default"))
     process_location.assert_called_once()
-    module_class.load_from_checkpoint.assert_called_once_with(str(checkpoint))
+    module_class.load_from_checkpoint.assert_called_once_with(str(checkpoint), weights_only=False)
 
 
 def test_app_data(app):
