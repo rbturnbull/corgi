@@ -4,6 +4,7 @@ version = "0.5.10"
 description = "Classifier for ORganelle Genomes Inter alia"
 authors = [{name = "Robert Turnbull", email = "robert.turnbull@unimelb.edu.au"}]
 license = "Apache-2.0"
+license-files = ["LICENSE"]
 readme = "README.rst"
 requires-python = ">=3.11,<3.15"
 keywords = ["metagenomic classifier", "tiara", "DNA", "bioinformatics", "lightning", "pytorch", "deep learning", "command-line interface"]
