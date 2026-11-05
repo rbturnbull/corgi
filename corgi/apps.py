@@ -276,7 +276,7 @@ class Corgi(ta.TorchApp):
                 raise FileNotFoundError(f"Cannot find pretrained model at '{pretrained}'")
 
             module_class = self.module_class(**kwargs)
-            module = module_class.load_from_checkpoint(str(pretrained))
+            module = module_class.load_from_checkpoint(str(pretrained), weights_only=False)
             model = module.model
             if model.output_types_match(self.output_types):
                 console.print(
