@@ -2,11 +2,15 @@
 
 .. start-badges
 
-|pypi badge| |testing badge| |coverage badge| |docs badge| |black badge| |git3moji badge| |torchapp badge|
+|pypi badge| |conda badge| |testing badge| |coverage badge| |docs badge| |black badge| |git3moji badge| |torchapp badge|
 
 .. |pypi badge| image:: https://img.shields.io/pypi/v/bio-corgi?color=blue
    :alt: PyPI - Version
    :target: https://pypi.org/project/bio-corgi/
+
+.. |conda badge| image:: https://img.shields.io/conda/vn/bioconda/corgi?color=green
+   :alt: Bioconda - Version
+   :target: https://bioconda.github.io/recipes/corgi/README.html
 
 .. |testing badge| image:: https://github.com/rbturnbull/corgi/actions/workflows/testing.yml/badge.svg
     :target: https://github.com/rbturnbull/corgi/actions
@@ -61,9 +65,11 @@ To save static images of SeqTree plots (``seqtree sunburst``), install the optio
 
     pip install "bio-corgi[images]"
 
-.. note ::
+Corgi can also be installed with `conda <https://docs.conda.io/>`_ from the `bioconda <https://bioconda.github.io/>`_ channel:
 
-    Soon corgi will be able to be installed using conda.
+.. code-block:: bash
+
+    conda install -c conda-forge -c bioconda corgi
 
 Usage
 ============
