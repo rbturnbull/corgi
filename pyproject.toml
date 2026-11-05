@@ -1,6 +1,6 @@
 [project]
 name = "bio-corgi"
-version = "0.5.9"
+version = "0.5.10"
 description = "Classifier for ORganelle Genomes Inter alia"
 authors = [{name = "Robert Turnbull", email = "robert.turnbull@unimelb.edu.au"}]
 license = "Apache-2.0"
