@@ -696,8 +696,8 @@ class Corgi(ta.TorchApp):
             default=None, help="Where to save a new SeqBank containing only the sequences selected for the SeqTree."
         ),
         engine: str = ta.Param(
-            default=None,
-            help="The storage engine for the output SeqBank: 'rocksdict', 'lmdb' or 'speedict'. If not given, then RocksDict is used.",
+            default="lmdb",
+            help="The storage engine for the output SeqBank: 'lmdb', 'rocksdict' or 'speedict'.",
         ),
         render: Path = ta.Param(default=None, help="The path to render an image of the SeqTree."),
         accessions: Path = ta.Param(default=None, help="The path to write a list of the accessions in the SeqTree."),

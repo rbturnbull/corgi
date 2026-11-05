@@ -49,7 +49,7 @@ Corgi was trained with the 225 release of RefSeq. If you want to explicitly give
 Choosing the SeqBank storage engine
 -----------------------------------
 
-By default, the output SeqBank is stored with the `RocksDict <https://github.com/rocksdict/RocksDict>`_ engine. 
+By default, the output SeqBank is stored with the `LMDB <https://lmdb.readthedocs.io/>`_ engine. 
 Use the ``--engine`` option to choose a different one:
 
 .. code-block:: bash
@@ -58,15 +58,15 @@ Use the ``--engine`` option to choose a different one:
         --output corgi-max200.st \
         --seqbank refseq.sb \
         --seqbank-output corgi-max200.sb \
-        --engine lmdb
+        --engine rocksdict
 
 The available engines are:
 
-``rocksdict``
-    The default.
-
 ``lmdb``
-    `LMDB <https://lmdb.readthedocs.io/>`_, a memory-mapped key-value store.
+    The default. `LMDB <https://lmdb.readthedocs.io/>`_, a memory-mapped key-value store.
+
+``rocksdict``
+    `RocksDict <https://github.com/rocksdict/RocksDict>`_. It requires installing ``seqbank[rocksdict]``.
 
 ``speedict``
     The legacy engine used by older SeqBanks. 
@@ -81,4 +81,4 @@ To change the engine of an existing SeqBank, use the ``seqbank convert`` command
 
 .. code-block:: bash
 
-    seqbank convert corgi-max200.sb corgi-max200-lmdb.sb --engine lmdb
+    seqbank convert corgi-max200.sb corgi-max200-rocksdict.sb --engine rocksdict

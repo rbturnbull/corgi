@@ -139,7 +139,7 @@ def refseq_to_seqtree(
     output: Path,
     seqbank: Path,
     seqbank_output: Path | None = None,
-    engine: str | None = None,
+    engine: str | None = "lmdb",
     render: Path | None = None,
     accessions: Path | None = None,
     partitions: int = 6,
@@ -167,7 +167,7 @@ def refseq_to_seqtree(
         seqbank (Path): The SeqBank with the sequences for the RefSeq accessions.
         seqbank_output (Path | None): Where to save a new SeqBank containing only the sequences selected for
             the SeqTree.
-        engine (str | None): The storage engine for the output SeqBank: 'rocksdict', 'lmdb' or 'speedict'.
+        engine (str | None): The storage engine for the output SeqBank: 'lmdb' (default), 'rocksdict' or 'speedict'.
             If not given, then RocksDict is used.
         render (Path | None): The path to render an image of the SeqTree.
         accessions (Path | None): The path to write a list of the accessions in the SeqTree.
